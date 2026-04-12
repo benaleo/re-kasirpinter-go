@@ -171,7 +171,7 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid 
+  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid
   # but you can override this to provide your own GraphQL UUID implementation
   UUID:
     model:
@@ -191,5 +191,16 @@ models:
       - github.com/99designs/gqlgen/graphql.Int32
   Int64:
     model:
-      - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
+  User:
+    fields:
+      id:
+        resolver: false
+  UserRole:
+    fields:
+      id:
+        resolver: false
+  UserPermission:
+    fields:
+      id:
+        resolver: false

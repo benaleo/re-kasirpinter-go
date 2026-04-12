@@ -2,13 +2,69 @@
 
 package model
 
+import (
+	"time"
+)
+
+type CreateUserInput struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Address  string `json:"address"`
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+	RoleID   *int64 `json:"role_id,omitempty"`
+}
+
 type Mutation struct {
 }
 
 type Query struct {
 }
 
+type UpdateUserInput struct {
+	Name     *string `json:"name,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	Address  *string `json:"address,omitempty"`
+	Phone    *string `json:"phone,omitempty"`
+	Avatar   *string `json:"avatar,omitempty"`
+	IsActive *bool   `json:"is_active,omitempty"`
+	RoleID   *int64  `json:"role_id,omitempty"`
+}
+
 type User struct {
-	ID   string `json:"id"`
+	ID        int32      `json:"id"`
+	SecureID  *string    `json:"secure_id,omitempty"`
+	Name      string     `json:"name"`
+	Email     string     `json:"email"`
+	Address   string     `json:"address"`
+	Phone     string     `json:"phone"`
+	Avatar    *string    `json:"avatar,omitempty"`
+	IsActive  bool       `json:"is_active"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	Role      *UserRole  `json:"role,omitempty"`
+}
+
+type UserPermission struct {
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
+}
+
+type UserRole struct {
+	ID          int64             `json:"id"`
+	Name        string            `json:"name"`
+	IsActive    bool              `json:"is_active"`
+	CreatedAt   time.Time         `json:"created_at"`
+	CreatedBy   *string           `json:"created_by,omitempty"`
+	UpdatedAt   time.Time         `json:"updated_at"`
+	UpdatedBy   *string           `json:"updated_by,omitempty"`
+	DeletedAt   *time.Time        `json:"deleted_at,omitempty"`
+	DeletedBy   *string           `json:"deleted_by,omitempty"`
+	Permissions []*UserPermission `json:"permissions"`
+}
+
+type UserRolePermission struct {
+	RoleID       int64 `json:"role_id"`
+	PermissionID int64 `json:"permission_id"`
 }
