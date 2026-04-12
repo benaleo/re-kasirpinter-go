@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"re-kasirpinter-go/config"
 	"re-kasirpinter-go/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,12 +18,23 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	// Load environment variables
+	if err := config.LoadEnv(); err != nil {
+		log.Printf("Warning: Failed to load environment variables: %v", err)
+	}
+
+	// Initialize database
+	db, err := config.InitDb()
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db}}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})

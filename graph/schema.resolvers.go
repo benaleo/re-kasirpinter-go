@@ -11,6 +11,78 @@ import (
 	"re-kasirpinter-go/graph/model"
 )
 
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthResponse, error) {
+	// Find user by email
+	var userDB model.UserDB
+	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
+	if result.Error != nil {
+		return nil, fmt.Errorf("invalid email or password")
+	}
+
+	// Check password
+	if !checkPassword(input.Password, userDB.Password) {
+		return nil, fmt.Errorf("invalid email or password")
+	}
+
+	// Get user role
+	var userRole model.UserRoleDB
+	if userDB.RoleID != nil {
+		r.DB.First(&userRole, *userDB.RoleID)
+	}
+
+	// Generate JWT token
+	roleName := ""
+	if userRole.ID > 0 {
+		roleName = userRole.Name
+	}
+
+	secureID := ""
+	if userDB.SecureID != nil {
+		secureID = *userDB.SecureID
+	}
+
+	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "login")
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate token: %v", err)
+	}
+
+	// Convert DB model to GraphQL model
+	user := &model.User{
+		ID:        userDB.ID,
+		SecureID:  userDB.SecureID,
+		Name:      userDB.Name,
+		Email:     userDB.Email,
+		Address:   userDB.Address,
+		Phone:     userDB.Phone,
+		Avatar:    userDB.Avatar,
+		IsActive:  userDB.IsActive,
+		DeletedAt: userDB.DeletedAt,
+		CreatedAt: userDB.CreatedAt,
+		UpdatedAt: userDB.UpdatedAt,
+	}
+
+	if userRole.ID > 0 {
+		user.Role = &model.UserRole{
+			ID:          userRole.ID,
+			Name:        userRole.Name,
+			IsActive:    userRole.IsActive,
+			CreatedAt:   userRole.CreatedAt,
+			CreatedBy:   userRole.CreatedBy,
+			UpdatedAt:   userRole.UpdatedAt,
+			UpdatedBy:   userRole.UpdatedBy,
+			DeletedAt:   userRole.DeletedAt,
+			DeletedBy:   userRole.DeletedBy,
+			Permissions: nil, // Can be populated if needed
+		}
+	}
+
+	return &model.AuthResponse{
+		Token: token,
+		User:  user,
+	}, nil
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))

@@ -49,9 +49,20 @@ type Query {
 }
 
 type Mutation {
+  login(input: LoginInput!): AuthResponse!
   createUser(input: CreateUserInput!): User!
   updateUser(id: Int!, input: UpdateUserInput!): User!
   deleteUser(id: Int!): Boolean!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type AuthResponse {
+  token: String!
+  user: User!
 }
 
 input CreateUserInput {
