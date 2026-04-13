@@ -42,5 +42,5 @@ services:
         protocol: http
     health_check:
       http:
-        path: /
+        path: /kaitheathcheck
         port: 8080
