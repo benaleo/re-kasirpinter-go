@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
+	"re-kasirpinter-go/helper"
 	"time"
 )
 
@@ -262,39 +263,8 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.De
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
-	// Set default values
-	defaultLimit := int32(10)
-	defaultPage := int32(1)
-	defaultSortBy := "created_at,desc"
-
-	if pagination != nil {
-		if pagination.Limit != nil && *pagination.Limit > 0 {
-			defaultLimit = *pagination.Limit
-		}
-		if pagination.Page != nil && *pagination.Page > 0 {
-			defaultPage = *pagination.Page
-		}
-		if pagination.SortBy != nil && *pagination.SortBy != "" {
-			defaultSortBy = *pagination.SortBy
-		}
-	}
-
-	// Parse sortBy (format: "field,direction")
-	// Convert "created_at,desc" to "created_at desc"
-	sortBy := defaultSortBy
-	if len(sortBy) > 0 {
-		// Replace comma with space for GORM
-		sortBy = defaultSortBy
-		for i := 0; i < len(sortBy); i++ {
-			if sortBy[i] == ',' {
-				sortBy = sortBy[:i] + " " + sortBy[i+1:]
-				break
-			}
-		}
-	}
-
-	// Calculate offset
-	offset := (defaultPage - 1) * defaultLimit
+	// Parse pagination parameters
+	params := helper.ParsePagination(pagination)
 
 	// Get total count
 	var total int64
@@ -304,34 +274,16 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 	}
 
 	// Query users with pagination
+	paginationResult := helper.BuildPaginationResult(params, total, 0)
 	var usersDB []model.UserDB
-	query := r.DB.Order(sortBy).Limit(int(defaultLimit)).Offset(int(offset))
-	result := query.Find(&usersDB)
+	query := r.DB.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset)
+	result := query.Find(&usersDB).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	// Calculate pagination metadata
-	totalPages := int32(0)
-	if total > 0 {
-		totalPages = (int32(total) + defaultLimit - 1) / defaultLimit
-	}
-
-	hasNextPage := defaultPage < totalPages
-	hasPreviousPage := defaultPage > 1
-
-	startItem := int32(0)
-	if total > 0 {
-		startItem = offset + 1
-	}
-
-	endItem := int32(0)
-	if total > 0 {
-		endItem = offset + int32(len(usersDB))
-		if endItem > int32(total) {
-			endItem = int32(total)
-		}
-	}
+	// Rebuild pagination result with actual item count
+	paginationResult = helper.BuildPaginationResult(params, total, len(usersDB))
 
 	// Convert DB models to GraphQL models
 	users := make([]*model.User, len(usersDB))
@@ -349,24 +301,9 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 		users[i] = toGraphQLUser(userDB, userRoleDB)
 	}
 
-	// Build pagination info
-	pageInfo := &model.PageInfo{
-		CurrentPage:     defaultPage,
-		PerPage:         defaultLimit,
-		TotalItems:      int32(total),
-		TotalPages:      totalPages,
-		HasNextPage:     hasNextPage,
-		HasPreviousPage: hasPreviousPage,
-	}
-
-	if total > 0 {
-		pageInfo.StartItem = &startItem
-		pageInfo.EndItem = &endItem
-	}
-
 	return &model.UsersResponse{
 		Data:       users,
-		Pagination: pageInfo,
+		Pagination: paginationResult.PageInfo,
 	}, nil
 }
 
