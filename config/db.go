@@ -49,6 +49,7 @@ func InitDb() (*gorm.DB, error) {
 		&model.UserPermissionDB{},
 		&model.UserRolePermissionDB{},
 		&model.OtpDB{},
+		&model.LogEmailDB{},
 	)
 
 	if err != nil {

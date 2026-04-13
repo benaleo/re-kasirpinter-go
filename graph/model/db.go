@@ -128,3 +128,28 @@ func (r *UserRoleDB) BeforeUpdate(tx *gorm.DB) error {
 	r.UpdatedAt = time.Now()
 	return nil
 }
+
+// LogEmailDB represents the database model for LogEmail
+type LogEmailDB struct {
+	ID      int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Email   string    `gorm:"not null" json:"email"`
+	Action  string    `gorm:"not null" json:"action"`
+	Status  string    `gorm:"not null" json:"status"`
+	Message string    `gorm:"not null" json:"message"`
+	Ts      time.Time `gorm:"not null" json:"ts"`
+	IP      *string   `json:"ip,omitempty"`
+	Browser *string   `json:"browser,omitempty"`
+	OS      *string   `json:"os,omitempty"`
+}
+
+// TableName specifies the table name for LogEmailDB
+func (LogEmailDB) TableName() string {
+	return "log_emails"
+}
+
+// BeforeCreate hook for LogEmailDB
+func (l *LogEmailDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	l.Ts = now
+	return nil
+}
