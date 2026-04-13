@@ -26,7 +26,7 @@ Set the following environment variables in Koyeb:
 ### Application Config
 - `JWT_SECRET` - Secret key for JWT tokens
 - `ENV` - Environment (production/development)
-- `PORT` - Application port (default: 8080)
+- `PORT` - Application port (default: 8000)
 - `ALLOWED_ORIGINS` - CORS allowed origins
 
 ### Email Configuration
@@ -53,19 +53,28 @@ Set the following environment variables in Koyeb:
 3. Select your Git repository
 4. Choose Dockerfile build
 5. Set environment variables manually
-6. Expose port 8080
+6. Expose port 8000
 7. Deploy
+
+### Method 3: Leapcell Deployment
+
+1. Push your code to a Git repository
+2. In Leapcell dashboard, create a new service
+3. Select your Git repository
+4. Leapcell will use the leapcell.json configuration automatically
+5. Set environment variables in Leapcell dashboard
+6. Deploy (Leapcell uses port 8000 by default)
 
 ## Building Locally (Optional)
 
 ```bash
 docker build -t kasirpinter-go .
-docker run -p 8080:8080 --env-file .env kasirpinter-go
+docker run -p 8000:8000 --env-file .env kasirpinter-go
 ```
 
 ## Health Check
 
-The application will be available at the Koyeb service URL with:
+The application will be available at the service URL (Koyeb/Leapcell) with:
 - Root: `/` (returns "Hello World")
 - Health Check: `/kaitheathcheck` (returns "OK")
 - GraphQL Playground: `/query`

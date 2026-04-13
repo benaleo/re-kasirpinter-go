@@ -34,7 +34,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
@@ -64,6 +64,6 @@ func main() {
 	http.Handle("/graphql", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", graph.AuthMiddleware(srv))
 
-	fmt.Println("Listening on", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	fmt.Println("Listening on 0.0.0.0:" + port)
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
 }
