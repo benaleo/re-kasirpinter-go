@@ -1,0 +1,19 @@
+{
+  "name": "kasirpinter-go",
+  "version": "1.0.0",
+  "build": {
+    "command": "go build -o main ."
+  },
+  "run": {
+    "command": "./main",
+    "env": {
+      "PORT": "8000"
+    }
+  },
+  "ports": [
+    {
+      "port": 8000,
+      "protocol": "http"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ services:
     type: web
     env:
       - name: PORT
-        value: "8080"
+        value: "8000"
       - name: DB_HOST
         value: "${KOYEB_DB_HOST}"
       - name: DB_HOST_UNPOOLED
@@ -38,9 +38,9 @@ services:
       - name: EMAIL_PASSWORD
         value: "${KOYEB_EMAIL_PASSWORD}"
     ports:
-      - port: 8080
+      - port: 8000
         protocol: http
     health_check:
       http:
         path: /kaitheathcheck
-        port: 8080
+        port: 8000
