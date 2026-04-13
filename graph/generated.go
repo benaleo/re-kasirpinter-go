@@ -1200,9 +1200,9 @@ func (ec *executionContext) _AuthResponse_data(ctx context.Context, field graphq
 			return obj.Data, nil
 		},
 		nil,
-		ec.marshalNAuthData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthData,
+		ec.marshalOAuthData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthData,
 		true,
-		true,
+		false,
 	)
 }
 
@@ -5801,9 +5801,6 @@ func (ec *executionContext) _AuthResponse(ctx context.Context, sel ast.Selection
 			}
 		case "data":
 			out.Values[i] = ec._AuthResponse_data(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7069,16 +7066,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAuthData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthData(ctx context.Context, sel ast.SelectionSet, v *model.AuthData) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._AuthData(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNAuthResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthResponse(ctx context.Context, sel ast.SelectionSet, v model.AuthResponse) graphql.Marshaler {
 	return ec._AuthResponse(ctx, sel, &v)
 }
@@ -7516,6 +7503,13 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOAuthData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthData(ctx context.Context, sel ast.SelectionSet, v *model.AuthData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AuthData(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {

@@ -2,7 +2,7 @@ type AuthResponse {
   code: Int!
   success: Boolean!
   message: String!
-  data: AuthData!
+  data: AuthData
 }
 
 # Pagination metadata type
