@@ -1,0 +1,46 @@
+name: kasirpinter-go
+services:
+  - name: web
+    type: web
+    env:
+      - name: PORT
+        value: "8080"
+      - name: DB_HOST
+        value: "${KOYEB_DB_HOST}"
+      - name: DB_HOST_UNPOOLED
+        value: "${KOYEB_DB_HOST}"
+      - name: DB_USER
+        value: "${KOYEB_DB_USER}"
+      - name: DB_NAME
+        value: "${KOYEB_DB_NAME}"
+      - name: DB_PASSWORD
+        value: "${KOYEB_DB_PASSWORD}"
+      - name: DB_PORT
+        value: "${KOYEB_DB_PORT}"
+      - name: ADMIN_EMAIL
+        value: "${KOYEB_ADMIN_EMAIL}"
+      - name: ADMIN_PASSWORD
+        value: "${KOYEB_ADMIN_PASSWORD}"
+      - name: ADMIN_ROLE
+        value: "${KOYEB_ADMIN_ROLE}"
+      - name: JWT_SECRET
+        value: "${KOYEB_JWT_SECRET}"
+      - name: ENV
+        value: "production"
+      - name: ALLOWED_ORIGINS
+        value: "${KOYEB_ALLOWED_ORIGINS}"
+      - name: EMAIL_HOST
+        value: "${KOYEB_EMAIL_HOST}"
+      - name: EMAIL_PORT
+        value: "${KOYEB_EMAIL_PORT}"
+      - name: EMAIL_USERNAME
+        value: "${KOYEB_EMAIL_USERNAME}"
+      - name: EMAIL_PASSWORD
+        value: "${KOYEB_EMAIL_PASSWORD}"
+    ports:
+      - port: 8080
+        protocol: http
+    health_check:
+      http:
+        path: /
+        port: 8080
