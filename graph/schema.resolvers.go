@@ -266,9 +266,12 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
+	// Build base query with filters
+	baseQuery := r.DB.Model(&model.UserDB{}).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
+
 	// Get total count
 	var total int64
-	countResult := r.DB.Model(&model.UserDB{}).Count(&total)
+	countResult := baseQuery.Count(&total)
 	if countResult.Error != nil {
 		return nil, countResult.Error
 	}
@@ -276,8 +279,7 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 	// Query users with pagination
 	paginationResult := helper.BuildPaginationResult(params, total, 0)
 	var usersDB []model.UserDB
-	query := r.DB.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset)
-	result := query.Find(&usersDB).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
+	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&usersDB)
 	if result.Error != nil {
 		return nil, result.Error
 	}
