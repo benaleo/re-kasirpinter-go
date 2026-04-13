@@ -2,13 +2,12 @@ package graph
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -33,12 +32,7 @@ func getEnv(key, defaultValue string) string {
 }
 
 func generateRandomString(n int) (string, error) {
-	b := make([]byte, n)
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(b), nil
+	return uuid.New().String(), nil
 }
 
 func hashPassword(password string) (string, error) {
