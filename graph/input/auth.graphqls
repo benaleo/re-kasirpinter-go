@@ -1,0 +1,9 @@
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type AuthResponse {
+  token: String!
+  user: User!
+}

@@ -1,0 +1,18 @@
+input CreateUserInput {
+  name: String!
+  email: String!
+  address: String!
+  phone: String!
+  password: String!
+  role_id: Int64
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  address: String
+  phone: String
+  avatar: String
+  is_active: Boolean
+  role_id: Int64
+}
