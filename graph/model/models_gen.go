@@ -6,29 +6,10 @@ import (
 	"time"
 )
 
-type CreateUserInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Address  string `json:"address"`
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
-	RoleID   *int64 `json:"role_id,omitempty"`
-}
-
 type Mutation struct {
 }
 
 type Query struct {
-}
-
-type UpdateUserInput struct {
-	Name     *string `json:"name,omitempty"`
-	Email    *string `json:"email,omitempty"`
-	Address  *string `json:"address,omitempty"`
-	Phone    *string `json:"phone,omitempty"`
-	Avatar   *string `json:"avatar,omitempty"`
-	IsActive *bool   `json:"is_active,omitempty"`
-	RoleID   *int64  `json:"role_id,omitempty"`
 }
 
 type User struct {
