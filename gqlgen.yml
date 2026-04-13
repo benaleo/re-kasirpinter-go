@@ -1,6 +1,6 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/**/*.graphqls
 
 # Where should the generated server code go?
 exec:
@@ -158,6 +158,7 @@ call_argument_directives_with_null: true
 # if they match it will use them, otherwise it will generate them.
 autobind:
   - "re-kasirpinter-go/graph/model"
+  - "re-kasirpinter-go/graph/input"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -192,6 +193,15 @@ models:
   Int64:
     model:
       - github.com/99designs/gqlgen/graphql.Int64
+  LoginInput:
+    model:
+      - re-kasirpinter-go/graph/input.LoginInput
+  CreateUserInput:
+    model:
+      - re-kasirpinter-go/graph/input.CreateUserInput
+  UpdateUserInput:
+    model:
+      - re-kasirpinter-go/graph/input.UpdateUserInput
   User:
     fields:
       id:
