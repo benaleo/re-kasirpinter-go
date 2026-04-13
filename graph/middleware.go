@@ -10,9 +10,27 @@ import (
 )
 
 const userCtxKey = "user"
+const clientInfoCtxKey = "clientInfo"
+
+type ClientInfo struct {
+	IP      string
+	Browser string
+	OS      string
+}
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract client information
+		clientInfo := &ClientInfo{
+			IP:      getClientIP(r),
+			Browser: parseUserAgent(r.UserAgent()),
+			OS:      parseOS(r.UserAgent()),
+		}
+
+		// Add client info to context
+		ctx := context.WithValue(r.Context(), clientInfoCtxKey, clientInfo)
+		r = r.WithContext(ctx)
+
 		// Skip auth for login and register mutations
 		if r.URL.Path == "/query" {
 			// This is a GraphQL request, check the operation name
@@ -27,9 +45,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				}
 
 				// Extract the token from the Authorization header
+				// Support both "Bearer <token>" and just "<token>" formats
 				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-				if tokenString == authHeader {
-					// No Bearer token found
+				tokenString = strings.TrimSpace(tokenString)
+
+				if tokenString == "" {
+					// No token found
 					next.ServeHTTP(w, r)
 					return
 				}
@@ -43,7 +64,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				}
 
 				// Add user info to context
-				ctx := context.WithValue(r.Context(), userCtxKey, claims)
+				ctx = context.WithValue(ctx, userCtxKey, claims)
 				r = r.WithContext(ctx)
 			}
 		}
@@ -58,9 +79,82 @@ func ForContext(ctx context.Context) *Claims {
 	return raw
 }
 
+// GetClientInfo finds the client info from the context. REQUIRES Middleware to have run.
+func GetClientInfo(ctx context.Context) *ClientInfo {
+	raw, _ := ctx.Value(clientInfoCtxKey).(*ClientInfo)
+	return raw
+}
+
+// getClientIP extracts the client IP from the request
+func getClientIP(r *http.Request) string {
+	// Check X-Forwarded-For header (for proxies/load balancers)
+	xff := r.Header.Get("X-Forwarded-For")
+	if xff != "" {
+		// Take the first IP if multiple are present
+		ips := strings.Split(xff, ",")
+		return strings.TrimSpace(ips[0])
+	}
+
+	// Check X-Real-IP header
+	xri := r.Header.Get("X-Real-IP")
+	if xri != "" {
+		return xri
+	}
+
+	// Fall back to RemoteAddr
+	ip := r.RemoteAddr
+	// Remove port if present
+	if idx := strings.LastIndex(ip, ":"); idx != -1 {
+		ip = ip[:idx]
+	}
+	return ip
+}
+
+// parseUserAgent extracts browser information from User-Agent string
+func parseUserAgent(userAgent string) string {
+	ua := strings.ToLower(userAgent)
+	if strings.Contains(ua, "chrome") && !strings.Contains(ua, "edg") {
+		return "Chrome"
+	}
+	if strings.Contains(ua, "firefox") {
+		return "Firefox"
+	}
+	if strings.Contains(ua, "safari") && !strings.Contains(ua, "chrome") {
+		return "Safari"
+	}
+	if strings.Contains(ua, "edg") {
+		return "Edge"
+	}
+	if strings.Contains(ua, "opera") || strings.Contains(ua, "opr") {
+		return "Opera"
+	}
+	return "Unknown"
+}
+
+// parseOS extracts OS information from User-Agent string
+func parseOS(userAgent string) string {
+	ua := strings.ToLower(userAgent)
+	if strings.Contains(ua, "windows") {
+		return "Windows"
+	}
+	if strings.Contains(ua, "mac") || strings.Contains(ua, "darwin") {
+		return "macOS"
+	}
+	if strings.Contains(ua, "linux") {
+		return "Linux"
+	}
+	if strings.Contains(ua, "android") {
+		return "Android"
+	}
+	if strings.Contains(ua, "iphone") || strings.Contains(ua, "ipad") || strings.Contains(ua, "ios") {
+		return "iOS"
+	}
+	return "Unknown"
+}
+
 // AuthDirective adds authentication to a field.
 // Only accepts full login tokens (purpose == "login").
-// Password-reset tokens are restricted to userUpdatePassword only.
+// Password-reset tokens are restricted to newPassword mutation only.
 func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
 	user := ForContext(ctx)
 	if user == nil {
@@ -71,7 +165,31 @@ func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) 
 			},
 		}
 	}
-	if user.Purpose != "login" && user.Purpose != "" {
+
+	// Get the field name from the graphql context
+	field := graphql.GetFieldContext(ctx)
+	if field == nil {
+		return nil, &gqlerror.Error{
+			Message: "Access denied. Unable to verify field.",
+			Extensions: map[string]interface{}{
+				"code": "FORBIDDEN",
+			},
+		}
+	}
+
+	// Allow password_reset purpose only for newPassword mutation
+	if user.Purpose == "password_reset" && field.Field.Name != "newPassword" {
+		return nil, &gqlerror.Error{
+			Message: "Access denied. Password reset token can only be used for password reset.",
+			Extensions: map[string]interface{}{
+				"code": "FORBIDDEN",
+			},
+		}
+	}
+
+	// Allow login purpose for all authenticated operations
+	// Allow password_reset purpose only for newPassword
+	if user.Purpose != "login" && user.Purpose != "password_reset" {
 		return nil, &gqlerror.Error{
 			Message: "Access denied. Token is not authorized for this operation.",
 			Extensions: map[string]interface{}{

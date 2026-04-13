@@ -55,4 +55,7 @@ type Mutation {
   createUser(input: CreateUserInput!): CreateUserResponse! @auth
   updateUser(id: String!, input: UpdateUserInput!): UpdateUserResponse! @auth
   deleteUser(id: String!): DeleteUserResponse! @auth
+  createOtp(input: CreateOtpInput!): CreateOtpResponse!
+  verifyOtp(input: VerifyOtpInput!): VerifyOtpResponse!
+  newPassword(input: NewPasswordInput!): NewPasswordResponse! @auth
 }
