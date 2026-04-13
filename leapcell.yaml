@@ -1,0 +1,5 @@
+runtime: go
+startCommand: ./app
+buildCommand: go mod tidy && go build -tags netgo -ldflags '-s -w' -o app
+port: 8080
+memory: 512mb
