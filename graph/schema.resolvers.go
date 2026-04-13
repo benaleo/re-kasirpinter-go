@@ -149,7 +149,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUse
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error) {
 	// Find user by secure_id
 	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).First(&userDB)
+	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
 	if result.Error != nil {
 		return &model.UpdateUserResponse{
 			Code:    404,
@@ -216,7 +216,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input inpu
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error) {
 	// Find user by secure_id
 	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).First(&userDB)
+	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
 	if result.Error != nil {
 		return &model.DeleteUserResponse{
 			Code:    404,
@@ -304,18 +304,25 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 	}
 
 	return &model.UsersResponse{
+		Code:       200,
+		Success:    true,
+		Message:    "users retrieved successfully",
 		Data:       users,
 		Pagination: paginationResult.PageInfo,
 	}, nil
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+func (r *queryResolver) User(ctx context.Context, id string) (*model.UserResponse, error) {
 	// Find user by secure_id
 	var userDB model.UserDB
 	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
 	if result.Error != nil {
-		return nil, result.Error
+		return &model.UserResponse{
+			Code:    404,
+			Success: false,
+			Message: "user not found",
+		}, nil
 	}
 
 	// Get user role if exists
@@ -331,7 +338,12 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	// Convert DB model to GraphQL model using mapper
 	user := toGraphQLUser(userDB, userRoleDB)
 
-	return user, nil
+	return &model.UserResponse{
+		Code:    200,
+		Success: true,
+		Message: "user retrieved successfully",
+		Data:    user,
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

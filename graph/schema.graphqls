@@ -47,7 +47,7 @@ scalar Int64
 
 type Query {
   users(pagination: PaginationInput): UsersResponse! @auth
-  user(id: String!): User @auth
+  user(id: String!): UserResponse! @auth
 }
 
 type Mutation {

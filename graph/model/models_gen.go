@@ -75,6 +75,13 @@ type UserPermission struct {
 	Name string `json:"name"`
 }
 
+type UserResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    *User  `json:"data,omitempty"`
+}
+
 type UserRole struct {
 	ID          int64             `json:"id"`
 	Name        string            `json:"name"`
@@ -94,6 +101,9 @@ type UserRolePermission struct {
 }
 
 type UsersResponse struct {
+	Code       int32     `json:"code"`
+	Success    bool      `json:"success"`
+	Message    string    `json:"message"`
 	Data       []*User   `json:"data"`
 	Pagination *PageInfo `json:"pagination"`
 }
