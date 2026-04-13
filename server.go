@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,8 +15,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/vektah/gqlparser/v2/ast"
 )
-
-const defaultPort = "8080"
 
 func main() {
 	// Load environment variables
@@ -35,7 +34,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = defaultPort
+		port = "8080"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
@@ -54,9 +53,17 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello World")
+	})
+
+	http.HandleFunc("/kaitheathcheck", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "OK")
+	})
+
+	http.Handle("/graphql", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", graph.AuthMiddleware(srv))
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	fmt.Println("Listening on", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

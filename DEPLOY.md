@@ -66,5 +66,7 @@ docker run -p 8080:8080 --env-file .env kasirpinter-go
 ## Health Check
 
 The application will be available at the Koyeb service URL with:
-- GraphQL Playground: `/`
-- GraphQL API: `/query`
+- Root: `/` (returns "Hello World")
+- Health Check: `/kaitheathcheck` (returns "OK")
+- GraphQL Playground: `/query`
+- GraphQL API: `/graphql`
