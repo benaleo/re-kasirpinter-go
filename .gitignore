@@ -47,3 +47,6 @@ coverage.txt
 
 # Air live reload
 tmp/
+
+# App
+re-kasirpinter-go

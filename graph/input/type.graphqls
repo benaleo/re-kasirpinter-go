@@ -1,0 +1,59 @@
+type AuthResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: AuthData!
+}
+
+# Pagination metadata type
+type PageInfo {
+  current_page: Int!
+  per_page: Int!
+  total_items: Int!
+  total_pages: Int!
+  has_next_page: Boolean!
+  has_previous_page: Boolean!
+  start_item: Int
+  end_item: Int
+}
+
+type AuthData {
+  token: String!
+  user: User!
+}
+
+type CreateUserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}
+
+type UpdateUserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}
+
+type DeleteUserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}
+
+type UserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}
+
+type UsersResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [User!]!
+  pagination: PageInfo!
+}
