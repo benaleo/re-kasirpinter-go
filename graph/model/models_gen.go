@@ -39,6 +39,16 @@ type DeleteUserResponse struct {
 type Mutation struct {
 }
 
+type NewPasswordInput struct {
+	Password string `json:"password"`
+}
+
+type NewPasswordResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type PageInfo struct {
 	CurrentPage     int32  `json:"current_page"`
 	PerPage         int32  `json:"per_page"`

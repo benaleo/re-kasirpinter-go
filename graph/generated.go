@@ -72,12 +72,19 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateOtp  func(childComplexity int, input model.CreateOtpInput) int
-		CreateUser func(childComplexity int, input input.CreateUserInput) int
-		DeleteUser func(childComplexity int, id string) int
-		Login      func(childComplexity int, input input.LoginInput) int
-		UpdateUser func(childComplexity int, id string, input input.UpdateUserInput) int
-		VerifyOtp  func(childComplexity int, input model.VerifyOtpInput) int
+		CreateOtp   func(childComplexity int, input model.CreateOtpInput) int
+		CreateUser  func(childComplexity int, input input.CreateUserInput) int
+		DeleteUser  func(childComplexity int, id string) int
+		Login       func(childComplexity int, input input.LoginInput) int
+		NewPassword func(childComplexity int, input model.NewPasswordInput) int
+		UpdateUser  func(childComplexity int, id string, input input.UpdateUserInput) int
+		VerifyOtp   func(childComplexity int, input model.VerifyOtpInput) int
+	}
+
+	NewPasswordResponse struct {
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
 	}
 
 	PageInfo struct {
@@ -171,6 +178,7 @@ type MutationResolver interface {
 	DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error)
 	CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error)
 	VerifyOtp(ctx context.Context, input model.VerifyOtpInput) (*model.VerifyOtpResponse, error)
+	NewPassword(ctx context.Context, input model.NewPasswordInput) (*model.NewPasswordResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error)
@@ -342,6 +350,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.Login(childComplexity, args["input"].(input.LoginInput)), true
+	case "Mutation.newPassword":
+		if e.ComplexityRoot.Mutation.NewPassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_newPassword_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.NewPassword(childComplexity, args["input"].(model.NewPasswordInput)), true
 	case "Mutation.updateUser":
 		if e.ComplexityRoot.Mutation.UpdateUser == nil {
 			break
@@ -364,6 +383,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.VerifyOtp(childComplexity, args["input"].(model.VerifyOtpInput)), true
+
+	case "NewPasswordResponse.code":
+		if e.ComplexityRoot.NewPasswordResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.NewPasswordResponse.Code(childComplexity), true
+	case "NewPasswordResponse.message":
+		if e.ComplexityRoot.NewPasswordResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.NewPasswordResponse.Message(childComplexity), true
+	case "NewPasswordResponse.success":
+		if e.ComplexityRoot.NewPasswordResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.NewPasswordResponse.Success(childComplexity), true
 
 	case "PageInfo.current_page":
 		if e.ComplexityRoot.PageInfo.CurrentPage == nil {
@@ -714,6 +752,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateOtpInput,
 		ec.unmarshalInputCreateUserInput,
 		ec.unmarshalInputLoginInput,
+		ec.unmarshalInputNewPasswordInput,
 		ec.unmarshalInputPaginationInput,
 		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputVerifyOtpInput,
@@ -850,6 +889,17 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNLoginInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐLoginInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_newPassword_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNNewPasswordInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐNewPasswordInput)
 	if err != nil {
 		return nil, err
 	}
@@ -1885,6 +1935,155 @@ func (ec *executionContext) fieldContext_Mutation_verifyOtp(ctx context.Context,
 	if fc.Args, err = ec.field_Mutation_verifyOtp_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_newPassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_newPassword,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().NewPassword(ctx, fc.Args["input"].(model.NewPasswordInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.NewPasswordResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNNewPasswordResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐNewPasswordResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_newPassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_NewPasswordResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_NewPasswordResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_NewPasswordResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NewPasswordResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_newPassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NewPasswordResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NewPasswordResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_NewPasswordResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NewPasswordResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NewPasswordResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NewPasswordResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_NewPasswordResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NewPasswordResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NewPasswordResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_NewPasswordResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_NewPasswordResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NewPasswordResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -5315,6 +5514,36 @@ func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj an
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewPasswordInput(ctx context.Context, obj any) (model.NewPasswordInput, error) {
+	var it model.NewPasswordInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Password = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputPaginationInput(ctx context.Context, obj any) (model.PaginationInput, error) {
 	var it model.PaginationInput
 	if obj == nil {
@@ -5800,6 +6029,62 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_verifyOtp(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "newPassword":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_newPassword(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var newPasswordResponseImplementors = []string{"NewPasswordResponse"}
+
+func (ec *executionContext) _NewPasswordResponse(ctx context.Context, sel ast.SelectionSet, obj *model.NewPasswordResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, newPasswordResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NewPasswordResponse")
+		case "code":
+			out.Values[i] = ec._NewPasswordResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._NewPasswordResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._NewPasswordResponse_message(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -6904,6 +7189,25 @@ func (ec *executionContext) marshalNInt642int64(ctx context.Context, sel ast.Sel
 func (ec *executionContext) unmarshalNLoginInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐLoginInput(ctx context.Context, v any) (input.LoginInput, error) {
 	res, err := ec.unmarshalInputLoginInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewPasswordInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐNewPasswordInput(ctx context.Context, v any) (model.NewPasswordInput, error) {
+	res, err := ec.unmarshalInputNewPasswordInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNNewPasswordResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐNewPasswordResponse(ctx context.Context, sel ast.SelectionSet, v model.NewPasswordResponse) graphql.Marshaler {
+	return ec._NewPasswordResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNNewPasswordResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐNewPasswordResponse(ctx context.Context, sel ast.SelectionSet, v *model.NewPasswordResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._NewPasswordResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPageInfo2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *model.PageInfo) graphql.Marshaler {

@@ -58,3 +58,11 @@ func toGraphQLVerifyOtpResponse(code int32, success bool, message string, token 
 		Token:   token,
 	}
 }
+
+func toGraphQLNewPasswordResponse(code int32, success bool, message string) *model.NewPasswordResponse {
+	return &model.NewPasswordResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+	}
+}

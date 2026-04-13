@@ -39,3 +39,7 @@ input VerifyOtpInput {
   code: String!
   type: String!
 }
+
+input NewPasswordInput {
+  password: String!
+}

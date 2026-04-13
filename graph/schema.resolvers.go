@@ -353,6 +353,42 @@ func (r *mutationResolver) VerifyOtp(ctx context.Context, input model.VerifyOtpI
 	return toGraphQLVerifyOtpResponse(200, true, "Verification successful", &token), nil
 }
 
+// NewPassword is the resolver for the newPassword field.
+func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPasswordInput) (*model.NewPasswordResponse, error) {
+	// Get user claims from context
+	userClaims := ForContext(ctx)
+	if userClaims == nil {
+		return toGraphQLNewPasswordResponse(401, false, "Unauthorized"), nil
+	}
+
+	// Verify that the token purpose is password_reset (extra safety check)
+	if userClaims.Purpose != "password_reset" {
+		return toGraphQLNewPasswordResponse(403, false, "Token is not authorized for password reset"), nil
+	}
+
+	// Find the user by ID
+	var userDB model.UserDB
+	result := r.DB.Where("id = ? AND is_active = ?", userClaims.UserID, true).First(&userDB)
+	if result.Error != nil {
+		return toGraphQLNewPasswordResponse(404, false, "User not found"), nil
+	}
+
+	// Hash the new password
+	hashedPassword, err := hashPassword(input.Password)
+	if err != nil {
+		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to hash password: %v", err)), nil
+	}
+
+	// Update the user's password
+	userDB.Password = hashedPassword
+	result = r.DB.Save(&userDB)
+	if result.Error != nil {
+		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to update password: %v", result.Error)), nil
+	}
+
+	return toGraphQLNewPasswordResponse(200, true, "Password updated successfully"), nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
 	// Parse pagination parameters

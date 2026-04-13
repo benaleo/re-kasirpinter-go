@@ -70,3 +70,9 @@ type VerifyOtpResponse {
   message: String!
   token: String
 }
+
+type NewPasswordResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+}
