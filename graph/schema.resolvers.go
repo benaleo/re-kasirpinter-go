@@ -267,9 +267,7 @@ func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpI
 	var userDB model.UserDB
 	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
 	if result.Error != nil {
-		// For security, still return success even if user doesn't exist
-		// This prevents email enumeration attacks
-		return toGraphQLCreateOtpResponse(200, true, "If the email exists, a verification code has been sent"), nil
+		return toGraphQLCreateOtpResponse(404, false, "User not found"), nil
 	}
 
 	// Generate 6-digit OTP code
