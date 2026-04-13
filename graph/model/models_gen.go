@@ -14,6 +14,7 @@ type AuthData struct {
 type CreateOtpInput struct {
 	Email string `json:"email"`
 	Type  string `json:"type"`
+	Retry *bool  `json:"retry,omitempty"`
 }
 
 type CreateOtpResponse struct {

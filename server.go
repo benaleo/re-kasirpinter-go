@@ -29,6 +29,10 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Initialize email queue
+	graph.GetEmailQueue()
+	log.Println("Email queue initialized with background workers")
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort

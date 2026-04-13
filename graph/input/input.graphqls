@@ -32,6 +32,7 @@ input PaginationInput {
 input CreateOtpInput {
   email: String!
   type: String!
+  retry: Boolean
 }
 
 input VerifyOtpInput {

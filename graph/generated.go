@@ -830,7 +830,7 @@ func newExecutionContext(
 	}
 }
 
-//go:embed "input/input.graphqls" "input/type.graphqls" "schema.graphqls"
+//go:embed "input/input.graphqls" "model/model.graphqls" "schema.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -843,7 +843,7 @@ func sourceData(filename string) string {
 
 var sources = []*ast.Source{
 	{Name: "input/input.graphqls", Input: sourceData("input/input.graphqls"), BuiltIn: false},
-	{Name: "input/type.graphqls", Input: sourceData("input/type.graphqls"), BuiltIn: false},
+	{Name: "model/model.graphqls", Input: sourceData("model/model.graphqls"), BuiltIn: false},
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -5386,7 +5386,7 @@ func (ec *executionContext) unmarshalInputCreateOtpInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "type"}
+	fieldsInOrder := [...]string{"email", "type", "retry"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5407,6 +5407,13 @@ func (ec *executionContext) unmarshalInputCreateOtpInput(ctx context.Context, ob
 				return it, err
 			}
 			it.Type = data
+		case "retry":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("retry"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Retry = data
 		}
 	}
 	return it, nil

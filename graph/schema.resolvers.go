@@ -292,12 +292,23 @@ func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpI
 		return toGraphQLCreateOtpResponse(500, false, fmt.Sprintf("failed to create OTP: %v", result.Error)), nil
 	}
 
-	// Send email with OTP code
-	err := SendPasswordResetEmail(input.Email, code)
+	// Get client information from context
+	clientInfo := GetClientInfo(ctx)
+	var ip, browser, os *string
+	if clientInfo != nil {
+		ip = &clientInfo.IP
+		browser = &clientInfo.Browser
+		os = &clientInfo.OS
+	}
+
+	// Determine retry value
+	retry := input.Retry != nil && *input.Retry
+
+	// Enqueue email job to background queue
+	err := EnqueueEmailJob(r.DB, input.Email, code, retry, ip, browser, os)
 	if err != nil {
 		// Log the error but still return success (OTP is saved in DB)
-		// This allows testing even if email fails
-		fmt.Printf("Warning: Failed to send email: %v\n", err)
+		fmt.Printf("Warning: Failed to enqueue email job: %v\n", err)
 	}
 
 	return toGraphQLCreateOtpResponse(200, true, "Verification code has been sent to your email"), nil
