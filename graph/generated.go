@@ -84,7 +84,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		User  func(childComplexity int, secureID string) int
+		User  func(childComplexity int, id string) int
 		Users func(childComplexity int, pagination *model.PaginationInput) int
 	}
 
@@ -147,7 +147,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error)
-	User(ctx context.Context, secureID string) (*model.User, error)
+	User(ctx context.Context, id string) (*model.User, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -356,7 +356,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.User(childComplexity, args["secure_id"].(string)), true
+		return e.ComplexityRoot.Query.User(childComplexity, args["id"].(string)), true
 	case "Query.users":
 		if e.ComplexityRoot.Query.Users == nil {
 			break
@@ -738,11 +738,11 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "secure_id", ec.unmarshalNString2string)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
 	if err != nil {
 		return nil, err
 	}
-	args["secure_id"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1829,7 +1829,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 		ec.fieldContext_Query_user,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().User(ctx, fc.Args["secure_id"].(string))
+			return ec.Resolvers.Query().User(ctx, fc.Args["id"].(string))
 		},
 		nil,
 		ec.marshalOUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,

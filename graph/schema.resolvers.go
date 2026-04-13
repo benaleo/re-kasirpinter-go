@@ -310,8 +310,28 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, secureID string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	// Find user by secure_id
+	var userDB model.UserDB
+	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	var userRoleDB *model.UserRoleDB
+	if userDB.RoleID != nil {
+		r.DB.First(&userRole, *userDB.RoleID)
+		if userRole.ID > 0 {
+			userRoleDB = &userRole
+		}
+	}
+
+	// Convert DB model to GraphQL model using mapper
+	user := toGraphQLUser(userDB, userRoleDB)
+
+	return user, nil
 }
 
 // Mutation returns MutationResolver implementation.
