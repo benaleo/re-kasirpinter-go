@@ -1,8 +1,6 @@
 package graph
 
 import (
-	"context"
-
 	"gorm.io/gorm"
 )
 
@@ -13,10 +11,4 @@ import (
 
 type Resolver struct {
 	DB *gorm.DB
-}
-
-// ForContext returns the Claims associated with the context
-func ForContext(ctx context.Context) *Claims {
-	raw, _ := ctx.Value("claims").(*Claims)
-	return raw
 }

@@ -102,15 +102,6 @@ func validateJWT(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
-// RequireAuth checks if the user is authenticated
-func RequireAuth(ctx context.Context) error {
-	userClaims := ForContext(ctx)
-	if userClaims == nil {
-		return errors.New("unauthorized: authentication required")
-	}
-	return nil
-}
-
 // RequireSuperAdmin checks if the user from context has superadmin role
 func RequireSuperAdmin(ctx context.Context) error {
 	userClaims := ForContext(ctx)
