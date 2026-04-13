@@ -153,3 +153,26 @@ func (l *LogEmailDB) BeforeCreate(tx *gorm.DB) error {
 	l.Ts = now
 	return nil
 }
+
+// LoginAuditDB represents the database model for LoginAudit
+type LoginAuditDB struct {
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Email     string    `gorm:"not null" json:"email"`
+	Success   bool      `gorm:"not null" json:"success"`
+	IP        *string   `json:"ip,omitempty"`
+	Browser   *string   `json:"browser,omitempty"`
+	OS        *string   `json:"os,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// TableName specifies the table name for LoginAuditDB
+func (LoginAuditDB) TableName() string {
+	return "login_audits"
+}
+
+// BeforeCreate hook for LoginAuditDB
+func (l *LoginAuditDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	l.CreatedAt = now
+	return nil
+}
