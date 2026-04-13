@@ -61,35 +61,12 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 		}, nil
 	}
 
-	// Convert DB model to GraphQL model
-	user := &model.User{
-		ID:        userDB.ID,
-		SecureID:  userDB.SecureID,
-		Name:      userDB.Name,
-		Email:     userDB.Email,
-		Address:   userDB.Address,
-		Phone:     userDB.Phone,
-		Avatar:    userDB.Avatar,
-		IsActive:  userDB.IsActive,
-		DeletedAt: userDB.DeletedAt,
-		CreatedAt: userDB.CreatedAt,
-		UpdatedAt: userDB.UpdatedAt,
-	}
-
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
 	if userRole.ID > 0 {
-		user.Role = &model.UserRole{
-			ID:          userRole.ID,
-			Name:        userRole.Name,
-			IsActive:    userRole.IsActive,
-			CreatedAt:   userRole.CreatedAt,
-			CreatedBy:   userRole.CreatedBy,
-			UpdatedAt:   userRole.UpdatedAt,
-			UpdatedBy:   userRole.UpdatedBy,
-			DeletedAt:   userRole.DeletedAt,
-			DeletedBy:   userRole.DeletedBy,
-			Permissions: nil, // Can be populated if needed
-		}
+		userRoleDB = &userRole
 	}
+	user := toGraphQLUser(userDB, userRoleDB)
 
 	return &model.AuthResponse{
 		Code:    200,
@@ -152,35 +129,12 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUse
 		r.DB.First(&userRole, *userDB.RoleID)
 	}
 
-	// Convert DB model to GraphQL model
-	user := &model.User{
-		ID:        userDB.ID,
-		SecureID:  userDB.SecureID,
-		Name:      userDB.Name,
-		Email:     userDB.Email,
-		Address:   userDB.Address,
-		Phone:     userDB.Phone,
-		Avatar:    userDB.Avatar,
-		IsActive:  userDB.IsActive,
-		DeletedAt: userDB.DeletedAt,
-		CreatedAt: userDB.CreatedAt,
-		UpdatedAt: userDB.UpdatedAt,
-	}
-
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
 	if userRole.ID > 0 {
-		user.Role = &model.UserRole{
-			ID:          userRole.ID,
-			Name:        userRole.Name,
-			IsActive:    userRole.IsActive,
-			CreatedAt:   userRole.CreatedAt,
-			CreatedBy:   userRole.CreatedBy,
-			UpdatedAt:   userRole.UpdatedAt,
-			UpdatedBy:   userRole.UpdatedBy,
-			DeletedAt:   userRole.DeletedAt,
-			DeletedBy:   userRole.DeletedBy,
-			Permissions: nil,
-		}
+		userRoleDB = &userRole
 	}
+	user := toGraphQLUser(userDB, userRoleDB)
 
 	return &model.CreateUserResponse{
 		Code:    201,
@@ -242,35 +196,12 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input inpu
 		r.DB.First(&userRole, *userDB.RoleID)
 	}
 
-	// Convert DB model to GraphQL model
-	user := &model.User{
-		ID:        userDB.ID,
-		SecureID:  userDB.SecureID,
-		Name:      userDB.Name,
-		Email:     userDB.Email,
-		Address:   userDB.Address,
-		Phone:     userDB.Phone,
-		Avatar:    userDB.Avatar,
-		IsActive:  userDB.IsActive,
-		DeletedAt: userDB.DeletedAt,
-		CreatedAt: userDB.CreatedAt,
-		UpdatedAt: userDB.UpdatedAt,
-	}
-
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
 	if userRole.ID > 0 {
-		user.Role = &model.UserRole{
-			ID:          userRole.ID,
-			Name:        userRole.Name,
-			IsActive:    userRole.IsActive,
-			CreatedAt:   userRole.CreatedAt,
-			CreatedBy:   userRole.CreatedBy,
-			UpdatedAt:   userRole.UpdatedAt,
-			UpdatedBy:   userRole.UpdatedBy,
-			DeletedAt:   userRole.DeletedAt,
-			DeletedBy:   userRole.DeletedBy,
-			Permissions: nil,
-		}
+		userRoleDB = &userRole
 	}
+	user := toGraphQLUser(userDB, userRoleDB)
 
 	return &model.UpdateUserResponse{
 		Code:    200,
@@ -314,35 +245,12 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.De
 		r.DB.First(&userRole, *userDB.RoleID)
 	}
 
-	// Convert DB model to GraphQL model
-	user := &model.User{
-		ID:        userDB.ID,
-		SecureID:  userDB.SecureID,
-		Name:      userDB.Name,
-		Email:     userDB.Email,
-		Address:   userDB.Address,
-		Phone:     userDB.Phone,
-		Avatar:    userDB.Avatar,
-		IsActive:  userDB.IsActive,
-		DeletedAt: userDB.DeletedAt,
-		CreatedAt: userDB.CreatedAt,
-		UpdatedAt: userDB.UpdatedAt,
-	}
-
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
 	if userRole.ID > 0 {
-		user.Role = &model.UserRole{
-			ID:          userRole.ID,
-			Name:        userRole.Name,
-			IsActive:    userRole.IsActive,
-			CreatedAt:   userRole.CreatedAt,
-			CreatedBy:   userRole.CreatedBy,
-			UpdatedAt:   userRole.UpdatedAt,
-			UpdatedBy:   userRole.UpdatedBy,
-			DeletedAt:   userRole.DeletedAt,
-			DeletedBy:   userRole.DeletedBy,
-			Permissions: nil,
-		}
+		userRoleDB = &userRole
 	}
+	user := toGraphQLUser(userDB, userRoleDB)
 
 	return &model.DeleteUserResponse{
 		Code:    200,
@@ -353,8 +261,113 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.De
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
+	// Set default values
+	defaultLimit := int32(10)
+	defaultPage := int32(1)
+	defaultSortBy := "created_at,desc"
+
+	if pagination != nil {
+		if pagination.Limit != nil && *pagination.Limit > 0 {
+			defaultLimit = *pagination.Limit
+		}
+		if pagination.Page != nil && *pagination.Page > 0 {
+			defaultPage = *pagination.Page
+		}
+		if pagination.SortBy != nil && *pagination.SortBy != "" {
+			defaultSortBy = *pagination.SortBy
+		}
+	}
+
+	// Parse sortBy (format: "field,direction")
+	// Convert "created_at,desc" to "created_at desc"
+	sortBy := defaultSortBy
+	if len(sortBy) > 0 {
+		// Replace comma with space for GORM
+		sortBy = defaultSortBy
+		for i := 0; i < len(sortBy); i++ {
+			if sortBy[i] == ',' {
+				sortBy = sortBy[:i] + " " + sortBy[i+1:]
+				break
+			}
+		}
+	}
+
+	// Calculate offset
+	offset := (defaultPage - 1) * defaultLimit
+
+	// Get total count
+	var total int64
+	countResult := r.DB.Model(&model.UserDB{}).Count(&total)
+	if countResult.Error != nil {
+		return nil, countResult.Error
+	}
+
+	// Query users with pagination
+	var usersDB []model.UserDB
+	query := r.DB.Order(sortBy).Limit(int(defaultLimit)).Offset(int(offset))
+	result := query.Find(&usersDB)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Calculate pagination metadata
+	totalPages := int32(0)
+	if total > 0 {
+		totalPages = (int32(total) + defaultLimit - 1) / defaultLimit
+	}
+
+	hasNextPage := defaultPage < totalPages
+	hasPreviousPage := defaultPage > 1
+
+	startItem := int32(0)
+	if total > 0 {
+		startItem = offset + 1
+	}
+
+	endItem := int32(0)
+	if total > 0 {
+		endItem = offset + int32(len(usersDB))
+		if endItem > int32(total) {
+			endItem = int32(total)
+		}
+	}
+
+	// Convert DB models to GraphQL models
+	users := make([]*model.User, len(usersDB))
+	for i, userDB := range usersDB {
+		// Get user role if exists
+		var userRoleDB *model.UserRoleDB
+		if userDB.RoleID != nil {
+			var userRole model.UserRoleDB
+			r.DB.First(&userRole, *userDB.RoleID)
+			if userRole.ID > 0 {
+				userRoleDB = &userRole
+			}
+		}
+
+		users[i] = toGraphQLUser(userDB, userRoleDB)
+	}
+
+	// Build pagination info
+	pageInfo := &model.PageInfo{
+		CurrentPage:     defaultPage,
+		PerPage:         defaultLimit,
+		TotalItems:      int32(total),
+		TotalPages:      totalPages,
+		HasNextPage:     hasNextPage,
+		HasPreviousPage: hasPreviousPage,
+	}
+
+	if total > 0 {
+		pageInfo.StartItem = &startItem
+		pageInfo.EndItem = &endItem
+	}
+
+	return &model.UsersResponse{
+		Data:       users,
+		Pagination: pageInfo,
+	}, nil
 }
 
 // User is the resolver for the user field.

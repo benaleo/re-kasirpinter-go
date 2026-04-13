@@ -21,3 +21,10 @@ input UpdateUserInput {
   is_active: Boolean
   role_id: Int64
 }
+
+# Pagination input type for queries
+input PaginationInput {
+  limit: Int = 10
+  page: Int = 1
+  sortBy: String = "created_at,desc"
+}

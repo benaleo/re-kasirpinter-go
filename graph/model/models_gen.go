@@ -28,6 +28,23 @@ type DeleteUserResponse struct {
 type Mutation struct {
 }
 
+type PageInfo struct {
+	CurrentPage     int32  `json:"current_page"`
+	PerPage         int32  `json:"per_page"`
+	TotalItems      int32  `json:"total_items"`
+	TotalPages      int32  `json:"total_pages"`
+	HasNextPage     bool   `json:"has_next_page"`
+	HasPreviousPage bool   `json:"has_previous_page"`
+	StartItem       *int32 `json:"start_item,omitempty"`
+	EndItem         *int32 `json:"end_item,omitempty"`
+}
+
+type PaginationInput struct {
+	Limit  *int32  `json:"limit,omitempty"`
+	Page   *int32  `json:"page,omitempty"`
+	SortBy *string `json:"sortBy,omitempty"`
+}
+
 type Query struct {
 }
 
@@ -74,4 +91,9 @@ type UserRole struct {
 type UserRolePermission struct {
 	RoleID       int64 `json:"role_id"`
 	PermissionID int64 `json:"permission_id"`
+}
+
+type UsersResponse struct {
+	Data       []*User   `json:"data"`
+	Pagination *PageInfo `json:"pagination"`
 }

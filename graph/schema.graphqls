@@ -46,7 +46,7 @@ scalar Time
 scalar Int64
 
 type Query {
-  users: [User!]!
+  users(pagination: PaginationInput): UsersResponse!
   user(secure_id: String!): User
 }
 

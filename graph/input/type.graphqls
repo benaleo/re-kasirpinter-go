@@ -5,6 +5,18 @@ type AuthResponse {
   data: AuthData!
 }
 
+# Pagination metadata type
+type PageInfo {
+  current_page: Int!
+  per_page: Int!
+  total_items: Int!
+  total_pages: Int!
+  has_next_page: Boolean!
+  has_previous_page: Boolean!
+  start_item: Int
+  end_item: Int
+}
+
 type AuthData {
   token: String!
   user: User!
@@ -29,4 +41,9 @@ type DeleteUserResponse {
   success: Boolean!
   message: String!
   data: User
+}
+
+type UsersResponse {
+  data: [User!]!
+  pagination: PageInfo!
 }
