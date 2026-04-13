@@ -8,11 +8,12 @@ package graph
 import (
 	"context"
 	"fmt"
+	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
 )
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthResponse, error) {
+func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error) {
 	// Find user by email
 	var userDB model.UserDB
 	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
@@ -84,17 +85,155 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput) (*model.User, error) {
+	// Generate secure_id (UUID)
+	secureID, err := generateRandomString(16)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate secure_id: %v", err)
+	}
+
+	// Hash password
+	hashedPassword, err := hashPassword(input.Password)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %v", err)
+	}
+
+	// Create user DB model
+	userDB := model.UserDB{
+		SecureID: &secureID,
+		Name:     input.Name,
+		Email:    input.Email,
+		Address:  input.Address,
+		Phone:    input.Phone,
+		Password: hashedPassword,
+		IsActive: true,
+		RoleID:   input.RoleID,
+	}
+
+	// Save to database
+	result := r.DB.Create(&userDB)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to create user: %v", result.Error)
+	}
+
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	if userDB.RoleID != nil {
+		r.DB.First(&userRole, *userDB.RoleID)
+	}
+
+	// Convert DB model to GraphQL model
+	user := &model.User{
+		ID:        userDB.ID,
+		SecureID:  userDB.SecureID,
+		Name:      userDB.Name,
+		Email:     userDB.Email,
+		Address:   userDB.Address,
+		Phone:     userDB.Phone,
+		Avatar:    userDB.Avatar,
+		IsActive:  userDB.IsActive,
+		DeletedAt: userDB.DeletedAt,
+		CreatedAt: userDB.CreatedAt,
+		UpdatedAt: userDB.UpdatedAt,
+	}
+
+	if userRole.ID > 0 {
+		user.Role = &model.UserRole{
+			ID:          userRole.ID,
+			Name:        userRole.Name,
+			IsActive:    userRole.IsActive,
+			CreatedAt:   userRole.CreatedAt,
+			CreatedBy:   userRole.CreatedBy,
+			UpdatedAt:   userRole.UpdatedAt,
+			UpdatedBy:   userRole.UpdatedBy,
+			DeletedAt:   userRole.DeletedAt,
+			DeletedBy:   userRole.DeletedBy,
+			Permissions: nil,
+		}
+	}
+
+	return user, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id int32, input model.UpdateUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+func (r *mutationResolver) UpdateUser(ctx context.Context, secureID string, input input.UpdateUserInput) (*model.User, error) {
+	// Find user by secure_id
+	var userDB model.UserDB
+	result := r.DB.Where("secure_id = ?", secureID).First(&userDB)
+	if result.Error != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	// Update fields if provided
+	if input.Name != nil {
+		userDB.Name = *input.Name
+	}
+	if input.Email != nil {
+		userDB.Email = *input.Email
+	}
+	if input.Address != nil {
+		userDB.Address = *input.Address
+	}
+	if input.Phone != nil {
+		userDB.Phone = *input.Phone
+	}
+	if input.Avatar != nil {
+		userDB.Avatar = input.Avatar
+	}
+	if input.IsActive != nil {
+		userDB.IsActive = *input.IsActive
+	}
+	if input.RoleID != nil {
+		userDB.RoleID = input.RoleID
+	}
+
+	// Save to database
+	result = r.DB.Save(&userDB)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to update user: %v", result.Error)
+	}
+
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	if userDB.RoleID != nil {
+		r.DB.First(&userRole, *userDB.RoleID)
+	}
+
+	// Convert DB model to GraphQL model
+	user := &model.User{
+		ID:        userDB.ID,
+		SecureID:  userDB.SecureID,
+		Name:      userDB.Name,
+		Email:     userDB.Email,
+		Address:   userDB.Address,
+		Phone:     userDB.Phone,
+		Avatar:    userDB.Avatar,
+		IsActive:  userDB.IsActive,
+		DeletedAt: userDB.DeletedAt,
+		CreatedAt: userDB.CreatedAt,
+		UpdatedAt: userDB.UpdatedAt,
+	}
+
+	if userRole.ID > 0 {
+		user.Role = &model.UserRole{
+			ID:          userRole.ID,
+			Name:        userRole.Name,
+			IsActive:    userRole.IsActive,
+			CreatedAt:   userRole.CreatedAt,
+			CreatedBy:   userRole.CreatedBy,
+			UpdatedAt:   userRole.UpdatedAt,
+			UpdatedBy:   userRole.UpdatedBy,
+			DeletedAt:   userRole.DeletedAt,
+			DeletedBy:   userRole.DeletedBy,
+			Permissions: nil,
+		}
+	}
+
+	return user, nil
 }
 
 // DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, id int32) (bool, error) {
+func (r *mutationResolver) DeleteUser(ctx context.Context, secureID string) (bool, error) {
 	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
 }
 
@@ -104,7 +243,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id int32) (*model.User, error) {
+func (r *queryResolver) User(ctx context.Context, secureID string) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 

@@ -45,41 +45,12 @@ scalar Int64
 
 type Query {
   users: [User!]!
-  user(id: Int!): User
+  user(secure_id: String!): User
 }
 
 type Mutation {
   login(input: LoginInput!): AuthResponse!
   createUser(input: CreateUserInput!): User!
-  updateUser(id: Int!, input: UpdateUserInput!): User!
-  deleteUser(id: Int!): Boolean!
-}
-
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-type AuthResponse {
-  token: String!
-  user: User!
-}
-
-input CreateUserInput {
-  name: String!
-  email: String!
-  address: String!
-  phone: String!
-  password: String!
-  role_id: Int64
-}
-
-input UpdateUserInput {
-  name: String
-  email: String
-  address: String
-  phone: String
-  avatar: String
-  is_active: Boolean
-  role_id: Int64
+  updateUser(secure_id: String!, input: UpdateUserInput!): User!
+  deleteUser(secure_id: String!): Boolean!
 }

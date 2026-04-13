@@ -6,9 +6,3 @@ type AuthResponse struct {
 	Token string `json:"token"`
 	User  *User  `json:"user"`
 }
-
-// LoginInput is the input for login mutation
-type LoginInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
