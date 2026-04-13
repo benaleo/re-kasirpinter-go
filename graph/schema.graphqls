@@ -2,6 +2,8 @@
 #
 # https://gqlgen.com/getting-started/
 
+directive @auth on FIELD_DEFINITION
+
 type User {
   id: Int!
   secure_id: String
@@ -50,7 +52,7 @@ type Query {
 
 type Mutation {
   login(input: LoginInput!): AuthResponse!
-  createUser(input: CreateUserInput!): User!
-  updateUser(secure_id: String!, input: UpdateUserInput!): User!
-  deleteUser(secure_id: String!): Boolean!
+  createUser(input: CreateUserInput!): User! @auth
+  updateUser(secure_id: String!, input: UpdateUserInput!): User! @auth
+  deleteUser(secure_id: String!): Boolean! @auth
 }

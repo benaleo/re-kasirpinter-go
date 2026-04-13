@@ -34,7 +34,10 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: db}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers:  &graph.Resolver{DB: db},
+		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
+	}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})

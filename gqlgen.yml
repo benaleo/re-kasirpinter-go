@@ -66,9 +66,9 @@ resolver:
 # embedded_structs_prefix: Base
 
 # Optional: custom directive configuration
-# directives:
-#   hasRole:
-#     skip_runtime: false
+directives:
+  auth:
+    skip_runtime: false
 
 # Optional: local package prefix for import sorting
 # local_prefix: ""
