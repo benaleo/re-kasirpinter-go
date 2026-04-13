@@ -39,9 +39,30 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	AuthResponse struct {
+	AuthData struct {
 		Token func(childComplexity int) int
 		User  func(childComplexity int) int
+	}
+
+	AuthResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	CreateUserResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	DeleteUserResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -54,6 +75,13 @@ type ComplexityRoot struct {
 	Query struct {
 		User  func(childComplexity int, secureID string) int
 		Users func(childComplexity int) int
+	}
+
+	UpdateUserResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
 	}
 
 	User struct {
@@ -97,9 +125,9 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error)
-	CreateUser(ctx context.Context, input input.CreateUserInput) (*model.User, error)
-	UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.User, error)
-	DeleteUser(ctx context.Context, id string) (bool, error)
+	CreateUser(ctx context.Context, input input.CreateUserInput) (*model.CreateUserResponse, error)
+	UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error)
+	DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
@@ -120,18 +148,93 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
-	case "AuthResponse.token":
-		if e.ComplexityRoot.AuthResponse.Token == nil {
+	case "AuthData.token":
+		if e.ComplexityRoot.AuthData.Token == nil {
 			break
 		}
 
-		return e.ComplexityRoot.AuthResponse.Token(childComplexity), true
-	case "AuthResponse.user":
-		if e.ComplexityRoot.AuthResponse.User == nil {
+		return e.ComplexityRoot.AuthData.Token(childComplexity), true
+	case "AuthData.user":
+		if e.ComplexityRoot.AuthData.User == nil {
 			break
 		}
 
-		return e.ComplexityRoot.AuthResponse.User(childComplexity), true
+		return e.ComplexityRoot.AuthData.User(childComplexity), true
+
+	case "AuthResponse.code":
+		if e.ComplexityRoot.AuthResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AuthResponse.Code(childComplexity), true
+	case "AuthResponse.data":
+		if e.ComplexityRoot.AuthResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AuthResponse.Data(childComplexity), true
+	case "AuthResponse.message":
+		if e.ComplexityRoot.AuthResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AuthResponse.Message(childComplexity), true
+	case "AuthResponse.success":
+		if e.ComplexityRoot.AuthResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AuthResponse.Success(childComplexity), true
+
+	case "CreateUserResponse.code":
+		if e.ComplexityRoot.CreateUserResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateUserResponse.Code(childComplexity), true
+	case "CreateUserResponse.data":
+		if e.ComplexityRoot.CreateUserResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateUserResponse.Data(childComplexity), true
+	case "CreateUserResponse.message":
+		if e.ComplexityRoot.CreateUserResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateUserResponse.Message(childComplexity), true
+	case "CreateUserResponse.success":
+		if e.ComplexityRoot.CreateUserResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateUserResponse.Success(childComplexity), true
+
+	case "DeleteUserResponse.code":
+		if e.ComplexityRoot.DeleteUserResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteUserResponse.Code(childComplexity), true
+	case "DeleteUserResponse.data":
+		if e.ComplexityRoot.DeleteUserResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteUserResponse.Data(childComplexity), true
+	case "DeleteUserResponse.message":
+		if e.ComplexityRoot.DeleteUserResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteUserResponse.Message(childComplexity), true
+	case "DeleteUserResponse.success":
+		if e.ComplexityRoot.DeleteUserResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteUserResponse.Success(childComplexity), true
 
 	case "Mutation.createUser":
 		if e.ComplexityRoot.Mutation.CreateUser == nil {
@@ -195,6 +298,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Users(childComplexity), true
+
+	case "UpdateUserResponse.code":
+		if e.ComplexityRoot.UpdateUserResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateUserResponse.Code(childComplexity), true
+	case "UpdateUserResponse.data":
+		if e.ComplexityRoot.UpdateUserResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateUserResponse.Data(childComplexity), true
+	case "UpdateUserResponse.message":
+		if e.ComplexityRoot.UpdateUserResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateUserResponse.Message(childComplexity), true
+	case "UpdateUserResponse.success":
+		if e.ComplexityRoot.UpdateUserResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateUserResponse.Success(childComplexity), true
 
 	case "User.address":
 		if e.ComplexityRoot.User.Address == nil {
@@ -441,7 +569,7 @@ func newExecutionContext(
 	}
 }
 
-//go:embed "input/auth.graphqls" "input/user.graphqls" "schema.graphqls"
+//go:embed "input/input.graphqls" "input/type.graphqls" "schema.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -453,8 +581,8 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
-	{Name: "input/auth.graphqls", Input: sourceData("input/auth.graphqls"), BuiltIn: false},
-	{Name: "input/user.graphqls", Input: sourceData("input/user.graphqls"), BuiltIn: false},
+	{Name: "input/input.graphqls", Input: sourceData("input/input.graphqls"), BuiltIn: false},
+	{Name: "input/type.graphqls", Input: sourceData("input/type.graphqls"), BuiltIn: false},
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -586,12 +714,12 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _AuthResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.AuthResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _AuthData_token(ctx context.Context, field graphql.CollectedField, obj *model.AuthData) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_AuthResponse_token,
+		ec.fieldContext_AuthData_token,
 		func(ctx context.Context) (any, error) {
 			return obj.Token, nil
 		},
@@ -602,7 +730,149 @@ func (ec *executionContext) _AuthResponse_token(ctx context.Context, field graph
 	)
 }
 
-func (ec *executionContext) fieldContext_AuthResponse_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AuthData_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AuthData_user(ctx context.Context, field graphql.CollectedField, obj *model.AuthData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AuthData_user,
+		func(ctx context.Context) (any, error) {
+			return obj.User, nil
+		},
+		nil,
+		ec.marshalNUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AuthData_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "secure_id":
+				return ec.fieldContext_User_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_User_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AuthResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.AuthResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AuthResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AuthResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AuthResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.AuthResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AuthResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AuthResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AuthResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.AuthResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AuthResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AuthResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AuthResponse",
 		Field:      field,
@@ -615,25 +885,289 @@ func (ec *executionContext) fieldContext_AuthResponse_token(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _AuthResponse_user(ctx context.Context, field graphql.CollectedField, obj *model.AuthResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _AuthResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.AuthResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_AuthResponse_user,
+		ec.fieldContext_AuthResponse_data,
 		func(ctx context.Context) (any, error) {
-			return obj.User, nil
+			return obj.Data, nil
 		},
 		nil,
-		ec.marshalNUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		ec.marshalNAuthData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthData,
 		true,
 		true,
 	)
 }
 
-func (ec *executionContext) fieldContext_AuthResponse_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AuthResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AuthResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_AuthData_token(ctx, field)
+			case "user":
+				return ec.fieldContext_AuthData_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuthData", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateUserResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CreateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateUserResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateUserResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateUserResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.CreateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateUserResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateUserResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateUserResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.CreateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateUserResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateUserResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateUserResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.CreateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateUserResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateUserResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "secure_id":
+				return ec.fieldContext_User_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_User_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteUserResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteUserResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteUserResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteUserResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteUserResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteUserResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteUserResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteUserResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteUserResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteUserResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.DeleteUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteUserResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteUserResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteUserResponse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -695,10 +1229,14 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "token":
-				return ec.fieldContext_AuthResponse_token(ctx, field)
-			case "user":
-				return ec.fieldContext_AuthResponse_user(ctx, field)
+			case "code":
+				return ec.fieldContext_AuthResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_AuthResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_AuthResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_AuthResponse_data(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AuthResponse", field.Name)
 		},
@@ -732,7 +1270,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 
 			directive1 := func(ctx context.Context) (any, error) {
 				if ec.Directives.Auth == nil {
-					var zeroVal *model.User
+					var zeroVal *model.CreateUserResponse
 					return zeroVal, errors.New("directive auth is not implemented")
 				}
 				return ec.Directives.Auth(ctx, nil, directive0)
@@ -741,7 +1279,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 			next = directive1
 			return next
 		},
-		ec.marshalNUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		ec.marshalNCreateUserResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateUserResponse,
 		true,
 		true,
 	)
@@ -755,32 +1293,16 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "secure_id":
-				return ec.fieldContext_User_secure_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "address":
-				return ec.fieldContext_User_address(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "avatar":
-				return ec.fieldContext_User_avatar(ctx, field)
-			case "is_active":
-				return ec.fieldContext_User_is_active(ctx, field)
-			case "deleted_at":
-				return ec.fieldContext_User_deleted_at(ctx, field)
-			case "created_at":
-				return ec.fieldContext_User_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_User_updated_at(ctx, field)
-			case "role":
-				return ec.fieldContext_User_role(ctx, field)
+			case "code":
+				return ec.fieldContext_CreateUserResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_CreateUserResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_CreateUserResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_CreateUserResponse_data(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CreateUserResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -812,7 +1334,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 
 			directive1 := func(ctx context.Context) (any, error) {
 				if ec.Directives.Auth == nil {
-					var zeroVal *model.User
+					var zeroVal *model.UpdateUserResponse
 					return zeroVal, errors.New("directive auth is not implemented")
 				}
 				return ec.Directives.Auth(ctx, nil, directive0)
@@ -821,7 +1343,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 			next = directive1
 			return next
 		},
-		ec.marshalNUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		ec.marshalNUpdateUserResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateUserResponse,
 		true,
 		true,
 	)
@@ -835,32 +1357,16 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "secure_id":
-				return ec.fieldContext_User_secure_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "address":
-				return ec.fieldContext_User_address(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "avatar":
-				return ec.fieldContext_User_avatar(ctx, field)
-			case "is_active":
-				return ec.fieldContext_User_is_active(ctx, field)
-			case "deleted_at":
-				return ec.fieldContext_User_deleted_at(ctx, field)
-			case "created_at":
-				return ec.fieldContext_User_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_User_updated_at(ctx, field)
-			case "role":
-				return ec.fieldContext_User_role(ctx, field)
+			case "code":
+				return ec.fieldContext_UpdateUserResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_UpdateUserResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_UpdateUserResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_UpdateUserResponse_data(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UpdateUserResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -892,7 +1398,7 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 
 			directive1 := func(ctx context.Context) (any, error) {
 				if ec.Directives.Auth == nil {
-					var zeroVal bool
+					var zeroVal *model.DeleteUserResponse
 					return zeroVal, errors.New("directive auth is not implemented")
 				}
 				return ec.Directives.Auth(ctx, nil, directive0)
@@ -901,7 +1407,7 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 			next = directive1
 			return next
 		},
-		ec.marshalNBoolean2bool,
+		ec.marshalNDeleteUserResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteUserResponse,
 		true,
 		true,
 	)
@@ -914,7 +1420,17 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_DeleteUserResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_DeleteUserResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_DeleteUserResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_DeleteUserResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteUserResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -1156,6 +1672,148 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateUserResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateUserResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateUserResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateUserResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateUserResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateUserResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateUserResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateUserResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateUserResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateUserResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.UpdateUserResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateUserResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateUserResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateUserResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "secure_id":
+				return ec.fieldContext_User_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "is_active":
+				return ec.fieldContext_User_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_User_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -3571,6 +4229,50 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var authDataImplementors = []string{"AuthData"}
+
+func (ec *executionContext) _AuthData(ctx context.Context, sel ast.SelectionSet, obj *model.AuthData) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, authDataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AuthData")
+		case "token":
+			out.Values[i] = ec._AuthData_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "user":
+			out.Values[i] = ec._AuthData_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var authResponseImplementors = []string{"AuthResponse"}
 
 func (ec *executionContext) _AuthResponse(ctx context.Context, sel ast.SelectionSet, obj *model.AuthResponse) graphql.Marshaler {
@@ -3582,16 +4284,128 @@ func (ec *executionContext) _AuthResponse(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AuthResponse")
-		case "token":
-			out.Values[i] = ec._AuthResponse_token(ctx, field, obj)
+		case "code":
+			out.Values[i] = ec._AuthResponse_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "user":
-			out.Values[i] = ec._AuthResponse_user(ctx, field, obj)
+		case "success":
+			out.Values[i] = ec._AuthResponse_success(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "message":
+			out.Values[i] = ec._AuthResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._AuthResponse_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createUserResponseImplementors = []string{"CreateUserResponse"}
+
+func (ec *executionContext) _CreateUserResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateUserResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createUserResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateUserResponse")
+		case "code":
+			out.Values[i] = ec._CreateUserResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._CreateUserResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._CreateUserResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._CreateUserResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteUserResponseImplementors = []string{"DeleteUserResponse"}
+
+func (ec *executionContext) _DeleteUserResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteUserResponse")
+		case "code":
+			out.Values[i] = ec._DeleteUserResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._DeleteUserResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._DeleteUserResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._DeleteUserResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3753,6 +4567,57 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateUserResponseImplementors = []string{"UpdateUserResponse"}
+
+func (ec *executionContext) _UpdateUserResponse(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateUserResponse")
+		case "code":
+			out.Values[i] = ec._UpdateUserResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._UpdateUserResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._UpdateUserResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._UpdateUserResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4353,6 +5218,16 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAuthData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthData(ctx context.Context, sel ast.SelectionSet, v *model.AuthData) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AuthData(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNAuthResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐAuthResponse(ctx context.Context, sel ast.SelectionSet, v model.AuthResponse) graphql.Marshaler {
 	return ec._AuthResponse(ctx, sel, &v)
 }
@@ -4386,6 +5261,34 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 func (ec *executionContext) unmarshalNCreateUserInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐCreateUserInput(ctx context.Context, v any) (input.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateUserResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateUserResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateUserResponse) graphql.Marshaler {
+	return ec._CreateUserResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateUserResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateUserResponse(ctx context.Context, sel ast.SelectionSet, v *model.CreateUserResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateUserResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteUserResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteUserResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteUserResponse) graphql.Marshaler {
+	return ec._DeleteUserResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteUserResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteUserResponse(ctx context.Context, sel ast.SelectionSet, v *model.DeleteUserResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteUserResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
@@ -4462,8 +5365,18 @@ func (ec *executionContext) unmarshalNUpdateUserInput2reᚑkasirpinterᚑgoᚋgr
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUser2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
-	return ec._User(ctx, sel, &v)
+func (ec *executionContext) marshalNUpdateUserResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateUserResponse(ctx context.Context, sel ast.SelectionSet, v model.UpdateUserResponse) graphql.Marshaler {
+	return ec._UpdateUserResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateUserResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateUserResponse(ctx context.Context, sel ast.SelectionSet, v *model.UpdateUserResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateUserResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUser2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {

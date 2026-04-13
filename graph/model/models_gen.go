@@ -6,10 +6,36 @@ import (
 	"time"
 )
 
+type AuthData struct {
+	Token string `json:"token"`
+	User  *User  `json:"user"`
+}
+
+type CreateUserResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    *User  `json:"data,omitempty"`
+}
+
+type DeleteUserResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    *User  `json:"data,omitempty"`
+}
+
 type Mutation struct {
 }
 
 type Query struct {
+}
+
+type UpdateUserResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    *User  `json:"data,omitempty"`
 }
 
 type User struct {

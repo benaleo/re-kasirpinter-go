@@ -1,0 +1,32 @@
+type AuthResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: AuthData!
+}
+
+type AuthData {
+  token: String!
+  user: User!
+}
+
+type CreateUserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}
+
+type UpdateUserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}
+
+type DeleteUserResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: User
+}

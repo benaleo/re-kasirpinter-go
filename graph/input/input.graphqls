@@ -1,3 +1,8 @@
+input LoginInput {
+  email: String!
+  password: String!
+}
+
 input CreateUserInput {
   name: String!
   email: String!

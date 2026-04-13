@@ -52,7 +52,7 @@ type Query {
 
 type Mutation {
   login(input: LoginInput!): AuthResponse!
-  createUser(input: CreateUserInput!): User! @auth
-  updateUser(id: String!, input: UpdateUserInput!): User! @auth
-  deleteUser(id: String!): Boolean! @auth
+  createUser(input: CreateUserInput!): CreateUserResponse! @auth
+  updateUser(id: String!, input: UpdateUserInput!): UpdateUserResponse! @auth
+  deleteUser(id: String!): DeleteUserResponse! @auth
 }

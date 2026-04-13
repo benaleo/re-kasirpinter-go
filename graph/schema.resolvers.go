@@ -19,12 +19,20 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 	var userDB model.UserDB
 	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
 	if result.Error != nil {
-		return nil, fmt.Errorf("invalid email or password")
+		return &model.AuthResponse{
+			Code:    401,
+			Success: false,
+			Message: "invalid email or password",
+		}, nil
 	}
 
 	// Check password
 	if !checkPassword(input.Password, userDB.Password) {
-		return nil, fmt.Errorf("invalid email or password")
+		return &model.AuthResponse{
+			Code:    401,
+			Success: false,
+			Message: "invalid email or password",
+		}, nil
 	}
 
 	// Get user role
@@ -46,7 +54,11 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 
 	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "login")
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate token: %v", err)
+		return &model.AuthResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to generate token: %v", err),
+		}, nil
 	}
 
 	// Convert DB model to GraphQL model
@@ -80,23 +92,36 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 	}
 
 	return &model.AuthResponse{
-		Token: token,
-		User:  user,
+		Code:    200,
+		Success: true,
+		Message: "login successful",
+		Data: &model.AuthData{
+			Token: token,
+			User:  user,
+		},
 	}, nil
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput) (*model.CreateUserResponse, error) {
 	// Generate secure_id (UUID)
 	secureID, err := generateRandomString(16)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate secure_id: %v", err)
+		return &model.CreateUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to generate secure_id: %v", err),
+		}, nil
 	}
 
 	// Hash password
 	hashedPassword, err := hashPassword(input.Password)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %v", err)
+		return &model.CreateUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to hash password: %v", err),
+		}, nil
 	}
 
 	// Create user DB model
@@ -114,7 +139,11 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUse
 	// Save to database
 	result := r.DB.Create(&userDB)
 	if result.Error != nil {
-		return nil, fmt.Errorf("failed to create user: %v", result.Error)
+		return &model.CreateUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to create user: %v", result.Error),
+		}, nil
 	}
 
 	// Get user role if exists
@@ -153,16 +182,25 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUse
 		}
 	}
 
-	return user, nil
+	return &model.CreateUserResponse{
+		Code:    201,
+		Success: true,
+		Message: "user created successfully",
+		Data:    user,
+	}, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error) {
 	// Find user by secure_id
 	var userDB model.UserDB
 	result := r.DB.Where("secure_id = ?", id).First(&userDB)
 	if result.Error != nil {
-		return nil, fmt.Errorf("user not found")
+		return &model.UpdateUserResponse{
+			Code:    404,
+			Success: false,
+			Message: "user not found",
+		}, nil
 	}
 
 	// Update fields if provided
@@ -191,7 +229,11 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input inpu
 	// Save to database
 	result = r.DB.Save(&userDB)
 	if result.Error != nil {
-		return nil, fmt.Errorf("failed to update user: %v", result.Error)
+		return &model.UpdateUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to update user: %v", result.Error),
+		}, nil
 	}
 
 	// Get user role if exists
@@ -230,16 +272,25 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input inpu
 		}
 	}
 
-	return user, nil
+	return &model.UpdateUserResponse{
+		Code:    200,
+		Success: true,
+		Message: "user updated successfully",
+		Data:    user,
+	}, nil
 }
 
 // DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error) {
 	// Find user by secure_id
 	var userDB model.UserDB
 	result := r.DB.Where("secure_id = ?", id).First(&userDB)
 	if result.Error != nil {
-		return false, fmt.Errorf("user not found")
+		return &model.DeleteUserResponse{
+			Code:    404,
+			Success: false,
+			Message: "user not found",
+		}, nil
 	}
 
 	// Soft delete by setting deleted_at and is_active
@@ -250,10 +301,55 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 	// Save to database
 	result = r.DB.Save(&userDB)
 	if result.Error != nil {
-		return false, fmt.Errorf("failed to delete user: %v", result.Error)
+		return &model.DeleteUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to delete user: %v", result.Error),
+		}, nil
 	}
 
-	return true, nil
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	if userDB.RoleID != nil {
+		r.DB.First(&userRole, *userDB.RoleID)
+	}
+
+	// Convert DB model to GraphQL model
+	user := &model.User{
+		ID:        userDB.ID,
+		SecureID:  userDB.SecureID,
+		Name:      userDB.Name,
+		Email:     userDB.Email,
+		Address:   userDB.Address,
+		Phone:     userDB.Phone,
+		Avatar:    userDB.Avatar,
+		IsActive:  userDB.IsActive,
+		DeletedAt: userDB.DeletedAt,
+		CreatedAt: userDB.CreatedAt,
+		UpdatedAt: userDB.UpdatedAt,
+	}
+
+	if userRole.ID > 0 {
+		user.Role = &model.UserRole{
+			ID:          userRole.ID,
+			Name:        userRole.Name,
+			IsActive:    userRole.IsActive,
+			CreatedAt:   userRole.CreatedAt,
+			CreatedBy:   userRole.CreatedBy,
+			UpdatedAt:   userRole.UpdatedAt,
+			UpdatedBy:   userRole.UpdatedBy,
+			DeletedAt:   userRole.DeletedAt,
+			DeletedBy:   userRole.DeletedBy,
+			Permissions: nil,
+		}
+	}
+
+	return &model.DeleteUserResponse{
+		Code:    200,
+		Success: true,
+		Message: "user deleted successfully",
+		Data:    user,
+	}, nil
 }
 
 // Users is the resolver for the users field.
