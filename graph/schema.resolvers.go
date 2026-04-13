@@ -156,10 +156,10 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUse
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, secureID string, input input.UpdateUserInput) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.User, error) {
 	// Find user by secure_id
 	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", secureID).First(&userDB)
+	result := r.DB.Where("secure_id = ?", id).First(&userDB)
 	if result.Error != nil {
 		return nil, fmt.Errorf("user not found")
 	}
@@ -233,7 +233,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, secureID string, inpu
 }
 
 // DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, secureID string) (bool, error) {
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
 	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
 }
 

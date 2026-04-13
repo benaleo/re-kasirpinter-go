@@ -46,9 +46,9 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateUser func(childComplexity int, input input.CreateUserInput) int
-		DeleteUser func(childComplexity int, secureID string) int
+		DeleteUser func(childComplexity int, id string) int
 		Login      func(childComplexity int, input input.LoginInput) int
-		UpdateUser func(childComplexity int, secureID string, input input.UpdateUserInput) int
+		UpdateUser func(childComplexity int, id string, input input.UpdateUserInput) int
 	}
 
 	Query struct {
@@ -98,8 +98,8 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error)
 	CreateUser(ctx context.Context, input input.CreateUserInput) (*model.User, error)
-	UpdateUser(ctx context.Context, secureID string, input input.UpdateUserInput) (*model.User, error)
-	DeleteUser(ctx context.Context, secureID string) (bool, error)
+	UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.User, error)
+	DeleteUser(ctx context.Context, id string) (bool, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
@@ -154,7 +154,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.DeleteUser(childComplexity, args["secure_id"].(string)), true
+		return e.ComplexityRoot.Mutation.DeleteUser(childComplexity, args["id"].(string)), true
 	case "Mutation.login":
 		if e.ComplexityRoot.Mutation.Login == nil {
 			break
@@ -176,7 +176,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.UpdateUser(childComplexity, args["secure_id"].(string), args["input"].(input.UpdateUserInput)), true
+		return e.ComplexityRoot.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(input.UpdateUserInput)), true
 
 	case "Query.user":
 		if e.ComplexityRoot.Query.User == nil {
@@ -477,11 +477,11 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "secure_id", ec.unmarshalNString2string)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
 	if err != nil {
 		return nil, err
 	}
-	args["secure_id"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -499,11 +499,11 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "secure_id", ec.unmarshalNString2string)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
 	if err != nil {
 		return nil, err
 	}
-	args["secure_id"] = arg0
+	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateUserInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐUpdateUserInput)
 	if err != nil {
 		return nil, err
@@ -805,7 +805,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 		ec.fieldContext_Mutation_updateUser,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().UpdateUser(ctx, fc.Args["secure_id"].(string), fc.Args["input"].(input.UpdateUserInput))
+			return ec.Resolvers.Mutation().UpdateUser(ctx, fc.Args["id"].(string), fc.Args["input"].(input.UpdateUserInput))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -885,7 +885,7 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 		ec.fieldContext_Mutation_deleteUser,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().DeleteUser(ctx, fc.Args["secure_id"].(string))
+			return ec.Resolvers.Mutation().DeleteUser(ctx, fc.Args["id"].(string))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
