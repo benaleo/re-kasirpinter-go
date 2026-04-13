@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
+	"time"
 )
 
 // Login is the resolver for the login field.
@@ -234,7 +235,25 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input inpu
 
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
+	// Find user by secure_id
+	var userDB model.UserDB
+	result := r.DB.Where("secure_id = ?", id).First(&userDB)
+	if result.Error != nil {
+		return false, fmt.Errorf("user not found")
+	}
+
+	// Soft delete by setting deleted_at and is_active
+	now := time.Now()
+	userDB.DeletedAt = &now
+	userDB.IsActive = false
+
+	// Save to database
+	result = r.DB.Save(&userDB)
+	if result.Error != nil {
+		return false, fmt.Errorf("failed to delete user: %v", result.Error)
+	}
+
+	return true, nil
 }
 
 // Users is the resolver for the users field.
