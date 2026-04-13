@@ -78,6 +78,29 @@ func (UserRolePermissionDB) TableName() string {
 	return "user_role_permissions"
 }
 
+// OtpDB represents the database model for OTP
+type OtpDB struct {
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Email     string    `gorm:"not null" json:"email"`
+	Code      string    `gorm:"size:6;not null" json:"code"`
+	IsValid   bool      `gorm:"default:true" json:"is_valid"`
+	ExpiredAt time.Time `gorm:"not null" json:"expired_at"`
+	CreatedAt time.Time `json:"created_at"`
+	Type      string    `gorm:"not null" json:"type"`
+}
+
+// TableName specifies the table name for OtpDB
+func (OtpDB) TableName() string {
+	return "otps"
+}
+
+// BeforeCreate hook for OtpDB
+func (o *OtpDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	o.CreatedAt = now
+	return nil
+}
+
 // BeforeCreate hook for UserDB
 func (u *UserDB) BeforeCreate(tx *gorm.DB) error {
 	now := time.Now()

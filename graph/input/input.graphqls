@@ -28,3 +28,14 @@ input PaginationInput {
   page: Int = 1
   sortBy: String = "created_at,desc"
 }
+
+input CreateOtpInput {
+  email: String!
+  type: String!
+}
+
+input VerifyOtpInput {
+  email: String!
+  code: String!
+  type: String!
+}

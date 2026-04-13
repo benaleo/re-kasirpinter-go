@@ -29,6 +29,10 @@ func LoadEnv() error {
 	setDefaultEnv("ENV", os.Getenv("ENV"))
 	setDefaultEnv("PORT", os.Getenv("PORT"))
 	setDefaultEnv("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGINS"))
+	setDefaultEnv("EMAIL_HOST", os.Getenv("EMAIL_HOST"))
+	setDefaultEnv("EMAIL_PORT", os.Getenv("EMAIL_PORT"))
+	setDefaultEnv("EMAIL_USERNAME", os.Getenv("EMAIL_USERNAME"))
+	setDefaultEnv("EMAIL_PASSWORD", os.Getenv("EMAIL_PASSWORD"))
 
 	return nil
 }

@@ -57,3 +57,16 @@ type UsersResponse {
   data: [User!]!
   pagination: PageInfo!
 }
+
+type CreateOtpResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+}
+
+type VerifyOtpResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  token: String
+}

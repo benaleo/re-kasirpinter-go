@@ -261,6 +261,98 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.De
 	}, nil
 }
 
+// CreateOtp is the resolver for the createOtp field.
+func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error) {
+	// Check if user exists (optional but good for security)
+	var userDB model.UserDB
+	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
+	if result.Error != nil {
+		// For security, still return success even if user doesn't exist
+		// This prevents email enumeration attacks
+		return toGraphQLCreateOtpResponse(200, true, "If the email exists, a verification code has been sent"), nil
+	}
+
+	// Generate 6-digit OTP code
+	code := generateOTPCode()
+
+	// Invalidate any existing OTPs for this email and type
+	r.DB.Model(&model.OtpDB{}).Where("email = ? AND type = ?", input.Email, input.Type).Update("is_valid", false)
+
+	// Create new OTP record
+	otpDB := model.OtpDB{
+		Email:     input.Email,
+		Code:      code,
+		IsValid:   true,
+		ExpiredAt: time.Now().Add(10 * time.Minute),
+		Type:      input.Type,
+	}
+
+	result = r.DB.Create(&otpDB)
+	if result.Error != nil {
+		return toGraphQLCreateOtpResponse(500, false, fmt.Sprintf("failed to create OTP: %v", result.Error)), nil
+	}
+
+	// Send email with OTP code
+	err := SendPasswordResetEmail(input.Email, code)
+	if err != nil {
+		// Log the error but still return success (OTP is saved in DB)
+		// This allows testing even if email fails
+		fmt.Printf("Warning: Failed to send email: %v\n", err)
+	}
+
+	return toGraphQLCreateOtpResponse(200, true, "Verification code has been sent to your email"), nil
+}
+
+// VerifyOtp is the resolver for the verifyOtp field.
+func (r *mutationResolver) VerifyOtp(ctx context.Context, input model.VerifyOtpInput) (*model.VerifyOtpResponse, error) {
+	// Find the OTP record
+	var otpDB model.OtpDB
+	result := r.DB.Where("email = ? AND code = ? AND type = ? AND is_valid = ?", input.Email, input.Code, input.Type, true).First(&otpDB)
+	if result.Error != nil {
+		return toGraphQLVerifyOtpResponse(400, false, "Invalid or expired verification code", nil), nil
+	}
+
+	// Check if OTP is expired
+	if time.Now().After(otpDB.ExpiredAt) {
+		// Mark as invalid
+		r.DB.Model(&otpDB).Update("is_valid", false)
+		return toGraphQLVerifyOtpResponse(400, false, "Verification code has expired", nil), nil
+	}
+
+	// Find the user
+	var userDB model.UserDB
+	result = r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
+	if result.Error != nil {
+		return toGraphQLVerifyOtpResponse(404, false, "User not found", nil), nil
+	}
+
+	// Get user role
+	var userRole model.UserRoleDB
+	roleName := ""
+	if userDB.RoleID != nil {
+		r.DB.First(&userRole, *userDB.RoleID)
+		if userRole.ID > 0 {
+			roleName = userRole.Name
+		}
+	}
+
+	// Generate JWT token for password reset
+	secureID := ""
+	if userDB.SecureID != nil {
+		secureID = *userDB.SecureID
+	}
+
+	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "password_reset")
+	if err != nil {
+		return toGraphQLVerifyOtpResponse(500, false, fmt.Sprintf("failed to generate token: %v", err), nil), nil
+	}
+
+	// Invalidate the OTP (one-time use)
+	r.DB.Model(&otpDB).Update("is_valid", false)
+
+	return toGraphQLVerifyOtpResponse(200, true, "Verification successful", &token), nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
 	// Parse pagination parameters

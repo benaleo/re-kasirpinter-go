@@ -11,6 +11,17 @@ type AuthData struct {
 	User  *User  `json:"user"`
 }
 
+type CreateOtpInput struct {
+	Email string `json:"email"`
+	Type  string `json:"type"`
+}
+
+type CreateOtpResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type CreateUserResponse struct {
 	Code    int32  `json:"code"`
 	Success bool   `json:"success"`
@@ -106,4 +117,17 @@ type UsersResponse struct {
 	Message    string    `json:"message"`
 	Data       []*User   `json:"data"`
 	Pagination *PageInfo `json:"pagination"`
+}
+
+type VerifyOtpInput struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+	Type  string `json:"type"`
+}
+
+type VerifyOtpResponse struct {
+	Code    int32   `json:"code"`
+	Success bool    `json:"success"`
+	Message string  `json:"message"`
+	Token   *string `json:"token,omitempty"`
 }

@@ -3,6 +3,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"math/rand"
 	"os"
 	"time"
 
@@ -33,6 +34,15 @@ func getEnv(key, defaultValue string) string {
 
 func generateRandomString(n int) (string, error) {
 	return uuid.New().String(), nil
+}
+
+func generateOTPCode() string {
+	rand.Seed(time.Now().UnixNano())
+	code := ""
+	for i := 0; i < 6; i++ {
+		code += string(rune('0' + rand.Intn(10)))
+	}
+	return code
 }
 
 func hashPassword(password string) (string, error) {
