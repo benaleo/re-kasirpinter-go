@@ -16,10 +16,78 @@ import (
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error) {
+	// Get client information from context
+	clientInfo := GetClientInfo(ctx)
+	var ip, browser, os *string
+	if clientInfo != nil {
+		ip = &clientInfo.IP
+		browser = &clientInfo.Browser
+		os = &clientInfo.OS
+	}
+
+	// Check for recent failed login attempts (within last 5 minutes)
+	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+	var failedAttemptsCount int64
+	r.DB.Model(&model.LoginAuditDB{}).
+		Where("email = ? AND success = ? AND created_at > ?", input.Email, false, fiveMinutesAgo).
+		Count(&failedAttemptsCount)
+
+	// If 3 or more failed attempts in last 5 minutes, block login
+	if failedAttemptsCount >= 3 {
+		// Record this blocked attempt
+		loginAudit := model.LoginAuditDB{
+			Email:   input.Email,
+			Success: false,
+			IP:      ip,
+			Browser: browser,
+			OS:      os,
+		}
+		r.DB.Create(&loginAudit)
+
+		// Calculate when user can try again (5 minutes from now)
+		tryAgainAt := time.Now().Add(5 * time.Minute).Format("2006-01-02 15:04:05")
+
+		return &model.AuthResponse{
+			Code:    429,
+			Success: false,
+			Message: fmt.Sprintf("too many failed login attempts. please wait 5 minutes before trying again [[%s]]", tryAgainAt),
+		}, nil
+	}
+
 	// Find user by email
 	var userDB model.UserDB
 	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
 	if result.Error != nil {
+		// Record failed attempt (user not found)
+		loginAudit := model.LoginAuditDB{
+			Email:   input.Email,
+			Success: false,
+			IP:      ip,
+			Browser: browser,
+			OS:      os,
+		}
+		r.DB.Create(&loginAudit)
+
+		return &model.AuthResponse{
+			Code:    401,
+			Success: false,
+			Message: "invalid email or password",
+		}, nil
+	}
+
+	// Decrypt password from frontend using AES
+	decryptedPassword, err := helper.Decrypt(input.Password)
+	if err != nil {
+		// Record failed attempt (decryption error)
+		loginAudit := model.LoginAuditDB{
+			Email:   input.Email,
+			Success: false,
+			IP:      ip,
+			Browser: browser,
+			OS:      os,
+		}
+		r.DB.Create(&loginAudit)
+
 		return &model.AuthResponse{
 			Code:    401,
 			Success: false,
@@ -28,7 +96,17 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 	}
 
 	// Check password
-	if !checkPassword(input.Password, userDB.Password) {
+	if !checkPassword(decryptedPassword, userDB.Password) {
+		// Record failed attempt (wrong password)
+		loginAudit := model.LoginAuditDB{
+			Email:   input.Email,
+			Success: false,
+			IP:      ip,
+			Browser: browser,
+			OS:      os,
+		}
+		r.DB.Create(&loginAudit)
+
 		return &model.AuthResponse{
 			Code:    401,
 			Success: false,
@@ -61,6 +139,16 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 			Message: fmt.Sprintf("failed to generate token: %v", err),
 		}, nil
 	}
+
+	// Record successful login attempt
+	loginAudit := model.LoginAuditDB{
+		Email:   input.Email,
+		Success: true,
+		IP:      ip,
+		Browser: browser,
+		OS:      os,
+	}
+	r.DB.Create(&loginAudit)
 
 	// Convert DB model to GraphQL model using mapper
 	var userRoleDB *model.UserRoleDB
@@ -267,9 +355,7 @@ func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpI
 	var userDB model.UserDB
 	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
 	if result.Error != nil {
-		// For security, still return success even if user doesn't exist
-		// This prevents email enumeration attacks
-		return toGraphQLCreateOtpResponse(200, true, "If the email exists, a verification code has been sent"), nil
+		return toGraphQLCreateOtpResponse(404, false, "User not found"), nil
 	}
 
 	// Generate 6-digit OTP code
