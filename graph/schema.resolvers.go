@@ -75,8 +75,28 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 		}, nil
 	}
 
+	// Decrypt password from frontend using AES
+	decryptedPassword, err := helper.Decrypt(input.Password)
+	if err != nil {
+		// Record failed attempt (decryption error)
+		loginAudit := model.LoginAuditDB{
+			Email:   input.Email,
+			Success: false,
+			IP:      ip,
+			Browser: browser,
+			OS:      os,
+		}
+		r.DB.Create(&loginAudit)
+
+		return &model.AuthResponse{
+			Code:    401,
+			Success: false,
+			Message: "invalid email or password",
+		}, nil
+	}
+
 	// Check password
-	if !checkPassword(input.Password, userDB.Password) {
+	if !checkPassword(decryptedPassword, userDB.Password) {
 		// Record failed attempt (wrong password)
 		loginAudit := model.LoginAuditDB{
 			Email:   input.Email,
