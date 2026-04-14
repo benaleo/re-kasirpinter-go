@@ -358,6 +358,31 @@ func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpI
 		return toGraphQLCreateOtpResponse(404, false, "User not found"), nil
 	}
 
+	// Check if there's a valid OTP created recently (within 30 seconds)
+	var existingOTP model.OtpDB
+	thirtySecondsAgo := time.Now().Add(-30 * time.Second)
+	result = r.DB.Where("email = ? AND type = ? AND is_valid = ? AND created_at > ?", input.Email, input.Type, true, thirtySecondsAgo).Order("created_at DESC").First(&existingOTP)
+
+	if result.Error == nil {
+		// Valid OTP exists recently, return it instead of creating a new one
+		// Get client information from context
+		clientInfo := GetClientInfo(ctx)
+		var ip, browser, os *string
+		if clientInfo != nil {
+			ip = &clientInfo.IP
+			browser = &clientInfo.Browser
+			os = &clientInfo.OS
+		}
+
+		// Determine retry value
+		retry := input.Retry != nil && *input.Retry
+
+		// Enqueue email job (will be skipped by deduplication logic)
+		_ = EnqueueEmailJob(r.DB, input.Email, existingOTP.Code, retry, ip, browser, os)
+
+		return toGraphQLCreateOtpResponse(200, true, "Verification code has been sent to your email"), nil
+	}
+
 	// Generate 6-digit OTP code
 	code := generateOTPCode()
 
