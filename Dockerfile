@@ -31,6 +31,9 @@ WORKDIR /root/
 # Copy the binary from builder
 COPY --from=builder /app/main .
 
+# Copy templates directory from builder
+COPY --from=builder /app/templates ./templates
+
 # Expose port
 EXPOSE 8000
 
