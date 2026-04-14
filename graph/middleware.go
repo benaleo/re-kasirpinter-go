@@ -60,8 +60,10 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 
 					// Check if token is blacklisted
 					if isTokenBlacklisted(db, tokenString) {
-						// Token is blacklisted, reject the request with standard 401
-						http.Error(w, "Unauthorized", http.StatusUnauthorized)
+						// Token is blacklisted, reject the request with GraphQL error format
+						w.Header().Set("Content-Type", "application/json")
+						w.WriteHeader(http.StatusUnauthorized)
+						w.Write([]byte(`{"errors":[{"message":"Access denied. You must be logged in.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
 						return
 					}
 
