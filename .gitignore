@@ -50,3 +50,4 @@ tmp/
 
 # App
 re-kasirpinter-go
+*test.go
