@@ -101,8 +101,8 @@ func main() {
 		fmt.Fprintf(w, "OK")
 	})
 
-	mux.Handle("/graphql", playground.Handler("GraphQL playground", "/query"))
-	mux.Handle("/query", graph.AuthMiddleware(srv))
+	mux.HandleFunc("/graphql", playground.Handler("GraphQL playground", "/query"))
+	mux.Handle("/query", graph.AuthMiddleware(db)(srv))
 
 	// Apply CORS middleware to all routes
 	handler := corsMiddleware(mux)

@@ -176,3 +176,24 @@ func (l *LoginAuditDB) BeforeCreate(tx *gorm.DB) error {
 	l.CreatedAt = now
 	return nil
 }
+
+// BlacklistedTokenDB represents the database model for blacklisted tokens
+type BlacklistedTokenDB struct {
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Token     string    `gorm:"uniqueIndex;not null;size:500" json:"token"`
+	UserID    int32     `gorm:"not null;index" json:"user_id"`
+	ExpiresAt time.Time `gorm:"not null;index" json:"expired_at"`
+	CreatedAt time.Time `gorm:"not null;index" json:"created_at"`
+}
+
+// TableName specifies the table name for BlacklistedTokenDB
+func (BlacklistedTokenDB) TableName() string {
+	return "blacklisted_tokens"
+}
+
+// BeforeCreate hook for BlacklistedTokenDB
+func (b *BlacklistedTokenDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	b.CreatedAt = now
+	return nil
+}

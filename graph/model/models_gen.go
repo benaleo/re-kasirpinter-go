@@ -37,6 +37,12 @@ type DeleteUserResponse struct {
 	Data    *User  `json:"data,omitempty"`
 }
 
+type LogoutResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type Mutation struct {
 }
 

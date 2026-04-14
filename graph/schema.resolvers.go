@@ -168,6 +168,70 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 	}, nil
 }
 
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, error) {
+	// Get user claims from context (already authenticated by @auth directive)
+	userClaims := ForContext(ctx)
+	if userClaims == nil {
+		return &model.LogoutResponse{
+			Code:    401,
+			Success: false,
+			Message: "Unauthorized",
+		}, nil
+	}
+
+	// Get the token from context (set by middleware)
+	token := GetToken(ctx)
+	if token == "" {
+		return &model.LogoutResponse{
+			Code:    400,
+			Success: false,
+			Message: "Token not found in context",
+		}, nil
+	}
+
+	// Validate the token to get its expiration time
+	claims, err := validateJWT(token)
+	if err != nil {
+		return &model.LogoutResponse{
+			Code:    400,
+			Success: false,
+			Message: "Invalid token",
+		}, nil
+	}
+
+	// Verify that the token belongs to the authenticated user
+	if claims.UserID != userClaims.UserID {
+		return &model.LogoutResponse{
+			Code:    403,
+			Success: false,
+			Message: "Token does not belong to authenticated user",
+		}, nil
+	}
+
+	// Get the token's expiration time
+	expiresAt := claims.ExpiresAt.Time
+
+	// Add the token to the blacklist
+	err = blacklistToken(r.DB, token, userClaims.UserID, expiresAt)
+	if err != nil {
+		return &model.LogoutResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("Failed to blacklist token: %v", err),
+		}, nil
+	}
+
+	// Optionally cleanup expired blacklisted tokens
+	go cleanupExpiredBlacklistedTokens(r.DB)
+
+	return &model.LogoutResponse{
+		Code:    200,
+		Success: true,
+		Message: "logout successful",
+	}, nil
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput) (*model.CreateUserResponse, error) {
 	// Generate secure_id (UUID)

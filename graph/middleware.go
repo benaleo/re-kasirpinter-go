@@ -7,10 +7,12 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
+	"gorm.io/gorm"
 )
 
 const userCtxKey = "user"
 const clientInfoCtxKey = "clientInfo"
+const tokenCtxKey = "token"
 
 type ClientInfo struct {
 	IP      string
@@ -18,59 +20,69 @@ type ClientInfo struct {
 	OS      string
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract client information
-		clientInfo := &ClientInfo{
-			IP:      getClientIP(r),
-			Browser: parseUserAgent(r.UserAgent()),
-			OS:      parseOS(r.UserAgent()),
-		}
-
-		// Add client info to context
-		ctx := context.WithValue(r.Context(), clientInfoCtxKey, clientInfo)
-		r = r.WithContext(ctx)
-
-		// Skip auth for login and register mutations
-		if r.URL.Path == "/query" {
-			// This is a GraphQL request, check the operation name
-			if r.Method == "POST" {
-				// In a real app, you'd parse the request body to check the operation name
-				// For simplicity, we'll just check the auth header for now
-				authHeader := r.Header.Get("Authorization")
-				if authHeader == "" {
-					// No auth header, let the resolver handle it
-					next.ServeHTTP(w, r)
-					return
-				}
-
-				// Extract the token from the Authorization header
-				// Support both "Bearer <token>" and just "<token>" formats
-				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-				tokenString = strings.TrimSpace(tokenString)
-
-				if tokenString == "" {
-					// No token found
-					next.ServeHTTP(w, r)
-					return
-				}
-
-				// Validate the token
-				claims, err := validateJWT(tokenString)
-				if err != nil {
-					// Invalid token, let the resolver handle it
-					next.ServeHTTP(w, r)
-					return
-				}
-
-				// Add user info to context
-				ctx = context.WithValue(ctx, userCtxKey, claims)
-				r = r.WithContext(ctx)
+func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Extract client information
+			clientInfo := &ClientInfo{
+				IP:      getClientIP(r),
+				Browser: parseUserAgent(r.UserAgent()),
+				OS:      parseOS(r.UserAgent()),
 			}
-		}
 
-		next.ServeHTTP(w, r)
-	})
+			// Add client info to context
+			ctx := context.WithValue(r.Context(), clientInfoCtxKey, clientInfo)
+			r = r.WithContext(ctx)
+
+			// Skip auth for login and register mutations
+			if r.URL.Path == "/query" {
+				// This is a GraphQL request, check the operation name
+				if r.Method == "POST" {
+					// In a real app, you'd parse the request body to check the operation name
+					// For simplicity, we'll just check the auth header for now
+					authHeader := r.Header.Get("Authorization")
+					if authHeader == "" {
+						// No auth header, let the resolver handle it
+						next.ServeHTTP(w, r)
+						return
+					}
+
+					// Extract the token from the Authorization header
+					// Support both "Bearer <token>" and just "<token>" formats
+					tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+					tokenString = strings.TrimSpace(tokenString)
+
+					if tokenString == "" {
+						// No token found
+						next.ServeHTTP(w, r)
+						return
+					}
+
+					// Check if token is blacklisted
+					if isTokenBlacklisted(db, tokenString) {
+						// Token is blacklisted, reject the request with standard 401
+						http.Error(w, "Unauthorized", http.StatusUnauthorized)
+						return
+					}
+
+					// Validate the token
+					claims, err := validateJWT(tokenString)
+					if err != nil {
+						// Invalid token, let the resolver handle it
+						next.ServeHTTP(w, r)
+						return
+					}
+
+					// Add user info and token to context
+					ctx = context.WithValue(ctx, userCtxKey, claims)
+					ctx = context.WithValue(ctx, tokenCtxKey, tokenString)
+					r = r.WithContext(ctx)
+				}
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
@@ -82,6 +94,12 @@ func ForContext(ctx context.Context) *Claims {
 // GetClientInfo finds the client info from the context. REQUIRES Middleware to have run.
 func GetClientInfo(ctx context.Context) *ClientInfo {
 	raw, _ := ctx.Value(clientInfoCtxKey).(*ClientInfo)
+	return raw
+}
+
+// GetToken finds the token from the context. REQUIRES Middleware to have run.
+func GetToken(ctx context.Context) string {
+	raw, _ := ctx.Value(tokenCtxKey).(string)
 	return raw
 }
 

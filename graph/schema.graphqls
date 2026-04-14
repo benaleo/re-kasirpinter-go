@@ -45,6 +45,12 @@ type UserRolePermission {
 scalar Time
 scalar Int64
 
+type LogoutResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+}
+
 type Query {
   users(pagination: PaginationInput): UsersResponse! @auth
   user(id: String!): UserResponse! @auth
@@ -52,6 +58,7 @@ type Query {
 
 type Mutation {
   login(input: LoginInput!): AuthResponse!
+  logout: LogoutResponse! @auth
   createUser(input: CreateUserInput!): CreateUserResponse! @auth
   updateUser(id: String!, input: UpdateUserInput!): UpdateUserResponse! @auth
   deleteUser(id: String!): DeleteUserResponse! @auth

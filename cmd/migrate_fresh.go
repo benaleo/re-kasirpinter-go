@@ -41,6 +41,7 @@ func truncateAllTables(db *gorm.DB) error {
 	// Truncate tables in reverse order of dependencies
 	// Many-to-many junction tables first, then dependent tables, then parent tables
 	tables := []string{
+		"blacklisted_tokens",
 		"user_role_permissions",
 		"users",
 		"user_roles",

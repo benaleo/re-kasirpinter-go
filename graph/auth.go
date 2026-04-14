@@ -5,11 +5,13 @@ import (
 	"errors"
 	"math/rand"
 	"os"
+	"re-kasirpinter-go/graph/model"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 var (
@@ -104,6 +106,28 @@ func validateJWT(tokenString string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+// isTokenBlacklisted checks if a token is in the blacklist
+func isTokenBlacklisted(db *gorm.DB, tokenString string) bool {
+	var count int64
+	db.Model(&model.BlacklistedTokenDB{}).Where("token = ? AND expires_at > ?", tokenString, time.Now()).Count(&count)
+	return count > 0
+}
+
+// blacklistToken adds a token to the blacklist
+func blacklistToken(db *gorm.DB, tokenString string, userID int32, expiresAt time.Time) error {
+	blacklistedToken := model.BlacklistedTokenDB{
+		Token:     tokenString,
+		UserID:    userID,
+		ExpiresAt: expiresAt,
+	}
+	return db.Create(&blacklistedToken).Error
+}
+
+// cleanupExpiredBlacklistedTokens removes expired tokens from the blacklist
+func cleanupExpiredBlacklistedTokens(db *gorm.DB) error {
+	return db.Where("expires_at <= ?", time.Now()).Delete(&model.BlacklistedTokenDB{}).Error
 }
 
 // RequireSuperAdmin checks if the user from context has superadmin role

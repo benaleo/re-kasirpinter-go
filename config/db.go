@@ -51,6 +51,7 @@ func InitDb() (*gorm.DB, error) {
 		&model.OtpDB{},
 		&model.LogEmailDB{},
 		&model.LoginAuditDB{},
+		&model.BlacklistedTokenDB{},
 	)
 
 	if err != nil {
