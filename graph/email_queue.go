@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"re-kasirpinter-go/graph/model"
 
@@ -33,6 +34,13 @@ var (
 	queueOnce    sync.Once
 	maxQueueSize = 1000
 	workerCount  = 5
+	// Track recent email sends to prevent duplicates
+	recentEmails = struct {
+		sync.RWMutex
+		lastSent map[string]time.Time
+	}{
+		lastSent: make(map[string]time.Time),
+	}
 )
 
 // GetEmailQueue returns the singleton email queue instance
@@ -125,6 +133,21 @@ func (eq *EmailQueue) Stop() {
 
 // EnqueueEmailJob is a convenience function to enqueue an email job
 func EnqueueEmailJob(db *gorm.DB, email, code string, retry bool, ip, browser, os *string) error {
+	// Check for duplicate email sends within 30 seconds
+	recentEmails.RLock()
+	lastSent, exists := recentEmails.lastSent[email]
+	recentEmails.RUnlock()
+
+	if exists && time.Since(lastSent) < 30*time.Second {
+		log.Printf("Skipping duplicate email to %s (last sent %v ago)", email, time.Since(lastSent))
+		return nil
+	}
+
+	// Update last sent time
+	recentEmails.Lock()
+	recentEmails.lastSent[email] = time.Now()
+	recentEmails.Unlock()
+
 	queue := GetEmailQueue()
 	job := EmailJob{
 		Email:   email,
