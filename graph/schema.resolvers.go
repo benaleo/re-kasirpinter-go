@@ -660,6 +660,84 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.UserRespons
 	}, nil
 }
 
+// Roles is the resolver for the roles field.
+func (r *queryResolver) Roles(ctx context.Context) (*model.RolesResponse, error) {
+	// Query all roles with permissions
+	var rolesDB []model.UserRoleDB
+	result := r.DB.Preload("Permissions").Where("deleted_at IS NULL").Find(&rolesDB)
+	if result.Error != nil {
+		return &model.RolesResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to retrieve roles: %v", result.Error),
+		}, nil
+	}
+
+	// Convert DB models to GraphQL models
+	roles := make([]*model.UserRole, len(rolesDB))
+	for i, roleDB := range rolesDB {
+		roles[i] = toGraphQLUserRole(roleDB)
+	}
+
+	return &model.RolesResponse{
+		Code:    200,
+		Success: true,
+		Message: "roles retrieved successfully",
+		Data:    roles,
+	}, nil
+}
+
+// Role is the resolver for the role field.
+func (r *queryResolver) Role(ctx context.Context, id int64) (*model.RoleResponse, error) {
+	// Find role by ID with permissions
+	var roleDB model.UserRoleDB
+	result := r.DB.Preload("Permissions").Where("id = ? AND deleted_at IS NULL", id).First(&roleDB)
+	if result.Error != nil {
+		return &model.RoleResponse{
+			Code:    404,
+			Success: false,
+			Message: "role not found",
+		}, nil
+	}
+
+	// Convert DB model to GraphQL model
+	role := toGraphQLUserRole(roleDB)
+
+	return &model.RoleResponse{
+		Code:    200,
+		Success: true,
+		Message: "role retrieved successfully",
+		Data:    role,
+	}, nil
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *queryResolver) Permissions(ctx context.Context) (*model.PermissionsResponse, error) {
+	// Query all permissions
+	var permissionsDB []model.UserPermissionDB
+	result := r.DB.Find(&permissionsDB)
+	if result.Error != nil {
+		return &model.PermissionsResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to retrieve permissions: %v", result.Error),
+		}, nil
+	}
+
+	// Convert DB models to GraphQL models
+	permissions := make([]*model.UserPermission, len(permissionsDB))
+	for i, permDB := range permissionsDB {
+		permissions[i] = toGraphQLUserPermission(permDB)
+	}
+
+	return &model.PermissionsResponse{
+		Code:    200,
+		Success: true,
+		Message: "permissions retrieved successfully",
+		Data:    permissions,
+	}, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 

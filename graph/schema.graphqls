@@ -54,6 +54,10 @@ type LogoutResponse {
 type Query {
   users(pagination: PaginationInput): UsersResponse! @auth
   user(id: String!): UserResponse! @auth
+  # administrator
+  roles: RolesResponse! @auth
+  role(id: Int64!): RoleResponse! @auth
+  permissions: PermissionsResponse! @auth
 }
 
 type Mutation {

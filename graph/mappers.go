@@ -28,6 +28,12 @@ func toGraphQLUser(userDB model.UserDB, userRoleDB *model.UserRoleDB) *model.Use
 }
 
 func toGraphQLUserRole(userRoleDB model.UserRoleDB) *model.UserRole {
+	// Convert permissions
+	permissions := make([]*model.UserPermission, len(userRoleDB.Permissions))
+	for i, permDB := range userRoleDB.Permissions {
+		permissions[i] = toGraphQLUserPermission(permDB)
+	}
+
 	return &model.UserRole{
 		ID:          userRoleDB.ID,
 		Name:        userRoleDB.Name,
@@ -38,7 +44,14 @@ func toGraphQLUserRole(userRoleDB model.UserRoleDB) *model.UserRole {
 		UpdatedBy:   userRoleDB.UpdatedBy,
 		DeletedAt:   userRoleDB.DeletedAt,
 		DeletedBy:   userRoleDB.DeletedBy,
-		Permissions: nil,
+		Permissions: permissions,
+	}
+}
+
+func toGraphQLUserPermission(userPermissionDB model.UserPermissionDB) *model.UserPermission {
+	return &model.UserPermission{
+		ID:   userPermissionDB.ID,
+		Name: userPermissionDB.Name,
 	}
 }
 

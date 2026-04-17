@@ -76,3 +76,24 @@ type NewPasswordResponse {
   success: Boolean!
   message: String!
 }
+
+type RolesResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [UserRole!]!
+}
+
+type RoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type PermissionsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [UserPermission!]!
+}

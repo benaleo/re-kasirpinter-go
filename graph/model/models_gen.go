@@ -73,7 +73,28 @@ type PaginationInput struct {
 	SortBy *string `json:"sortBy,omitempty"`
 }
 
+type PermissionsResponse struct {
+	Code    int32             `json:"code"`
+	Success bool              `json:"success"`
+	Message string            `json:"message"`
+	Data    []*UserPermission `json:"data"`
+}
+
 type Query struct {
+}
+
+type RoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
+}
+
+type RolesResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    []*UserRole `json:"data"`
 }
 
 type UpdateUserResponse struct {
