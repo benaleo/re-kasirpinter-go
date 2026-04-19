@@ -52,7 +52,7 @@ type LogoutResponse {
 }
 
 type Query {
-  users(pagination: PaginationInput): UsersResponse! @auth
+  users(pagination: PaginationInput, is_user: Boolean = true): UsersResponse! @auth
   user(id: String!): UserResponse! @auth
   # administrator
   roles: RolesResponse! @auth

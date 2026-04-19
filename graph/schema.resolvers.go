@@ -736,12 +736,22 @@ func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.Del
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
+func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query with filters
 	baseQuery := r.DB.Model(&model.UserDB{}).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
+
+	// Filter by role_id based on is_user parameter (default: true)
+	getUserWithRole2 := isUser == nil || *isUser
+	if getUserWithRole2 {
+		// Get users with role_id = 2
+		baseQuery = baseQuery.Where("role_id = ?", 2)
+	} else {
+		// Get users excluding role_id = 2
+		baseQuery = baseQuery.Where("role_id != ?", 2)
+	}
 
 	// Get total count
 	var total int64

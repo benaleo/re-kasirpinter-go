@@ -134,7 +134,7 @@ type ComplexityRoot struct {
 		Role        func(childComplexity int, id int64) int
 		Roles       func(childComplexity int) int
 		User        func(childComplexity int, id string) int
-		Users       func(childComplexity int, pagination *model.PaginationInput) int
+		Users       func(childComplexity int, pagination *model.PaginationInput, isUser *bool) int
 	}
 
 	RoleResponse struct {
@@ -240,7 +240,7 @@ type MutationResolver interface {
 	DeleteRole(ctx context.Context, id int64) (*model.DeleteRoleResponse, error)
 }
 type QueryResolver interface {
-	Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error)
+	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
 	User(ctx context.Context, id string) (*model.UserResponse, error)
 	Roles(ctx context.Context) (*model.RolesResponse, error)
 	Role(ctx context.Context, id int64) (*model.RoleResponse, error)
@@ -691,7 +691,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Users(childComplexity, args["pagination"].(*model.PaginationInput)), true
+		return e.ComplexityRoot.Query.Users(childComplexity, args["pagination"].(*model.PaginationInput), args["is_user"].(*bool)), true
 
 	case "RoleResponse.code":
 		if e.ComplexityRoot.RoleResponse.Code == nil {
@@ -1308,6 +1308,11 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 		return nil, err
 	}
 	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_user", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_user"] = arg1
 	return args, nil
 }
 
@@ -3399,7 +3404,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 		ec.fieldContext_Query_users,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Users(ctx, fc.Args["pagination"].(*model.PaginationInput))
+			return ec.Resolvers.Query().Users(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_user"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
