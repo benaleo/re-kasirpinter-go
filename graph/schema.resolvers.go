@@ -629,6 +629,17 @@ func (r *mutationResolver) UpdateRole(ctx context.Context, id int64, input model
 		}, nil
 	}
 
+	// Check if role ID is 1 or 2 (protected roles) - only superadmin can modify
+	if id == 1 || id == 2 {
+		if err := RequireSuperAdmin(ctx); err != nil {
+			return &model.UpdateRoleResponse{
+				Code:    403,
+				Success: false,
+				Message: err.Error(),
+			}, nil
+		}
+	}
+
 	// Update fields
 	roleDB.Name = input.Name
 	roleDB.IsActive = input.Status
@@ -683,6 +694,17 @@ func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.Del
 			Success: false,
 			Message: "role not found",
 		}, nil
+	}
+
+	// Check if role ID is 1 or 2 (protected roles) - only superadmin can delete
+	if id == 1 || id == 2 {
+		if err := RequireSuperAdmin(ctx); err != nil {
+			return &model.DeleteRoleResponse{
+				Code:    403,
+				Success: false,
+				Message: err.Error(),
+			}, nil
+		}
 	}
 
 	// Soft delete by setting deleted_at
