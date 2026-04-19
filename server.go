@@ -7,6 +7,7 @@ import (
 	"os"
 	"re-kasirpinter-go/config"
 	"re-kasirpinter-go/graph"
+	"re-kasirpinter-go/service"
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -69,13 +70,19 @@ func main() {
 	graph.GetEmailQueue()
 	log.Println("Email queue initialized with background workers")
 
+	// Initialize user service
+	userService, err := service.NewUserService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize user service: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db},
+		Resolvers:  &graph.Resolver{DB: db, UserService: userService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 

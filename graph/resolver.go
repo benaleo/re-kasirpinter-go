@@ -1,6 +1,8 @@
 package graph
 
 import (
+	"re-kasirpinter-go/service"
+
 	"gorm.io/gorm"
 )
 
@@ -10,5 +12,6 @@ import (
 // here.
 
 type Resolver struct {
-	DB *gorm.DB
+	DB          *gorm.DB
+	UserService *service.UserService
 }

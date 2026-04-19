@@ -6,6 +6,7 @@ import (
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -195,4 +196,140 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 
 		return helper.SuccessResponse(201, "user created successfully", user), nil
 	}
+}
+
+func (s *UserService) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error) {
+	// Find user by secure_id
+	var userDB model.UserDB
+	result := s.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
+	if result.Error != nil {
+		return &model.UpdateUserResponse{
+			Code:    404,
+			Success: false,
+			Message: "user not found",
+		}, nil
+	}
+
+	// Handle avatar upload if provided
+	var avatarURL *string
+	if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
+		avatarURLStr, err := s.R2Service.UploadFromBase64(
+			ctx,
+			*input.Avatar,
+			"avatars",
+			id,
+		)
+		if err != nil {
+			return &model.UpdateUserResponse{
+				Code:    500,
+				Success: false,
+				Message: fmt.Sprintf("failed to upload avatar: %v", err),
+			}, nil
+		}
+		avatarURL = &avatarURLStr
+	}
+
+	// Update fields if provided
+	if input.Name != nil {
+		userDB.Name = *input.Name
+	}
+	if input.Email != nil {
+		userDB.Email = *input.Email
+	}
+	if input.Address != nil {
+		userDB.Address = *input.Address
+	}
+	if input.Phone != nil {
+		userDB.Phone = *input.Phone
+	}
+	if avatarURL != nil {
+		userDB.Avatar = avatarURL
+	} else if input.Avatar != nil && *input.Avatar == "" {
+		// If avatar is explicitly set to empty string, clear it
+		userDB.Avatar = nil
+	}
+	if input.IsActive != nil {
+		userDB.IsActive = *input.IsActive
+	}
+	if input.RoleID != nil {
+		userDB.RoleID = input.RoleID
+	}
+
+	// Save to database
+	result = s.DB.Save(&userDB)
+	if result.Error != nil {
+		return &model.UpdateUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to update user: %v", result.Error),
+		}, nil
+	}
+
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	if userDB.RoleID != nil {
+		s.DB.First(&userRole, *userDB.RoleID)
+	}
+
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
+	if userRole.ID > 0 {
+		userRoleDB = &userRole
+	}
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
+
+	return &model.UpdateUserResponse{
+		Code:    200,
+		Success: true,
+		Message: "user updated successfully",
+		Data:    user,
+	}, nil
+}
+
+func (s *UserService) DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error) {
+	// Find user by secure_id
+	var userDB model.UserDB
+	result := s.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
+	if result.Error != nil {
+		return &model.DeleteUserResponse{
+			Code:    404,
+			Success: false,
+			Message: "user not found",
+		}, nil
+	}
+
+	// Soft delete by setting deleted_at and is_active
+	now := time.Now()
+	userDB.DeletedAt = &now
+	userDB.IsActive = false
+
+	// Save to database
+	result = s.DB.Save(&userDB)
+	if result.Error != nil {
+		return &model.DeleteUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to delete user: %v", result.Error),
+		}, nil
+	}
+
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	if userDB.RoleID != nil {
+		s.DB.First(&userRole, *userDB.RoleID)
+	}
+
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
+	if userRole.ID > 0 {
+		userRoleDB = &userRole
+	}
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
+
+	return &model.DeleteUserResponse{
+		Code:    200,
+		Success: true,
+		Message: "user deleted successfully",
+		Data:    user,
+	}, nil
 }

@@ -248,118 +248,26 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUse
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error) {
-	// Find user by secure_id
-	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
-	if result.Error != nil {
-		return &model.UpdateUserResponse{
-			Code:    404,
-			Success: false,
-			Message: "user not found",
-		}, nil
-	}
-
-	// Update fields if provided
-	if input.Name != nil {
-		userDB.Name = *input.Name
-	}
-	if input.Email != nil {
-		userDB.Email = *input.Email
-	}
-	if input.Address != nil {
-		userDB.Address = *input.Address
-	}
-	if input.Phone != nil {
-		userDB.Phone = *input.Phone
-	}
-	if input.Avatar != nil {
-		userDB.Avatar = input.Avatar
-	}
-	if input.IsActive != nil {
-		userDB.IsActive = *input.IsActive
-	}
-	if input.RoleID != nil {
-		userDB.RoleID = input.RoleID
-	}
-
-	// Save to database
-	result = r.DB.Save(&userDB)
-	if result.Error != nil {
+	if r.UserService == nil {
 		return &model.UpdateUserResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to update user: %v", result.Error),
+			Message: "user service not initialized",
 		}, nil
 	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := helper.ToGraphQLUser(userDB, userRoleDB)
-
-	return &model.UpdateUserResponse{
-		Code:    200,
-		Success: true,
-		Message: "user updated successfully",
-		Data:    user,
-	}, nil
+	return r.UserService.UpdateUser(ctx, id, input)
 }
 
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error) {
-	// Find user by secure_id
-	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
-	if result.Error != nil {
-		return &model.DeleteUserResponse{
-			Code:    404,
-			Success: false,
-			Message: "user not found",
-		}, nil
-	}
-
-	// Soft delete by setting deleted_at and is_active
-	now := time.Now()
-	userDB.DeletedAt = &now
-	userDB.IsActive = false
-
-	// Save to database
-	result = r.DB.Save(&userDB)
-	if result.Error != nil {
+	if r.UserService == nil {
 		return &model.DeleteUserResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to delete user: %v", result.Error),
+			Message: "user service not initialized",
 		}, nil
 	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := helper.ToGraphQLUser(userDB, userRoleDB)
-
-	return &model.DeleteUserResponse{
-		Code:    200,
-		Success: true,
-		Message: "user deleted successfully",
-		Data:    user,
-	}, nil
+	return r.UserService.DeleteUser(ctx, id)
 }
 
 // CreateOtp is the resolver for the createOtp field.
