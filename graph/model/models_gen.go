@@ -23,11 +23,31 @@ type CreateOtpResponse struct {
 	Message string `json:"message"`
 }
 
+type CreateRoleInput struct {
+	Name          string   `json:"name"`
+	Status        bool     `json:"status"`
+	PermissionIds []*int64 `json:"permission_ids,omitempty"`
+}
+
+type CreateRoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
+}
+
 type CreateUserResponse struct {
 	Code    int32  `json:"code"`
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    *User  `json:"data,omitempty"`
+}
+
+type DeleteRoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
 }
 
 type DeleteUserResponse struct {
@@ -95,6 +115,19 @@ type RolesResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    []*UserRole `json:"data"`
+}
+
+type UpdateRoleInput struct {
+	Name          string   `json:"name"`
+	Status        bool     `json:"status"`
+	PermissionIds []*int64 `json:"permission_ids,omitempty"`
+}
+
+type UpdateRoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
 }
 
 type UpdateUserResponse struct {

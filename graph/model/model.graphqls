@@ -97,3 +97,24 @@ type PermissionsResponse {
   message: String!
   data: [UserPermission!]!
 }
+
+type CreateRoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type UpdateRoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type DeleteRoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}

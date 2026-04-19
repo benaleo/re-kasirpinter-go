@@ -69,4 +69,9 @@ type Mutation {
   createOtp(input: CreateOtpInput!): CreateOtpResponse!
   verifyOtp(input: VerifyOtpInput!): VerifyOtpResponse!
   newPassword(input: NewPasswordInput!): NewPasswordResponse! @auth
+
+  #administrator
+  createRole(input: CreateRoleInput!): CreateRoleResponse! @auth
+  updateRole(id: Int64!, input: UpdateRoleInput!): UpdateRoleResponse! @auth
+  deleteRole(id: Int64!): DeleteRoleResponse! @auth
 }

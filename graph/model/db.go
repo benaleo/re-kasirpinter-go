@@ -39,7 +39,7 @@ type UserRoleDB struct {
 	DeletedBy *string    `json:"deleted_by,omitempty"`
 
 	// Relations
-	Permissions []UserPermissionDB `gorm:"many2many:user_role_permissions;" json:"permissions,omitempty"`
+	Permissions []UserPermissionDB `gorm:"many2many:user_role_permissions;foreignKey:ID;joinForeignKey:RoleID;joinReferences:PermissionID" json:"permissions,omitempty"`
 }
 
 // UserPermissionDB represents the database model for UserPermission

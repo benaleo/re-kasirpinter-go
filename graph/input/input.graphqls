@@ -44,3 +44,15 @@ input VerifyOtpInput {
 input NewPasswordInput {
   password: String!
 }
+
+input CreateRoleInput {
+  name: String!
+  status: Boolean!
+  permission_ids: [Int64]
+}
+
+input UpdateRoleInput {
+  name: String!
+  status: Boolean!
+  permission_ids: [Int64]
+}

@@ -575,6 +575,144 @@ func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPassw
 	return toGraphQLNewPasswordResponse(200, true, "Password updated successfully"), nil
 }
 
+// CreateRole is the resolver for the createRole field.
+func (r *mutationResolver) CreateRole(ctx context.Context, input model.CreateRoleInput) (*model.CreateRoleResponse, error) {
+	// Create role DB model
+	roleDB := model.UserRoleDB{
+		Name:     input.Name,
+		IsActive: true,
+	}
+
+	// Save to database
+	result := r.DB.Create(&roleDB)
+	if result.Error != nil {
+		return &model.CreateRoleResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to create role: %v", result.Error),
+		}, nil
+	}
+
+	// Associate permissions if provided
+	if len(input.PermissionIds) > 0 {
+		var permissions []model.UserPermissionDB
+		r.DB.Where("id IN ?", input.PermissionIds).Find(&permissions)
+		if len(permissions) > 0 {
+			r.DB.Model(&roleDB).Association("Permissions").Append(&permissions)
+		}
+	}
+
+	// Reload role with permissions
+	r.DB.Preload("Permissions").First(&roleDB, roleDB.ID)
+
+	// Convert DB model to GraphQL model
+	role := toGraphQLUserRole(roleDB)
+
+	return &model.CreateRoleResponse{
+		Code:    201,
+		Success: true,
+		Message: "role created successfully",
+		Data:    role,
+	}, nil
+}
+
+// UpdateRole is the resolver for the updateRole field.
+func (r *mutationResolver) UpdateRole(ctx context.Context, id int64, input model.UpdateRoleInput) (*model.UpdateRoleResponse, error) {
+	// Find role by ID
+	var roleDB model.UserRoleDB
+	result := r.DB.Where("id = ? AND deleted_at IS NULL", id).First(&roleDB)
+	if result.Error != nil {
+		return &model.UpdateRoleResponse{
+			Code:    404,
+			Success: false,
+			Message: "role not found",
+		}, nil
+	}
+
+	// Update fields
+	roleDB.Name = input.Name
+	roleDB.IsActive = input.Status
+
+	// Update permissions if provided
+	if input.PermissionIds != nil {
+		// Clear existing permissions
+		r.DB.Model(&roleDB).Association("Permissions").Clear()
+
+		// Add new permissions
+		if len(input.PermissionIds) > 0 {
+			var permissions []model.UserPermissionDB
+			r.DB.Where("id IN ?", input.PermissionIds).Find(&permissions)
+			if len(permissions) > 0 {
+				r.DB.Model(&roleDB).Association("Permissions").Append(&permissions)
+			}
+		}
+	}
+
+	// Save to database
+	result = r.DB.Save(&roleDB)
+	if result.Error != nil {
+		return &model.UpdateRoleResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to update role: %v", result.Error),
+		}, nil
+	}
+
+	// Reload role with permissions
+	r.DB.Preload("Permissions").First(&roleDB, roleDB.ID)
+
+	// Convert DB model to GraphQL model
+	role := toGraphQLUserRole(roleDB)
+
+	return &model.UpdateRoleResponse{
+		Code:    200,
+		Success: true,
+		Message: "role updated successfully",
+		Data:    role,
+	}, nil
+}
+
+// DeleteRole is the resolver for the deleteRole field.
+func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.DeleteRoleResponse, error) {
+	// Find role by ID
+	var roleDB model.UserRoleDB
+	result := r.DB.Where("id = ? AND deleted_at IS NULL", id).First(&roleDB)
+	if result.Error != nil {
+		return &model.DeleteRoleResponse{
+			Code:    404,
+			Success: false,
+			Message: "role not found",
+		}, nil
+	}
+
+	// Soft delete by setting deleted_at
+	now := time.Now()
+	roleDB.DeletedAt = &now
+
+	// Save to database
+	result = r.DB.Save(&roleDB)
+	if result.Error != nil {
+		return &model.DeleteRoleResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to delete role: %v", result.Error),
+		}, nil
+	}
+
+	// Reload role with permissions
+	r.DB.Preload("Permissions").First(&roleDB, roleDB.ID)
+
+	// Convert DB model to GraphQL model
+	role := toGraphQLUserRole(roleDB)
+
+	return &model.DeleteRoleResponse{
+		Code:    200,
+		Success: true,
+		Message: "role deleted successfully",
+		Data:    role,
+	}, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
 	// Parse pagination parameters
