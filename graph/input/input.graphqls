@@ -6,9 +6,9 @@ input LoginInput {
 input CreateUserInput {
   name: String!
   email: String!
-  address: String!
+  address: String
   phone: String!
-  password: String!
+  password: String
   role_id: Int64
 }
 

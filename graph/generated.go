@@ -94,7 +94,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateOtp   func(childComplexity int, input model.CreateOtpInput) int
 		CreateRole  func(childComplexity int, input model.CreateRoleInput) int
-		CreateUser  func(childComplexity int, input input.CreateUserInput) int
+		CreateUser  func(childComplexity int, input input.CreateUserInput, isUser *bool) int
 		DeleteRole  func(childComplexity int, id int64) int
 		DeleteUser  func(childComplexity int, id string) int
 		Login       func(childComplexity int, input input.LoginInput) int
@@ -229,7 +229,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error)
 	Logout(ctx context.Context) (*model.LogoutResponse, error)
-	CreateUser(ctx context.Context, input input.CreateUserInput) (*model.CreateUserResponse, error)
+	CreateUser(ctx context.Context, input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error)
 	UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error)
 	DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error)
 	CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error)
@@ -469,7 +469,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CreateUser(childComplexity, args["input"].(input.CreateUserInput)), true
+		return e.ComplexityRoot.Mutation.CreateUser(childComplexity, args["input"].(input.CreateUserInput), args["is_user"].(*bool)), true
 	case "Mutation.deleteRole":
 		if e.ComplexityRoot.Mutation.DeleteRole == nil {
 			break
@@ -1177,6 +1177,11 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 		return nil, err
 	}
 	args["input"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_user", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_user"] = arg1
 	return args, nil
 }
 
@@ -2417,7 +2422,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		ec.fieldContext_Mutation_createUser,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateUser(ctx, fc.Args["input"].(input.CreateUserInput))
+			return ec.Resolvers.Mutation().CreateUser(ctx, fc.Args["input"].(input.CreateUserInput), fc.Args["is_user"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -7155,7 +7160,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			it.Email = data
 		case "address":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7169,7 +7174,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			it.Phone = data
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9949,6 +9954,18 @@ func (ec *executionContext) unmarshalOPaginationInput2ᚖreᚑkasirpinterᚑgo�
 	}
 	res, err := ec.unmarshalInputPaginationInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOString2string(ctx context.Context, v any) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalString(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {

@@ -11,6 +11,7 @@ import (
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
+	"re-kasirpinter-go/service"
 	"time"
 )
 
@@ -96,7 +97,7 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 	}
 
 	// Check password
-	if !checkPassword(decryptedPassword, userDB.Password) {
+	if !helper.CheckPassword(decryptedPassword, userDB.Password) {
 		// Record failed attempt (wrong password)
 		loginAudit := model.LoginAuditDB{
 			Email:   input.Email,
@@ -155,7 +156,7 @@ func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*
 	if userRole.ID > 0 {
 		userRoleDB = &userRole
 	}
-	user := toGraphQLUser(userDB, userRoleDB)
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
 
 	return &model.AuthResponse{
 		Code:    200,
@@ -233,68 +234,9 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput) (*model.CreateUserResponse, error) {
-	// Generate secure_id (UUID)
-	secureID, err := generateRandomString(16)
-	if err != nil {
-		return &model.CreateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to generate secure_id: %v", err),
-		}, nil
-	}
-
-	// Hash password
-	hashedPassword, err := hashPassword(input.Password)
-	if err != nil {
-		return &model.CreateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to hash password: %v", err),
-		}, nil
-	}
-
-	// Create user DB model
-	userDB := model.UserDB{
-		SecureID: &secureID,
-		Name:     input.Name,
-		Email:    input.Email,
-		Address:  input.Address,
-		Phone:    input.Phone,
-		Password: hashedPassword,
-		IsActive: true,
-		RoleID:   input.RoleID,
-	}
-
-	// Save to database
-	result := r.DB.Create(&userDB)
-	if result.Error != nil {
-		return &model.CreateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to create user: %v", result.Error),
-		}, nil
-	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := toGraphQLUser(userDB, userRoleDB)
-
-	return &model.CreateUserResponse{
-		Code:    201,
-		Success: true,
-		Message: "user created successfully",
-		Data:    user,
-	}, nil
+func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error) {
+	userService := service.NewUserService(r.DB)
+	return userService.CreateUser(input, isUser)
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -354,7 +296,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input inpu
 	if userRole.ID > 0 {
 		userRoleDB = &userRole
 	}
-	user := toGraphQLUser(userDB, userRoleDB)
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
 
 	return &model.UpdateUserResponse{
 		Code:    200,
@@ -403,7 +345,7 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.De
 	if userRole.ID > 0 {
 		userRoleDB = &userRole
 	}
-	user := toGraphQLUser(userDB, userRoleDB)
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
 
 	return &model.DeleteUserResponse{
 		Code:    200,
@@ -560,7 +502,7 @@ func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPassw
 	}
 
 	// Hash the new password
-	hashedPassword, err := hashPassword(input.Password)
+	hashedPassword, err := helper.HashPassword(input.Password)
 	if err != nil {
 		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to hash password: %v", err)), nil
 	}
@@ -606,7 +548,7 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input model.CreateRol
 	r.DB.Preload("Permissions").First(&roleDB, roleDB.ID)
 
 	// Convert DB model to GraphQL model
-	role := toGraphQLUserRole(roleDB)
+	role := helper.ToGraphQLUserRole(roleDB)
 
 	return &model.CreateRoleResponse{
 		Code:    201,
@@ -673,7 +615,7 @@ func (r *mutationResolver) UpdateRole(ctx context.Context, id int64, input model
 	r.DB.Preload("Permissions").First(&roleDB, roleDB.ID)
 
 	// Convert DB model to GraphQL model
-	role := toGraphQLUserRole(roleDB)
+	role := helper.ToGraphQLUserRole(roleDB)
 
 	return &model.UpdateRoleResponse{
 		Code:    200,
@@ -725,7 +667,7 @@ func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.Del
 	r.DB.Preload("Permissions").First(&roleDB, roleDB.ID)
 
 	// Convert DB model to GraphQL model
-	role := toGraphQLUserRole(roleDB)
+	role := helper.ToGraphQLUserRole(roleDB)
 
 	return &model.DeleteRoleResponse{
 		Code:    200,
@@ -784,7 +726,7 @@ func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationI
 			}
 		}
 
-		users[i] = toGraphQLUser(userDB, userRoleDB)
+		users[i] = helper.ToGraphQLUser(userDB, userRoleDB)
 	}
 
 	return &model.UsersResponse{
@@ -820,7 +762,7 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.UserRespons
 	}
 
 	// Convert DB model to GraphQL model using mapper
-	user := toGraphQLUser(userDB, userRoleDB)
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
 
 	return &model.UserResponse{
 		Code:    200,
@@ -846,7 +788,7 @@ func (r *queryResolver) Roles(ctx context.Context) (*model.RolesResponse, error)
 	// Convert DB models to GraphQL models
 	roles := make([]*model.UserRole, len(rolesDB))
 	for i, roleDB := range rolesDB {
-		roles[i] = toGraphQLUserRole(roleDB)
+		roles[i] = helper.ToGraphQLUserRole(roleDB)
 	}
 
 	return &model.RolesResponse{
@@ -871,7 +813,7 @@ func (r *queryResolver) Role(ctx context.Context, id int64) (*model.RoleResponse
 	}
 
 	// Convert DB model to GraphQL model
-	role := toGraphQLUserRole(roleDB)
+	role := helper.ToGraphQLUserRole(roleDB)
 
 	return &model.RoleResponse{
 		Code:    200,
@@ -897,7 +839,7 @@ func (r *queryResolver) Permissions(ctx context.Context) (*model.PermissionsResp
 	// Convert DB models to GraphQL models
 	permissions := make([]*model.UserPermission, len(permissionsDB))
 	for i, permDB := range permissionsDB {
-		permissions[i] = toGraphQLUserPermission(permDB)
+		permissions[i] = helper.ToGraphQLUserPermission(permDB)
 	}
 
 	return &model.PermissionsResponse{

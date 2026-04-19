@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -34,10 +32,6 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-func generateRandomString(n int) (string, error) {
-	return uuid.New().String(), nil
-}
-
 func generateOTPCode() string {
 	rand.Seed(time.Now().UnixNano())
 	code := ""
@@ -45,19 +39,6 @@ func generateOTPCode() string {
 		code += string(rune('0' + rand.Intn(10)))
 	}
 	return code
-}
-
-func hashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(hashedPassword), nil
-}
-
-func checkPassword(password, hashedPassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	return err == nil
 }
 
 func generateJWT(userID int32, email string, role string, secureID string, purpose string) (string, error) {
