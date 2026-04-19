@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
@@ -10,11 +11,22 @@ import (
 )
 
 type UserService struct {
-	DB *gorm.DB
+	DB        *gorm.DB
+	R2Service *R2Service
 }
 
-func NewUserService(db *gorm.DB) *UserService {
-	return &UserService{DB: db}
+func NewUserService(db *gorm.DB) (*UserService, error) {
+	r2Service, err := NewR2Service()
+	if err != nil {
+		// Log the error but don't fail service creation
+		// Avatar upload will be optional
+		fmt.Printf("Warning: Failed to initialize R2 service: %v\n", err)
+	}
+
+	return &UserService{
+		DB:        db,
+		R2Service: r2Service,
+	}, nil
 }
 
 func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error) {
@@ -50,6 +62,21 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 			return helper.InternalServerErrorResponse(fmt.Sprintf("failed to generate secure_id: %v", err)), nil
 		}
 
+		// Handle avatar upload if provided
+		var avatarURL *string
+		if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
+			avatarURLStr, err := s.R2Service.UploadFromBase64(
+				context.Background(),
+				*input.Avatar,
+				"avatars",
+				secureID,
+			)
+			if err != nil {
+				return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+			}
+			avatarURL = &avatarURLStr
+		}
+
 		// Create user DB model
 		userDB := model.UserDB{
 			SecureID: &secureID,
@@ -58,6 +85,7 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 			Address:  input.Address, // Optional
 			Phone:    input.Phone,
 			Password: hashedPassword,
+			Avatar:   avatarURL,
 			IsActive: true,
 			RoleID:   &roleID,
 		}
@@ -118,6 +146,21 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 			return helper.InternalServerErrorResponse(fmt.Sprintf("failed to generate secure_id: %v", err)), nil
 		}
 
+		// Handle avatar upload if provided
+		var avatarURL *string
+		if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
+			avatarURLStr, err := s.R2Service.UploadFromBase64(
+				context.Background(),
+				*input.Avatar,
+				"avatars",
+				secureID,
+			)
+			if err != nil {
+				return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+			}
+			avatarURL = &avatarURLStr
+		}
+
 		// Create user DB model
 		userDB := model.UserDB{
 			SecureID: &secureID,
@@ -126,6 +169,7 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 			Address:  input.Address,
 			Phone:    input.Phone,
 			Password: hashedPassword,
+			Avatar:   avatarURL,
 			IsActive: true,
 			RoleID:   input.RoleID,
 		}

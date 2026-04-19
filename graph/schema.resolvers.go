@@ -235,7 +235,14 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error) {
-	userService := service.NewUserService(r.DB)
+	userService, err := service.NewUserService(r.DB)
+	if err != nil {
+		return &model.CreateUserResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
+		}, nil
+	}
 	return userService.CreateUser(input, isUser)
 }
 
