@@ -13,5 +13,6 @@ import (
 
 type Resolver struct {
 	DB          *gorm.DB
+	R2Service   *service.R2Service
 	UserService *service.UserService
 }

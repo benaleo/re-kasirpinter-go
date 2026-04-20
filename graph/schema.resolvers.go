@@ -432,6 +432,18 @@ func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPassw
 	return toGraphQLNewPasswordResponse(200, true, "Password updated successfully"), nil
 }
 
+// TestR2Connection is the resolver for the testR2Connection field.
+func (r *mutationResolver) TestR2Connection(ctx context.Context) (string, error) {
+	if r.R2Service == nil {
+		return "R2 service not initialized", nil
+	}
+	err := r.R2Service.TestConnection(ctx)
+	if err != nil {
+		return fmt.Sprintf("R2 connection failed: %v", err), nil
+	}
+	return "R2 connection successful", nil
+}
+
 // CreateRole is the resolver for the createRole field.
 func (r *mutationResolver) CreateRole(ctx context.Context, input model.CreateRoleInput) (*model.CreateRoleResponse, error) {
 	// Create role DB model

@@ -69,6 +69,7 @@ type Mutation {
   createOtp(input: CreateOtpInput!): CreateOtpResponse!
   verifyOtp(input: VerifyOtpInput!): VerifyOtpResponse!
   newPassword(input: NewPasswordInput!): NewPasswordResponse! @auth
+  testR2Connection: String! @auth
 
   #administrator
   createRole(input: CreateRoleInput!): CreateRoleResponse! @auth

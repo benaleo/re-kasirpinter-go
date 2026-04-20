@@ -25,6 +25,32 @@ type R2Service struct {
 	PublicURL  string
 }
 
+func r2AccountIDFromPublicURL(publicURL string) string {
+	// Accept forms:
+	// - https://<accountid>.r2.cloudflarestorage.com/<bucket>
+	// - <accountid>.r2.cloudflarestorage.com/<bucket>
+	publicURL = strings.TrimSpace(publicURL)
+	publicURL = strings.TrimPrefix(publicURL, "https://")
+	publicURL = strings.TrimPrefix(publicURL, "http://")
+	publicURL = strings.TrimSuffix(publicURL, "/")
+
+	// Keep only the host part
+	host := publicURL
+	if idx := strings.Index(host, "/"); idx >= 0 {
+		host = host[:idx]
+	}
+
+	// Expect: <accountid>.r2.cloudflarestorage.com
+	if !strings.Contains(host, "r2.cloudflarestorage.com") {
+		return ""
+	}
+	parts := strings.Split(host, ".")
+	if len(parts) == 0 {
+		return ""
+	}
+	return parts[0]
+}
+
 func NewR2Service() (*R2Service, error) {
 	accessKeyID := os.Getenv("R2_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("R2_SECRET_ACCESS_KEY")
@@ -35,6 +61,23 @@ func NewR2Service() (*R2Service, error) {
 	if accessKeyID == "" || secretAccessKey == "" || bucketName == "" {
 		return nil, fmt.Errorf("missing R2 credentials or bucket name")
 	}
+	// Common misconfiguration: using Cloudflare API token (cfat_) as S3 secret
+	if strings.HasPrefix(strings.TrimSpace(secretAccessKey), "cfat_") {
+		return nil, fmt.Errorf("R2_SECRET_ACCESS_KEY looks like a Cloudflare API token (cfat_*). R2 S3 API requires an R2 Access Key ID + Secret Access Key from R2 API Tokens")
+	}
+	if region == "" {
+		region = "auto"
+	}
+
+	accountID := os.Getenv("R2_ACCOUNT_ID")
+	if accountID == "" {
+		accountID = r2AccountIDFromPublicURL(publicURL)
+	}
+	if accountID == "" {
+		return nil, fmt.Errorf("missing R2 account id (set R2_ACCOUNT_ID or set CLOUD_STORAGE_URL to https://<accountid>.r2.cloudflarestorage.com/<bucket>)")
+	}
+
+	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountID)
 
 	// Create AWS configuration with R2 credentials
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
@@ -44,6 +87,7 @@ func NewR2Service() (*R2Service, error) {
 				return aws.Credentials{
 					AccessKeyID:     accessKeyID,
 					SecretAccessKey: secretAccessKey,
+					Source:          "cloudflare-r2",
 				}, nil
 			}),
 		),
@@ -54,16 +98,9 @@ func NewR2Service() (*R2Service, error) {
 
 	// Create S3 client with R2 endpoint
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		// R2 uses S3-compatible API, but we need to set the custom endpoint
-		// Extract account ID from the public URL to construct the endpoint
-		if strings.Contains(publicURL, "r2.cloudflarestorage.com") {
-			// Parse the URL to get the account ID
-			parts := strings.Split(publicURL, ".")
-			if len(parts) > 0 {
-				accountID := strings.TrimPrefix(parts[0], "https://")
-				o.BaseEndpoint = aws.String(fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountID))
-			}
-		}
+		o.BaseEndpoint = aws.String(endpoint)
+		// R2 expects path-style requests: https://<accountid>.r2.cloudflarestorage.com/<bucket>/<key>
+		o.UsePathStyle = true
 	})
 
 	return &R2Service{
@@ -71,6 +108,19 @@ func NewR2Service() (*R2Service, error) {
 		BucketName: bucketName,
 		PublicURL:  publicURL,
 	}, nil
+}
+
+// TestConnection tests the R2 connection and bucket access
+func (r *R2Service) TestConnection(ctx context.Context) error {
+	// Try to list objects in the bucket to test connection
+	_, err := r.Client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+		Bucket:  aws.String(r.BucketName),
+		MaxKeys: aws.Int32(1),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to connect to R2 bucket: %w", err)
+	}
+	return nil
 }
 
 // UploadFromBase64 uploads a file to R2 from base64 encoded string
@@ -148,8 +198,8 @@ func (r *R2Service) UploadFile(ctx context.Context, file multipart.File, header 
 	}
 
 	// Create the key path
-	ext := filepath.Ext(header.Filename)
-	key := fmt.Sprintf("%s/%s%s", folder, header.Filename, ext)
+	_ = filepath.Ext(header.Filename)
+	key := fmt.Sprintf("%s/%s", folder, header.Filename)
 
 	// Upload to R2
 	_, err = r.Client.PutObject(ctx, &s3.PutObjectInput{

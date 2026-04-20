@@ -70,6 +70,12 @@ func main() {
 	graph.GetEmailQueue()
 	log.Println("Email queue initialized with background workers")
 
+	// Initialize R2 service
+	r2Service, err := service.NewR2Service()
+	if err != nil {
+		log.Printf("Warning: Failed to initialize R2 service: %v", err)
+	}
+
 	// Initialize user service
 	userService, err := service.NewUserService(db)
 	if err != nil {
@@ -82,7 +88,7 @@ func main() {
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, UserService: userService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 

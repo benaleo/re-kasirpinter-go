@@ -92,17 +92,18 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateOtp   func(childComplexity int, input model.CreateOtpInput) int
-		CreateRole  func(childComplexity int, input model.CreateRoleInput) int
-		CreateUser  func(childComplexity int, input input.CreateUserInput, isUser *bool) int
-		DeleteRole  func(childComplexity int, id int64) int
-		DeleteUser  func(childComplexity int, id string) int
-		Login       func(childComplexity int, input input.LoginInput) int
-		Logout      func(childComplexity int) int
-		NewPassword func(childComplexity int, input model.NewPasswordInput) int
-		UpdateRole  func(childComplexity int, id int64, input model.UpdateRoleInput) int
-		UpdateUser  func(childComplexity int, id string, input input.UpdateUserInput) int
-		VerifyOtp   func(childComplexity int, input model.VerifyOtpInput) int
+		CreateOtp        func(childComplexity int, input model.CreateOtpInput) int
+		CreateRole       func(childComplexity int, input model.CreateRoleInput) int
+		CreateUser       func(childComplexity int, input input.CreateUserInput, isUser *bool) int
+		DeleteRole       func(childComplexity int, id int64) int
+		DeleteUser       func(childComplexity int, id string) int
+		Login            func(childComplexity int, input input.LoginInput) int
+		Logout           func(childComplexity int) int
+		NewPassword      func(childComplexity int, input model.NewPasswordInput) int
+		TestR2Connection func(childComplexity int) int
+		UpdateRole       func(childComplexity int, id int64, input model.UpdateRoleInput) int
+		UpdateUser       func(childComplexity int, id string, input input.UpdateUserInput) int
+		VerifyOtp        func(childComplexity int, input model.VerifyOtpInput) int
 	}
 
 	NewPasswordResponse struct {
@@ -235,6 +236,7 @@ type MutationResolver interface {
 	CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error)
 	VerifyOtp(ctx context.Context, input model.VerifyOtpInput) (*model.VerifyOtpResponse, error)
 	NewPassword(ctx context.Context, input model.NewPasswordInput) (*model.NewPasswordResponse, error)
+	TestR2Connection(ctx context.Context) (string, error)
 	CreateRole(ctx context.Context, input model.CreateRoleInput) (*model.CreateRoleResponse, error)
 	UpdateRole(ctx context.Context, id int64, input model.UpdateRoleInput) (*model.UpdateRoleResponse, error)
 	DeleteRole(ctx context.Context, id int64) (*model.DeleteRoleResponse, error)
@@ -520,6 +522,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.NewPassword(childComplexity, args["input"].(model.NewPasswordInput)), true
+	case "Mutation.testR2Connection":
+		if e.ComplexityRoot.Mutation.TestR2Connection == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Mutation.TestR2Connection(childComplexity), true
 	case "Mutation.updateRole":
 		if e.ComplexityRoot.Mutation.UpdateRole == nil {
 			break
@@ -2764,6 +2772,48 @@ func (ec *executionContext) fieldContext_Mutation_newPassword(ctx context.Contex
 	if fc.Args, err = ec.field_Mutation_newPassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_testR2Connection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_testR2Connection,
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Mutation().TestR2Connection(ctx)
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal string
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_testR2Connection(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -7948,6 +7998,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "newPassword":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_newPassword(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "testR2Connection":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_testR2Connection(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
