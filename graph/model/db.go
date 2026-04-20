@@ -241,6 +241,7 @@ type IngredientDB struct {
 
 	// Relations
 	Category *IngredientCategoryDB `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Stocks   []IngredientStockDB   `gorm:"foreignKey:IngredientID" json:"stocks,omitempty"`
 }
 
 // TableName specifies the table name for IngredientDB
@@ -258,6 +259,52 @@ func (i *IngredientDB) BeforeCreate(tx *gorm.DB) error {
 
 // BeforeUpdate hook for IngredientDB
 func (i *IngredientDB) BeforeUpdate(tx *gorm.DB) error {
+	i.UpdatedAt = time.Now()
+	return nil
+}
+
+// IngredientStockType represents the type of stock movement
+type IngredientStockType string
+
+const (
+	IngredientStockTypeIncrease IngredientStockType = "increase"
+	IngredientStockTypeDecrease IngredientStockType = "decrease"
+)
+
+// IngredientStockDB represents the database model for IngredientStock
+type IngredientStockDB struct {
+	ID          int64               `gorm:"primaryKey;autoIncrement" json:"id"`
+	Code        *string             `json:"code,omitempty"`
+	Qty         float64             `gorm:"default:0" json:"qty"`
+	Type        IngredientStockType `gorm:"not null" json:"type"`
+	Capital     int64               `json:"capital"`
+	CapitalItem int64               `json:"capital_item"`
+	Message     *string             `json:"message,omitempty"`
+	Image       *string             `json:"image,omitempty"`
+	DeletedAt   *time.Time          `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt   time.Time           `json:"created_at"`
+	UpdatedAt   time.Time           `json:"updated_at"`
+
+	// Relations
+	IngredientID int64         `gorm:"not null;index" json:"ingredient_id"`
+	Ingredient   *IngredientDB `gorm:"foreignKey:IngredientID" json:"ingredient,omitempty"`
+}
+
+// TableName specifies the table name for IngredientStockDB
+func (IngredientStockDB) TableName() string {
+	return "ingredient_stocks"
+}
+
+// BeforeCreate hook for IngredientStockDB
+func (i *IngredientStockDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	i.CreatedAt = now
+	i.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for IngredientStockDB
+func (i *IngredientStockDB) BeforeUpdate(tx *gorm.DB) error {
 	i.UpdatedAt = time.Now()
 	return nil
 }

@@ -61,6 +61,7 @@ type Query {
   # ingredients
   ingredientCategories(pagination: PaginationInput): IngredientCategoriesResponse! @auth
   ingredients(pagination: PaginationInput): IngredientsResponse! @auth
+  ingredientStocks(pagination: PaginationInput): IngredientStocksResponse! @auth
 }
 
 type Mutation {
@@ -86,4 +87,9 @@ type Mutation {
   createIngredient(input: CreateIngredientInput!): CreateIngredientResponse! @auth
   updateIngredient(id: Int64!, input: UpdateIngredientInput!): UpdateIngredientResponse! @auth
   deleteIngredient(id: Int64!): DeleteIngredientResponse! @auth
+
+  # ingredient stocks
+  createIngredientStock(input: CreateIngredientStockInput!): CreateIngredientStockResponse! @auth
+  updateIngredientStock(id: Int64!, input: UpdateIngredientStockInput!): UpdateIngredientStockResponse! @auth
+  deleteIngredientStock(id: Int64!): DeleteIngredientStockResponse! @auth
 }

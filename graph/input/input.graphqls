@@ -84,3 +84,25 @@ input UpdateIngredientInput {
   category_id: Int64
   is_active: Boolean
 }
+
+input CreateIngredientStockInput {
+  code: String
+  qty: Float!
+  type: IngredientStockType!
+  capital: Int64!
+  capital_item: Int64!
+  message: String
+  image: String
+  ingredient_id: Int64!
+}
+
+input UpdateIngredientStockInput {
+  code: String
+  qty: Float
+  type: IngredientStockType
+  capital: Int64
+  capital_item: Int64
+  message: String
+  image: String
+  ingredient_id: Int64
+}

@@ -191,6 +191,42 @@ type DeleteIngredientResponse {
   data: Ingredient
 }
 
+type IngredientStocksResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [IngredientStock!]!
+  pagination: PageInfo
+}
+
+type IngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type CreateIngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type UpdateIngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type DeleteIngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
 type IngredientCategory {
   id: Int64!
   name: String!
@@ -211,4 +247,26 @@ type Ingredient {
   deleted_at: Time
   created_at: Time!
   updated_at: Time!
+  stocks: [IngredientStock!]!
+}
+
+enum IngredientStockType {
+  increase
+  decrease
+}
+
+type IngredientStock {
+  id: Int64!
+  code: String
+  qty: Float!
+  type: IngredientStockType!
+  capital: Int64!
+  capital_item: Int64!
+  message: String
+  image: String
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+  ingredient_id: Int64!
+  ingredient: Ingredient
 }

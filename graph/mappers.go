@@ -102,3 +102,40 @@ func toGraphQLIngredientsResponse(code int32, success bool, message string, data
 		Pagination: pagination,
 	}
 }
+
+func toGraphQLCreateIngredientStockResponse(code int32, success bool, message string, data *model.IngredientStock) *model.CreateIngredientStockResponse {
+	return &model.CreateIngredientStockResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLUpdateIngredientStockResponse(code int32, success bool, message string, data *model.IngredientStock) *model.UpdateIngredientStockResponse {
+	return &model.UpdateIngredientStockResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLDeleteIngredientStockResponse(code int32, success bool, message string, data *model.IngredientStock) *model.DeleteIngredientStockResponse {
+	return &model.DeleteIngredientStockResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLIngredientStocksResponse(code int32, success bool, message string, data []*model.IngredientStock, pagination *model.PageInfo) *model.IngredientStocksResponse {
+	return &model.IngredientStocksResponse{
+		Code:       code,
+		Success:    success,
+		Message:    message,
+		Data:       data,
+		Pagination: pagination,
+	}
+}

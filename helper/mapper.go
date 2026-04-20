@@ -89,5 +89,39 @@ func ToGraphQLIngredient(ingredientDB model.IngredientDB) *model.Ingredient {
 		ingredient.Category = ToGraphQLIngredientCategory(*ingredientDB.Category)
 	}
 
+	// Set stocks if provided
+	if len(ingredientDB.Stocks) > 0 {
+		stocks := make([]*model.IngredientStock, len(ingredientDB.Stocks))
+		for i, stockDB := range ingredientDB.Stocks {
+			stocks[i] = ToGraphQLIngredientStock(stockDB)
+		}
+		ingredient.Stocks = stocks
+	}
+
 	return ingredient
+}
+
+// ToGraphQLIngredientStock converts IngredientStockDB to GraphQL IngredientStock model
+func ToGraphQLIngredientStock(ingredientStockDB model.IngredientStockDB) *model.IngredientStock {
+	stock := &model.IngredientStock{
+		ID:           ingredientStockDB.ID,
+		Code:         ingredientStockDB.Code,
+		Qty:          ingredientStockDB.Qty,
+		Type:         model.IngredientStockType(ingredientStockDB.Type),
+		Capital:      ingredientStockDB.Capital,
+		CapitalItem:  ingredientStockDB.CapitalItem,
+		Message:      ingredientStockDB.Message,
+		Image:        ingredientStockDB.Image,
+		DeletedAt:    ingredientStockDB.DeletedAt,
+		CreatedAt:    ingredientStockDB.CreatedAt,
+		UpdatedAt:    ingredientStockDB.UpdatedAt,
+		IngredientID: ingredientStockDB.IngredientID,
+	}
+
+	// Set ingredient if provided
+	if ingredientStockDB.Ingredient != nil && ingredientStockDB.Ingredient.ID > 0 {
+		stock.Ingredient = ToGraphQLIngredient(*ingredientStockDB.Ingredient)
+	}
+
+	return stock
 }

@@ -38,6 +38,24 @@ type CreateIngredientResponse struct {
 	Data    *Ingredient `json:"data,omitempty"`
 }
 
+type CreateIngredientStockInput struct {
+	Code         *string             `json:"code,omitempty"`
+	Qty          float64             `json:"qty"`
+	Type         IngredientStockType `json:"type"`
+	Capital      int64               `json:"capital"`
+	CapitalItem  int64               `json:"capital_item"`
+	Message      *string             `json:"message,omitempty"`
+	Image        *string             `json:"image,omitempty"`
+	IngredientID int64               `json:"ingredient_id"`
+}
+
+type CreateIngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
 type CreateOtpInput struct {
 	Email string `json:"email"`
 	Type  string `json:"type"`
@@ -84,6 +102,13 @@ type DeleteIngredientResponse struct {
 	Data    *Ingredient `json:"data,omitempty"`
 }
 
+type DeleteIngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
 type DeleteRoleResponse struct {
 	Code    int32     `json:"code"`
 	Success bool      `json:"success"`
@@ -107,6 +132,7 @@ type Ingredient struct {
 	DeletedAt  *time.Time          `json:"deleted_at,omitempty"`
 	CreatedAt  time.Time           `json:"created_at"`
 	UpdatedAt  time.Time           `json:"updated_at"`
+	Stocks     []*IngredientStock  `json:"stocks"`
 }
 
 type IngredientCategoriesResponse struct {
@@ -140,6 +166,37 @@ type IngredientResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type IngredientStock struct {
+	ID           int64               `json:"id"`
+	Code         *string             `json:"code,omitempty"`
+	Qty          float64             `json:"qty"`
+	Type         IngredientStockType `json:"type"`
+	Capital      int64               `json:"capital"`
+	CapitalItem  int64               `json:"capital_item"`
+	Message      *string             `json:"message,omitempty"`
+	Image        *string             `json:"image,omitempty"`
+	DeletedAt    *time.Time          `json:"deleted_at,omitempty"`
+	CreatedAt    time.Time           `json:"created_at"`
+	UpdatedAt    time.Time           `json:"updated_at"`
+	IngredientID int64               `json:"ingredient_id"`
+	Ingredient   *Ingredient         `json:"ingredient,omitempty"`
+}
+
+type IngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
+type IngredientStocksResponse struct {
+	Code       int32              `json:"code"`
+	Success    bool               `json:"success"`
+	Message    string             `json:"message"`
+	Data       []*IngredientStock `json:"data"`
+	Pagination *PageInfo          `json:"pagination,omitempty"`
 }
 
 type IngredientsResponse struct {
@@ -235,6 +292,24 @@ type UpdateIngredientResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type UpdateIngredientStockInput struct {
+	Code         *string              `json:"code,omitempty"`
+	Qty          *float64             `json:"qty,omitempty"`
+	Type         *IngredientStockType `json:"type,omitempty"`
+	Capital      *int64               `json:"capital,omitempty"`
+	CapitalItem  *int64               `json:"capital_item,omitempty"`
+	Message      *string              `json:"message,omitempty"`
+	Image        *string              `json:"image,omitempty"`
+	IngredientID *int64               `json:"ingredient_id,omitempty"`
+}
+
+type UpdateIngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
 }
 
 type UpdateRoleInput struct {
