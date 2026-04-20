@@ -123,15 +123,16 @@ type DeleteUserResponse struct {
 }
 
 type Ingredient struct {
-	ID         int64               `json:"id"`
-	Name       string              `json:"name"`
-	CategoryID *int64              `json:"category_id,omitempty"`
-	Category   *IngredientCategory `json:"category,omitempty"`
-	IsActive   bool                `json:"is_active"`
-	DeletedAt  *time.Time          `json:"deleted_at,omitempty"`
-	CreatedAt  time.Time           `json:"created_at"`
-	UpdatedAt  time.Time           `json:"updated_at"`
-	Stocks     []*IngredientStock  `json:"stocks"`
+	ID          int64               `json:"id"`
+	Name        string              `json:"name"`
+	CategoryID  *int64              `json:"category_id,omitempty"`
+	Category    *IngredientCategory `json:"category,omitempty"`
+	IsActive    bool                `json:"is_active"`
+	DeletedAt   *time.Time          `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time           `json:"created_at"`
+	UpdatedAt   time.Time           `json:"updated_at"`
+	Stocks      []*IngredientStock  `json:"stocks"`
+	TotalStocks float64             `json:"total_stocks"`
 }
 
 type IngredientCategoriesResponse struct {

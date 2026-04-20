@@ -128,15 +128,16 @@ type ComplexityRoot struct {
 	}
 
 	Ingredient struct {
-		Category   func(childComplexity int) int
-		CategoryID func(childComplexity int) int
-		CreatedAt  func(childComplexity int) int
-		DeletedAt  func(childComplexity int) int
-		ID         func(childComplexity int) int
-		IsActive   func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Stocks     func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
+		Category    func(childComplexity int) int
+		CategoryID  func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		DeletedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		IsActive    func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Stocks      func(childComplexity int) int
+		TotalStocks func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	IngredientCategoriesResponse struct {
@@ -789,6 +790,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Ingredient.Stocks(childComplexity), true
+	case "Ingredient.total_stocks":
+		if e.ComplexityRoot.Ingredient.TotalStocks == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Ingredient.TotalStocks(childComplexity), true
 	case "Ingredient.updated_at":
 		if e.ComplexityRoot.Ingredient.UpdatedAt == nil {
 			break
@@ -2888,6 +2895,8 @@ func (ec *executionContext) fieldContext_CreateIngredientResponse_data(_ context
 				return ec.fieldContext_Ingredient_updated_at(ctx, field)
 			case "stocks":
 				return ec.fieldContext_Ingredient_stocks(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_Ingredient_total_stocks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ingredient", field.Name)
 		},
@@ -3669,6 +3678,8 @@ func (ec *executionContext) fieldContext_DeleteIngredientResponse_data(_ context
 				return ec.fieldContext_Ingredient_updated_at(ctx, field)
 			case "stocks":
 				return ec.fieldContext_Ingredient_stocks(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_Ingredient_total_stocks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ingredient", field.Name)
 		},
@@ -4407,6 +4418,35 @@ func (ec *executionContext) fieldContext_Ingredient_stocks(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Ingredient_total_stocks(ctx context.Context, field graphql.CollectedField, obj *model.Ingredient) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Ingredient_total_stocks,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalStocks, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Ingredient_total_stocks(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Ingredient",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _IngredientCategoriesResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.IngredientCategoriesResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -5083,6 +5123,8 @@ func (ec *executionContext) fieldContext_IngredientResponse_data(_ context.Conte
 				return ec.fieldContext_Ingredient_updated_at(ctx, field)
 			case "stocks":
 				return ec.fieldContext_Ingredient_stocks(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_Ingredient_total_stocks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ingredient", field.Name)
 		},
@@ -5480,6 +5522,8 @@ func (ec *executionContext) fieldContext_IngredientStock_ingredient(_ context.Co
 				return ec.fieldContext_Ingredient_updated_at(ctx, field)
 			case "stocks":
 				return ec.fieldContext_Ingredient_stocks(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_Ingredient_total_stocks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ingredient", field.Name)
 		},
@@ -5951,6 +5995,8 @@ func (ec *executionContext) fieldContext_IngredientsResponse_data(_ context.Cont
 				return ec.fieldContext_Ingredient_updated_at(ctx, field)
 			case "stocks":
 				return ec.fieldContext_Ingredient_stocks(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_Ingredient_total_stocks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ingredient", field.Name)
 		},
@@ -8941,6 +8987,8 @@ func (ec *executionContext) fieldContext_UpdateIngredientResponse_data(_ context
 				return ec.fieldContext_Ingredient_updated_at(ctx, field)
 			case "stocks":
 				return ec.fieldContext_Ingredient_stocks(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_Ingredient_total_stocks(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Ingredient", field.Name)
 		},
@@ -13535,6 +13583,11 @@ func (ec *executionContext) _Ingredient(ctx context.Context, sel ast.SelectionSe
 			}
 		case "stocks":
 			out.Values[i] = ec._Ingredient_stocks(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total_stocks":
+			out.Values[i] = ec._Ingredient_total_stocks(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

@@ -248,6 +248,7 @@ type Ingredient {
   created_at: Time!
   updated_at: Time!
   stocks: [IngredientStock!]!
+  total_stocks: Float!
 }
 
 enum IngredientStockType {
@@ -260,8 +261,8 @@ type IngredientStock {
   code: String
   qty: Float!
   type: IngredientStockType!
-  capital: Int64!
-  capital_item: Int64!
+  capital: Float!
+  capital_item: Float!
   message: String
   image: String
   deleted_at: Time

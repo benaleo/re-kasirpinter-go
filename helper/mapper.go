@@ -74,14 +74,29 @@ func ToGraphQLIngredientCategory(ingredientCategoryDB model.IngredientCategoryDB
 
 // ToGraphQLIngredient converts IngredientDB to GraphQL Ingredient model
 func ToGraphQLIngredient(ingredientDB model.IngredientDB) *model.Ingredient {
+	// Calculate total_stocks: sum of increase - sum of decrease (excluding deleted stocks)
+	var totalStocks float64
+	for _, stock := range ingredientDB.Stocks {
+		// Skip deleted stocks
+		if stock.DeletedAt != nil {
+			continue
+		}
+		if stock.Type == model.IngredientStockTypeIncrease {
+			totalStocks += stock.Qty
+		} else if stock.Type == model.IngredientStockTypeDecrease {
+			totalStocks -= stock.Qty
+		}
+	}
+
 	ingredient := &model.Ingredient{
-		ID:         ingredientDB.ID,
-		Name:       ingredientDB.Name,
-		CategoryID: ingredientDB.CategoryID,
-		IsActive:   ingredientDB.IsActive,
-		DeletedAt:  ingredientDB.DeletedAt,
-		CreatedAt:  ingredientDB.CreatedAt,
-		UpdatedAt:  ingredientDB.UpdatedAt,
+		ID:          ingredientDB.ID,
+		Name:        ingredientDB.Name,
+		CategoryID:  ingredientDB.CategoryID,
+		IsActive:    ingredientDB.IsActive,
+		DeletedAt:   ingredientDB.DeletedAt,
+		CreatedAt:   ingredientDB.CreatedAt,
+		UpdatedAt:   ingredientDB.UpdatedAt,
+		TotalStocks: totalStocks,
 	}
 
 	// Set category if provided
@@ -89,13 +104,21 @@ func ToGraphQLIngredient(ingredientDB model.IngredientDB) *model.Ingredient {
 		ingredient.Category = ToGraphQLIngredientCategory(*ingredientDB.Category)
 	}
 
-	// Set stocks if provided
+	// Set stocks if provided (excluding deleted stocks)
 	if len(ingredientDB.Stocks) > 0 {
-		stocks := make([]*model.IngredientStock, len(ingredientDB.Stocks))
-		for i, stockDB := range ingredientDB.Stocks {
-			stocks[i] = ToGraphQLIngredientStock(stockDB)
+		var activeStocks []model.IngredientStockDB
+		for _, stockDB := range ingredientDB.Stocks {
+			if stockDB.DeletedAt == nil {
+				activeStocks = append(activeStocks, stockDB)
+			}
 		}
-		ingredient.Stocks = stocks
+		if len(activeStocks) > 0 {
+			stocks := make([]*model.IngredientStock, len(activeStocks))
+			for i, stockDB := range activeStocks {
+				stocks[i] = ToGraphQLIngredientStock(stockDB)
+			}
+			ingredient.Stocks = stocks
+		}
 	}
 
 	return ingredient

@@ -693,8 +693,8 @@ func (r *mutationResolver) CreateIngredient(ctx context.Context, input model.Cre
 		return toGraphQLCreateIngredientResponse(500, false, fmt.Sprintf("failed to create ingredient: %v", result.Error), nil), nil
 	}
 
-	// Reload with category
-	r.DB.Preload("Category").First(&ingredientDB, ingredientDB.ID)
+	// Reload with category and stocks
+	r.DB.Preload("Category").Preload("Stocks", "deleted_at IS NULL").First(&ingredientDB, ingredientDB.ID)
 
 	// Convert DB model to GraphQL model
 	ingredient := helper.ToGraphQLIngredient(ingredientDB)
@@ -728,8 +728,8 @@ func (r *mutationResolver) UpdateIngredient(ctx context.Context, id int64, input
 		return toGraphQLUpdateIngredientResponse(500, false, fmt.Sprintf("failed to update ingredient: %v", result.Error), nil), nil
 	}
 
-	// Reload with category
-	r.DB.Preload("Category").First(&ingredientDB, ingredientDB.ID)
+	// Reload with category and stocks
+	r.DB.Preload("Category").Preload("Stocks", "deleted_at IS NULL").First(&ingredientDB, ingredientDB.ID)
 
 	// Convert DB model to GraphQL model
 	ingredient := helper.ToGraphQLIngredient(ingredientDB)
@@ -756,8 +756,8 @@ func (r *mutationResolver) DeleteIngredient(ctx context.Context, id int64) (*mod
 		return toGraphQLDeleteIngredientResponse(500, false, fmt.Sprintf("failed to delete ingredient: %v", result.Error), nil), nil
 	}
 
-	// Reload with category
-	r.DB.Preload("Category").First(&ingredientDB, ingredientDB.ID)
+	// Reload with category and stocks
+	r.DB.Preload("Category").Preload("Stocks", "deleted_at IS NULL").First(&ingredientDB, ingredientDB.ID)
 
 	// Convert DB model to GraphQL model
 	ingredient := helper.ToGraphQLIngredient(ingredientDB)
@@ -1113,8 +1113,8 @@ func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.Pagin
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
-	// Build base query with category preload
-	baseQuery := r.DB.Model(&model.IngredientDB{}).Preload("Category").Where("deleted_at IS NULL")
+	// Build base query with category and stocks preload
+	baseQuery := r.DB.Model(&model.IngredientDB{}).Preload("Category").Preload("Stocks", "deleted_at IS NULL").Where("deleted_at IS NULL")
 
 	// Get total count
 	var total int64
@@ -1163,7 +1163,7 @@ func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.
 	params := helper.ParsePagination(pagination)
 
 	// Build base query with ingredient preload
-	baseQuery := r.DB.Model(&model.IngredientStockDB{}).Preload("Ingredient").Preload("Ingredient.Category").Where("deleted_at IS NULL")
+	baseQuery := r.DB.Model(&model.IngredientStockDB{}).Preload("Ingredient").Preload("Ingredient.Category").Preload("Ingredient.Stocks", "deleted_at IS NULL").Where("deleted_at IS NULL")
 
 	// Get total count
 	var total int64
