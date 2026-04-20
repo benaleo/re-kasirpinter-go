@@ -59,7 +59,7 @@ type Query {
   role(id: Int64!): RoleResponse! @auth
   permissions: PermissionsResponse! @auth
   # ingredients
-  ingredientCategories(pagination: PaginationInput): IngredientCategoriesResponse! @auth
+  ingredientCategories(pagination: PaginationInput, is_options: Boolean = false): IngredientCategoriesResponse! @auth
   ingredients(pagination: PaginationInput): IngredientsResponse! @auth
   ingredientStocks(pagination: PaginationInput): IngredientStocksResponse! @auth
 }

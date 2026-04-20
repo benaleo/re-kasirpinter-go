@@ -1046,12 +1046,18 @@ func (r *queryResolver) Permissions(ctx context.Context) (*model.PermissionsResp
 }
 
 // IngredientCategories is the resolver for the ingredientCategories field.
-func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientCategoriesResponse, error) {
+func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query
 	baseQuery := r.DB.Model(&model.IngredientCategoryDB{}).Where("deleted_at IS NULL")
+
+	// Filter by is_active if is_options is true
+	getActiveOnly := isOptions != nil && *isOptions
+	if getActiveOnly {
+		baseQuery = baseQuery.Where("is_active = ?", true)
+	}
 
 	// Get total count
 	var total int64

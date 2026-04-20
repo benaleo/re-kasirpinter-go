@@ -266,7 +266,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		IngredientCategories func(childComplexity int, pagination *model.PaginationInput) int
+		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
 		IngredientStocks     func(childComplexity int, pagination *model.PaginationInput) int
 		Ingredients          func(childComplexity int, pagination *model.PaginationInput) int
 		Permissions          func(childComplexity int) int
@@ -415,7 +415,7 @@ type QueryResolver interface {
 	Roles(ctx context.Context) (*model.RolesResponse, error)
 	Role(ctx context.Context, id int64) (*model.RoleResponse, error)
 	Permissions(ctx context.Context) (*model.PermissionsResponse, error)
-	IngredientCategories(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientCategoriesResponse, error)
+	IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error)
 	Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error)
 	IngredientStocks(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientStocksResponse, error)
 }
@@ -1436,7 +1436,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.IngredientCategories(childComplexity, args["pagination"].(*model.PaginationInput)), true
+		return e.ComplexityRoot.Query.IngredientCategories(childComplexity, args["pagination"].(*model.PaginationInput), args["is_options"].(*bool)), true
 	case "Query.ingredientStocks":
 		if e.ComplexityRoot.Query.IngredientStocks == nil {
 			break
@@ -2299,6 +2299,11 @@ func (ec *executionContext) field_Query_ingredientCategories_args(ctx context.Co
 		return nil, err
 	}
 	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_options", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_options"] = arg1
 	return args, nil
 }
 
@@ -8099,7 +8104,7 @@ func (ec *executionContext) _Query_ingredientCategories(ctx context.Context, fie
 		ec.fieldContext_Query_ingredientCategories,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().IngredientCategories(ctx, fc.Args["pagination"].(*model.PaginationInput))
+			return ec.Resolvers.Query().IngredientCategories(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_options"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
