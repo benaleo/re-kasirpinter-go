@@ -42,8 +42,7 @@ type CreateIngredientStockInput struct {
 	Code         *string             `json:"code,omitempty"`
 	Qty          float64             `json:"qty"`
 	Type         IngredientStockType `json:"type"`
-	Capital      int64               `json:"capital"`
-	CapitalItem  int64               `json:"capital_item"`
+	Capital      float64             `json:"capital"`
 	Message      *string             `json:"message,omitempty"`
 	Image        *string             `json:"image,omitempty"`
 	IngredientID int64               `json:"ingredient_id"`
@@ -173,8 +172,8 @@ type IngredientStock struct {
 	Code         *string             `json:"code,omitempty"`
 	Qty          float64             `json:"qty"`
 	Type         IngredientStockType `json:"type"`
-	Capital      int64               `json:"capital"`
-	CapitalItem  int64               `json:"capital_item"`
+	Capital      float64             `json:"capital"`
+	CapitalItem  float64             `json:"capital_item"`
 	Message      *string             `json:"message,omitempty"`
 	Image        *string             `json:"image,omitempty"`
 	DeletedAt    *time.Time          `json:"deleted_at,omitempty"`
@@ -298,8 +297,7 @@ type UpdateIngredientStockInput struct {
 	Code         *string              `json:"code,omitempty"`
 	Qty          *float64             `json:"qty,omitempty"`
 	Type         *IngredientStockType `json:"type,omitempty"`
-	Capital      *int64               `json:"capital,omitempty"`
-	CapitalItem  *int64               `json:"capital_item,omitempty"`
+	Capital      *float64             `json:"capital,omitempty"`
 	Message      *string              `json:"message,omitempty"`
 	Image        *string              `json:"image,omitempty"`
 	IngredientID *int64               `json:"ingredient_id,omitempty"`

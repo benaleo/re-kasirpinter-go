@@ -767,13 +767,16 @@ func (r *mutationResolver) DeleteIngredient(ctx context.Context, id int64) (*mod
 
 // CreateIngredientStock is the resolver for the createIngredientStock field.
 func (r *mutationResolver) CreateIngredientStock(ctx context.Context, input model.CreateIngredientStockInput) (*model.CreateIngredientStockResponse, error) {
+	// Calculate capital_item as capital divided by qty
+	capitalItem := input.Capital / input.Qty
+
 	// Create ingredient stock DB model
 	stockDB := model.IngredientStockDB{
 		Code:         input.Code,
 		Qty:          input.Qty,
 		Type:         model.IngredientStockType(input.Type),
 		Capital:      input.Capital,
-		CapitalItem:  input.CapitalItem,
+		CapitalItem:  capitalItem,
 		Message:      input.Message,
 		Image:        input.Image,
 		IngredientID: input.IngredientID,
@@ -804,20 +807,20 @@ func (r *mutationResolver) UpdateIngredientStock(ctx context.Context, id int64, 
 	}
 
 	// Update fields if provided
+	needsRecalculation := false
 	if input.Code != nil {
 		stockDB.Code = input.Code
 	}
 	if input.Qty != nil {
 		stockDB.Qty = *input.Qty
+		needsRecalculation = true
 	}
 	if input.Type != nil {
 		stockDB.Type = model.IngredientStockType(*input.Type)
 	}
 	if input.Capital != nil {
 		stockDB.Capital = *input.Capital
-	}
-	if input.CapitalItem != nil {
-		stockDB.CapitalItem = *input.CapitalItem
+		needsRecalculation = true
 	}
 	if input.Message != nil {
 		stockDB.Message = input.Message
@@ -827,6 +830,11 @@ func (r *mutationResolver) UpdateIngredientStock(ctx context.Context, id int64, 
 	}
 	if input.IngredientID != nil {
 		stockDB.IngredientID = *input.IngredientID
+	}
+
+	// Recalculate capital_item if capital or qty changed
+	if needsRecalculation && stockDB.Qty > 0 {
+		stockDB.CapitalItem = stockDB.Capital / stockDB.Qty
 	}
 
 	// Save to database

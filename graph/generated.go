@@ -5216,7 +5216,7 @@ func (ec *executionContext) _IngredientStock_capital(ctx context.Context, field 
 			return obj.Capital, nil
 		},
 		nil,
-		ec.marshalNInt642int64,
+		ec.marshalNFloat2float64,
 		true,
 		true,
 	)
@@ -5229,7 +5229,7 @@ func (ec *executionContext) fieldContext_IngredientStock_capital(_ context.Conte
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int64 does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5245,7 +5245,7 @@ func (ec *executionContext) _IngredientStock_capital_item(ctx context.Context, f
 			return obj.CapitalItem, nil
 		},
 		nil,
-		ec.marshalNInt642int64,
+		ec.marshalNFloat2float64,
 		true,
 		true,
 	)
@@ -5258,7 +5258,7 @@ func (ec *executionContext) fieldContext_IngredientStock_capital_item(_ context.
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int64 does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -12153,7 +12153,7 @@ func (ec *executionContext) unmarshalInputCreateIngredientStockInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"code", "qty", "type", "capital", "capital_item", "message", "image", "ingredient_id"}
+	fieldsInOrder := [...]string{"code", "qty", "type", "capital", "message", "image", "ingredient_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12183,18 +12183,11 @@ func (ec *executionContext) unmarshalInputCreateIngredientStockInput(ctx context
 			it.Type = data
 		case "capital":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("capital"))
-			data, err := ec.unmarshalNInt642int64(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Capital = data
-		case "capital_item":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("capital_item"))
-			data, err := ec.unmarshalNInt642int64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CapitalItem = data
 		case "message":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12608,7 +12601,7 @@ func (ec *executionContext) unmarshalInputUpdateIngredientStockInput(ctx context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"code", "qty", "type", "capital", "capital_item", "message", "image", "ingredient_id"}
+	fieldsInOrder := [...]string{"code", "qty", "type", "capital", "message", "image", "ingredient_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12638,18 +12631,11 @@ func (ec *executionContext) unmarshalInputUpdateIngredientStockInput(ctx context
 			it.Type = data
 		case "capital":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("capital"))
-			data, err := ec.unmarshalOInt642ᚖint64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Capital = data
-		case "capital_item":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("capital_item"))
-			data, err := ec.unmarshalOInt642ᚖint64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CapitalItem = data
 		case "message":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

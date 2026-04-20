@@ -89,8 +89,7 @@ input CreateIngredientStockInput {
   code: String
   qty: Float!
   type: IngredientStockType!
-  capital: Int64!
-  capital_item: Int64!
+  capital: Float!
   message: String
   image: String
   ingredient_id: Int64!
@@ -100,8 +99,7 @@ input UpdateIngredientStockInput {
   code: String
   qty: Float
   type: IngredientStockType
-  capital: Int64
-  capital_item: Int64
+  capital: Float
   message: String
   image: String
   ingredient_id: Int64

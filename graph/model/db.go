@@ -277,8 +277,8 @@ type IngredientStockDB struct {
 	Code        *string             `json:"code,omitempty"`
 	Qty         float64             `gorm:"default:0" json:"qty"`
 	Type        IngredientStockType `gorm:"not null" json:"type"`
-	Capital     int64               `json:"capital"`
-	CapitalItem int64               `json:"capital_item"`
+	Capital     float64             `json:"capital"`
+	CapitalItem float64             `json:"capital_item"`
 	Message     *string             `json:"message,omitempty"`
 	Image       *string             `json:"image,omitempty"`
 	DeletedAt   *time.Time          `gorm:"index" json:"deleted_at,omitempty"`
