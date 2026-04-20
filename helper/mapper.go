@@ -57,3 +57,37 @@ func ToGraphQLUserPermission(userPermissionDB model.UserPermissionDB) *model.Use
 		Name: userPermissionDB.Name,
 	}
 }
+
+// ToGraphQLIngredientCategory converts IngredientCategoryDB to GraphQL IngredientCategory model
+func ToGraphQLIngredientCategory(ingredientCategoryDB model.IngredientCategoryDB) *model.IngredientCategory {
+	return &model.IngredientCategory{
+		ID:          ingredientCategoryDB.ID,
+		Name:        ingredientCategoryDB.Name,
+		Unit:        ingredientCategoryDB.Unit,
+		ConvertUnit: ingredientCategoryDB.ConvertUnit,
+		Status:      ingredientCategoryDB.Status,
+		DeletedAt:   ingredientCategoryDB.DeletedAt,
+		CreatedAt:   ingredientCategoryDB.CreatedAt,
+		UpdatedAt:   ingredientCategoryDB.UpdatedAt,
+	}
+}
+
+// ToGraphQLIngredient converts IngredientDB to GraphQL Ingredient model
+func ToGraphQLIngredient(ingredientDB model.IngredientDB) *model.Ingredient {
+	ingredient := &model.Ingredient{
+		ID:         ingredientDB.ID,
+		Name:       ingredientDB.Name,
+		CategoryID: ingredientDB.CategoryID,
+		IsActive:   ingredientDB.IsActive,
+		DeletedAt:  ingredientDB.DeletedAt,
+		CreatedAt:  ingredientDB.CreatedAt,
+		UpdatedAt:  ingredientDB.UpdatedAt,
+	}
+
+	// Set category if provided
+	if ingredientDB.Category != nil && ingredientDB.Category.ID > 0 {
+		ingredient.Category = ToGraphQLIngredientCategory(*ingredientDB.Category)
+	}
+
+	return ingredient
+}

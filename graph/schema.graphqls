@@ -58,6 +58,9 @@ type Query {
   roles: RolesResponse! @auth
   role(id: Int64!): RoleResponse! @auth
   permissions: PermissionsResponse! @auth
+  # ingredients
+  ingredientCategories(pagination: PaginationInput): IngredientCategoriesResponse! @auth
+  ingredients(pagination: PaginationInput): IngredientsResponse! @auth
 }
 
 type Mutation {
@@ -75,4 +78,12 @@ type Mutation {
   createRole(input: CreateRoleInput!): CreateRoleResponse! @auth
   updateRole(id: Int64!, input: UpdateRoleInput!): UpdateRoleResponse! @auth
   deleteRole(id: Int64!): DeleteRoleResponse! @auth
+
+  # ingredients
+  createIngredientCategory(input: CreateIngredientCategoryInput!): CreateIngredientCategoryResponse! @auth
+  updateIngredientCategory(id: Int64!, input: UpdateIngredientCategoryInput!): UpdateIngredientCategoryResponse! @auth
+  deleteIngredientCategory(id: Int64!): DeleteIngredientCategoryResponse! @auth
+  createIngredient(input: CreateIngredientInput!): CreateIngredientResponse! @auth
+  updateIngredient(id: Int64!, input: UpdateIngredientInput!): UpdateIngredientResponse! @auth
+  deleteIngredient(id: Int64!): DeleteIngredientResponse! @auth
 }

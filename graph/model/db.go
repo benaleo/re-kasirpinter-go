@@ -197,3 +197,67 @@ func (b *BlacklistedTokenDB) BeforeCreate(tx *gorm.DB) error {
 	b.CreatedAt = now
 	return nil
 }
+
+// IngredientCategoryDB represents the database model for IngredientCategory
+type IngredientCategoryDB struct {
+	ID          int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name        string     `gorm:"not null" json:"name"`
+	Unit        string     `gorm:"not null" json:"unit"`
+	ConvertUnit *string    `json:"convert_unit,omitempty"`
+	Status      bool       `gorm:"default:true" json:"status"`
+	DeletedAt   *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+}
+
+// TableName specifies the table name for IngredientCategoryDB
+func (IngredientCategoryDB) TableName() string {
+	return "ingredient_categories"
+}
+
+// BeforeCreate hook for IngredientCategoryDB
+func (i *IngredientCategoryDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	i.CreatedAt = now
+	i.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for IngredientCategoryDB
+func (i *IngredientCategoryDB) BeforeUpdate(tx *gorm.DB) error {
+	i.UpdatedAt = time.Now()
+	return nil
+}
+
+// IngredientDB represents the database model for Ingredient
+type IngredientDB struct {
+	ID         int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name       string     `gorm:"not null" json:"name"`
+	CategoryID *int64     `json:"category_id,omitempty"`
+	IsActive   bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt  *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+
+	// Relations
+	Category *IngredientCategoryDB `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+}
+
+// TableName specifies the table name for IngredientDB
+func (IngredientDB) TableName() string {
+	return "ingredients"
+}
+
+// BeforeCreate hook for IngredientDB
+func (i *IngredientDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	i.CreatedAt = now
+	i.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for IngredientDB
+func (i *IngredientDB) BeforeUpdate(tx *gorm.DB) error {
+	i.UpdatedAt = time.Now()
+	return nil
+}

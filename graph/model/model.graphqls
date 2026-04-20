@@ -118,3 +118,97 @@ type DeleteRoleResponse {
   message: String!
   data: UserRole
 }
+
+type IngredientCategoriesResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [IngredientCategory!]!
+  pagination: PageInfo
+}
+
+type IngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type IngredientsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Ingredient!]!
+  pagination: PageInfo
+}
+
+type IngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type CreateIngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type UpdateIngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type DeleteIngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type CreateIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type UpdateIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type DeleteIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type IngredientCategory {
+  id: Int64!
+  name: String!
+  unit: String!
+  convert_unit: String
+  status: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Ingredient {
+  id: Int64!
+  name: String!
+  category_id: Int64
+  category: IngredientCategory
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}

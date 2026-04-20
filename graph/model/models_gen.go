@@ -11,6 +11,33 @@ type AuthData struct {
 	User  *User  `json:"user"`
 }
 
+type CreateIngredientCategoryInput struct {
+	Name        string  `json:"name"`
+	Unit        string  `json:"unit"`
+	ConvertUnit *string `json:"convert_unit,omitempty"`
+	Status      bool    `json:"status"`
+}
+
+type CreateIngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type CreateIngredientInput struct {
+	Name       string `json:"name"`
+	CategoryID *int64 `json:"category_id,omitempty"`
+	IsActive   bool   `json:"is_active"`
+}
+
+type CreateIngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
 type CreateOtpInput struct {
 	Email string `json:"email"`
 	Type  string `json:"type"`
@@ -43,6 +70,20 @@ type CreateUserResponse struct {
 	Data    *User  `json:"data,omitempty"`
 }
 
+type DeleteIngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type DeleteIngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
 type DeleteRoleResponse struct {
 	Code    int32     `json:"code"`
 	Success bool      `json:"success"`
@@ -55,6 +96,58 @@ type DeleteUserResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    *User  `json:"data,omitempty"`
+}
+
+type Ingredient struct {
+	ID         int64               `json:"id"`
+	Name       string              `json:"name"`
+	CategoryID *int64              `json:"category_id,omitempty"`
+	Category   *IngredientCategory `json:"category,omitempty"`
+	IsActive   bool                `json:"is_active"`
+	DeletedAt  *time.Time          `json:"deleted_at,omitempty"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
+}
+
+type IngredientCategoriesResponse struct {
+	Code       int32                 `json:"code"`
+	Success    bool                  `json:"success"`
+	Message    string                `json:"message"`
+	Data       []*IngredientCategory `json:"data"`
+	Pagination *PageInfo             `json:"pagination,omitempty"`
+}
+
+type IngredientCategory struct {
+	ID          int64      `json:"id"`
+	Name        string     `json:"name"`
+	Unit        string     `json:"unit"`
+	ConvertUnit *string    `json:"convert_unit,omitempty"`
+	Status      bool       `json:"status"`
+	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+}
+
+type IngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type IngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type IngredientsResponse struct {
+	Code       int32         `json:"code"`
+	Success    bool          `json:"success"`
+	Message    string        `json:"message"`
+	Data       []*Ingredient `json:"data"`
+	Pagination *PageInfo     `json:"pagination,omitempty"`
 }
 
 type LogoutResponse struct {
@@ -115,6 +208,33 @@ type RolesResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    []*UserRole `json:"data"`
+}
+
+type UpdateIngredientCategoryInput struct {
+	Name        string  `json:"name"`
+	Unit        string  `json:"unit"`
+	ConvertUnit *string `json:"convert_unit,omitempty"`
+	Status      bool    `json:"status"`
+}
+
+type UpdateIngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type UpdateIngredientInput struct {
+	Name       *string `json:"name,omitempty"`
+	CategoryID *int64  `json:"category_id,omitempty"`
+	IsActive   *bool   `json:"is_active,omitempty"`
+}
+
+type UpdateIngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
 }
 
 type UpdateRoleInput struct {

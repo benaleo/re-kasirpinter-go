@@ -58,3 +58,29 @@ input UpdateRoleInput {
   status: Boolean!
   permission_ids: [Int64]
 }
+
+input CreateIngredientCategoryInput {
+  name: String!
+  unit: String!
+  convert_unit: String
+  status: Boolean!
+}
+
+input UpdateIngredientCategoryInput {
+  name: String!
+  unit: String!
+  convert_unit: String
+  status: Boolean!
+}
+
+input CreateIngredientInput {
+  name: String!
+  category_id: Int64
+  is_active: Boolean!
+}
+
+input UpdateIngredientInput {
+  name: String
+  category_id: Int64
+  is_active: Boolean
+}
