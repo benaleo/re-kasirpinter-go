@@ -15,7 +15,7 @@ type CreateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
 	ConvertUnit *string `json:"convert_unit,omitempty"`
-	Status      bool    `json:"status"`
+	IsActive    bool    `json:"is_active"`
 }
 
 type CreateIngredientCategoryResponse struct {
@@ -122,7 +122,7 @@ type IngredientCategory struct {
 	Name        string     `json:"name"`
 	Unit        string     `json:"unit"`
 	ConvertUnit *string    `json:"convert_unit,omitempty"`
-	Status      bool       `json:"status"`
+	IsActive    bool       `json:"is_active"`
 	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -214,7 +214,7 @@ type UpdateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
 	ConvertUnit *string `json:"convert_unit,omitempty"`
-	Status      bool    `json:"status"`
+	IsActive    bool    `json:"is_active"`
 }
 
 type UpdateIngredientCategoryResponse struct {

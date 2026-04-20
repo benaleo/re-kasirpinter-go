@@ -611,7 +611,7 @@ func (r *mutationResolver) CreateIngredientCategory(ctx context.Context, input m
 		Name:        input.Name,
 		Unit:        input.Unit,
 		ConvertUnit: input.ConvertUnit,
-		Status:      input.Status,
+		IsActive:    input.IsActive,
 	}
 
 	// Save to database
@@ -639,7 +639,7 @@ func (r *mutationResolver) UpdateIngredientCategory(ctx context.Context, id int6
 	categoryDB.Name = input.Name
 	categoryDB.Unit = input.Unit
 	categoryDB.ConvertUnit = input.ConvertUnit
-	categoryDB.Status = input.Status
+	categoryDB.IsActive = input.IsActive
 
 	// Save to database
 	result = r.DB.Save(&categoryDB)

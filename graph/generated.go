@@ -137,8 +137,8 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		DeletedAt   func(childComplexity int) int
 		ID          func(childComplexity int) int
+		IsActive    func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Status      func(childComplexity int) int
 		Unit        func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
@@ -734,18 +734,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.IngredientCategory.ID(childComplexity), true
+	case "IngredientCategory.is_active":
+		if e.ComplexityRoot.IngredientCategory.IsActive == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientCategory.IsActive(childComplexity), true
 	case "IngredientCategory.name":
 		if e.ComplexityRoot.IngredientCategory.Name == nil {
 			break
 		}
 
 		return e.ComplexityRoot.IngredientCategory.Name(childComplexity), true
-	case "IngredientCategory.status":
-		if e.ComplexityRoot.IngredientCategory.Status == nil {
-			break
-		}
-
-		return e.ComplexityRoot.IngredientCategory.Status(childComplexity), true
 	case "IngredientCategory.unit":
 		if e.ComplexityRoot.IngredientCategory.Unit == nil {
 			break
@@ -2367,8 +2367,8 @@ func (ec *executionContext) fieldContext_CreateIngredientCategoryResponse_data(_
 				return ec.fieldContext_IngredientCategory_unit(ctx, field)
 			case "convert_unit":
 				return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
-			case "status":
-				return ec.fieldContext_IngredientCategory_status(ctx, field)
+			case "is_active":
+				return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_IngredientCategory_deleted_at(ctx, field)
 			case "created_at":
@@ -3002,8 +3002,8 @@ func (ec *executionContext) fieldContext_DeleteIngredientCategoryResponse_data(_
 				return ec.fieldContext_IngredientCategory_unit(ctx, field)
 			case "convert_unit":
 				return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
-			case "status":
-				return ec.fieldContext_IngredientCategory_status(ctx, field)
+			case "is_active":
+				return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_IngredientCategory_deleted_at(ctx, field)
 			case "created_at":
@@ -3550,8 +3550,8 @@ func (ec *executionContext) fieldContext_Ingredient_category(_ context.Context, 
 				return ec.fieldContext_IngredientCategory_unit(ctx, field)
 			case "convert_unit":
 				return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
-			case "status":
-				return ec.fieldContext_IngredientCategory_status(ctx, field)
+			case "is_active":
+				return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_IngredientCategory_deleted_at(ctx, field)
 			case "created_at":
@@ -3800,8 +3800,8 @@ func (ec *executionContext) fieldContext_IngredientCategoriesResponse_data(_ con
 				return ec.fieldContext_IngredientCategory_unit(ctx, field)
 			case "convert_unit":
 				return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
-			case "status":
-				return ec.fieldContext_IngredientCategory_status(ctx, field)
+			case "is_active":
+				return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_IngredientCategory_deleted_at(ctx, field)
 			case "created_at":
@@ -3978,14 +3978,14 @@ func (ec *executionContext) fieldContext_IngredientCategory_convert_unit(_ conte
 	return fc, nil
 }
 
-func (ec *executionContext) _IngredientCategory_status(ctx context.Context, field graphql.CollectedField, obj *model.IngredientCategory) (ret graphql.Marshaler) {
+func (ec *executionContext) _IngredientCategory_is_active(ctx context.Context, field graphql.CollectedField, obj *model.IngredientCategory) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_IngredientCategory_status,
+		ec.fieldContext_IngredientCategory_is_active,
 		func(ctx context.Context) (any, error) {
-			return obj.Status, nil
+			return obj.IsActive, nil
 		},
 		nil,
 		ec.marshalNBoolean2bool,
@@ -3994,7 +3994,7 @@ func (ec *executionContext) _IngredientCategory_status(ctx context.Context, fiel
 	)
 }
 
-func (ec *executionContext) fieldContext_IngredientCategory_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_IngredientCategory_is_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "IngredientCategory",
 		Field:      field,
@@ -4213,8 +4213,8 @@ func (ec *executionContext) fieldContext_IngredientCategoryResponse_data(_ conte
 				return ec.fieldContext_IngredientCategory_unit(ctx, field)
 			case "convert_unit":
 				return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
-			case "status":
-				return ec.fieldContext_IngredientCategory_status(ctx, field)
+			case "is_active":
+				return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_IngredientCategory_deleted_at(ctx, field)
 			case "created_at":
@@ -7077,8 +7077,8 @@ func (ec *executionContext) fieldContext_UpdateIngredientCategoryResponse_data(_
 				return ec.fieldContext_IngredientCategory_unit(ctx, field)
 			case "convert_unit":
 				return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
-			case "status":
-				return ec.fieldContext_IngredientCategory_status(ctx, field)
+			case "is_active":
+				return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 			case "deleted_at":
 				return ec.fieldContext_IngredientCategory_deleted_at(ctx, field)
 			case "created_at":
@@ -10192,7 +10192,7 @@ func (ec *executionContext) unmarshalInputCreateIngredientCategoryInput(ctx cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "status"}
+	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10220,13 +10220,13 @@ func (ec *executionContext) unmarshalInputCreateIngredientCategoryInput(ctx cont
 				return it, err
 			}
 			it.ConvertUnit = data
-		case "status":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+		case "is_active":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Status = data
+			it.IsActive = data
 		}
 	}
 	return it, nil
@@ -10568,7 +10568,7 @@ func (ec *executionContext) unmarshalInputUpdateIngredientCategoryInput(ctx cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "status"}
+	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10596,13 +10596,13 @@ func (ec *executionContext) unmarshalInputUpdateIngredientCategoryInput(ctx cont
 				return it, err
 			}
 			it.ConvertUnit = data
-		case "status":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+		case "is_active":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Status = data
+			it.IsActive = data
 		}
 	}
 	return it, nil
@@ -11528,8 +11528,8 @@ func (ec *executionContext) _IngredientCategory(ctx context.Context, sel ast.Sel
 			}
 		case "convert_unit":
 			out.Values[i] = ec._IngredientCategory_convert_unit(ctx, field, obj)
-		case "status":
-			out.Values[i] = ec._IngredientCategory_status(ctx, field, obj)
+		case "is_active":
+			out.Values[i] = ec._IngredientCategory_is_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

@@ -204,7 +204,7 @@ type IngredientCategoryDB struct {
 	Name        string     `gorm:"not null" json:"name"`
 	Unit        string     `gorm:"not null" json:"unit"`
 	ConvertUnit *string    `json:"convert_unit,omitempty"`
-	Status      bool       `gorm:"default:true" json:"status"`
+	IsActive    bool       `gorm:"default:true" json:"is_active"`
 	DeletedAt   *time.Time `gorm:"index" json:"deleted_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`

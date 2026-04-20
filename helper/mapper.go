@@ -65,7 +65,7 @@ func ToGraphQLIngredientCategory(ingredientCategoryDB model.IngredientCategoryDB
 		Name:        ingredientCategoryDB.Name,
 		Unit:        ingredientCategoryDB.Unit,
 		ConvertUnit: ingredientCategoryDB.ConvertUnit,
-		Status:      ingredientCategoryDB.Status,
+		IsActive:    ingredientCategoryDB.IsActive,
 		DeletedAt:   ingredientCategoryDB.DeletedAt,
 		CreatedAt:   ingredientCategoryDB.CreatedAt,
 		UpdatedAt:   ingredientCategoryDB.UpdatedAt,

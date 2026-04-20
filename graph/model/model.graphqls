@@ -196,7 +196,7 @@ type IngredientCategory {
   name: String!
   unit: String!
   convert_unit: String
-  status: Boolean!
+  is_active: Boolean!
   deleted_at: Time
   created_at: Time!
   updated_at: Time!
