@@ -242,6 +242,29 @@ func (s *UserService) UpdateUser(ctx context.Context, id string, input input.Upd
 	if input.Phone != nil {
 		userDB.Phone = *input.Phone
 	}
+	if input.Password != nil && *input.Password != "" {
+		// Decrypt password from frontend using AES
+		decryptedPassword, err := helper.Decrypt(*input.Password)
+		if err != nil {
+			return &model.UpdateUserResponse{
+				Code:    400,
+				Success: false,
+				Message: "invalid password format",
+			}, nil
+		}
+
+		// Hash the new password
+		hashedPassword, err := helper.HashPassword(decryptedPassword)
+		if err != nil {
+			return &model.UpdateUserResponse{
+				Code:    500,
+				Success: false,
+				Message: fmt.Sprintf("failed to hash password: %v", err),
+			}, nil
+		}
+
+		userDB.Password = hashedPassword
+	}
 	if avatarURL != nil {
 		userDB.Avatar = avatarURL
 	} else if input.Avatar != nil && *input.Avatar == "" {

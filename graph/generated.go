@@ -32,6 +32,7 @@ type Config = graphql.Config[ResolverRoot, DirectiveRoot, ComplexityRoot]
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	UpdateUserInput() UpdateUserInputResolver
 }
 
 type DirectiveRoot struct {
@@ -247,6 +248,10 @@ type QueryResolver interface {
 	Roles(ctx context.Context) (*model.RolesResponse, error)
 	Role(ctx context.Context, id int64) (*model.RoleResponse, error)
 	Permissions(ctx context.Context) (*model.PermissionsResponse, error)
+}
+
+type UpdateUserInputResolver interface {
+	Password(ctx context.Context, obj *input.UpdateUserInput, data *string) error
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -7187,7 +7192,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "email", "address", "phone", "password", "role_id"}
+	fieldsInOrder := [...]string{"name", "email", "address", "phone", "password", "avatar", "role_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7229,6 +7234,13 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Password = data
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Avatar = data
 		case "role_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_id"))
 			data, err := ec.unmarshalOInt642ᚖint64(ctx, v)
@@ -7417,7 +7429,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "email", "address", "phone", "avatar", "is_active", "role_id"}
+	fieldsInOrder := [...]string{"name", "email", "address", "phone", "password", "avatar", "is_active", "role_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7452,6 +7464,15 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Phone = data
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.Resolvers.UpdateUserInput().Password(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "avatar":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

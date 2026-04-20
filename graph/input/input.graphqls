@@ -9,6 +9,7 @@ input CreateUserInput {
   address: String
   phone: String!
   password: String
+  avatar: String
   role_id: Int64
 }
 
@@ -17,6 +18,7 @@ input UpdateUserInput {
   email: String
   address: String
   phone: String
+  password: String
   avatar: String
   is_active: Boolean
   role_id: Int64
