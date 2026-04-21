@@ -522,51 +522,14 @@ func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *mo
 
 // Ingredients is the resolver for the ingredients field.
 func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error) {
-	// Parse pagination parameters
-	params := helper.ParsePagination(pagination)
-
-	// Build base query with category and stocks preload
-	baseQuery := r.DB.Model(&model.IngredientDB{}).Preload("Category").Preload("Stocks", "deleted_at IS NULL").Where("deleted_at IS NULL")
-
-	// Get total count
-	var total int64
-	countResult := baseQuery.Count(&total)
-	if countResult.Error != nil {
+	if r.IngredientService == nil {
 		return &model.IngredientsResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to count ingredients: %v", countResult.Error),
+			Message: "ingredient service not initialized",
 		}, nil
 	}
-
-	// Query ingredients with pagination
-	paginationResult := helper.BuildPaginationResult(params, total, 0)
-	var ingredientsDB []model.IngredientDB
-	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&ingredientsDB)
-	if result.Error != nil {
-		return &model.IngredientsResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to retrieve ingredients: %v", result.Error),
-		}, nil
-	}
-
-	// Rebuild pagination result with actual item count
-	paginationResult = helper.BuildPaginationResult(params, total, len(ingredientsDB))
-
-	// Convert DB models to GraphQL models
-	ingredients := make([]*model.Ingredient, len(ingredientsDB))
-	for i, ingredientDB := range ingredientsDB {
-		ingredients[i] = helper.ToGraphQLIngredient(ingredientDB)
-	}
-
-	return &model.IngredientsResponse{
-		Code:       200,
-		Success:    true,
-		Message:    "ingredients retrieved successfully",
-		Data:       ingredients,
-		Pagination: paginationResult.PageInfo,
-	}, nil
+	return r.IngredientService.Ingredients(pagination)
 }
 
 // IngredientStocks is the resolver for the ingredientStocks field.
