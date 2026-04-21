@@ -12,9 +12,10 @@ import (
 // here.
 
 type Resolver struct {
-	DB          *gorm.DB
-	R2Service   *service.R2Service
-	UserService *service.UserService
-	AuthService *service.AuthService
-	RoleService *service.RoleService
+	DB                        *gorm.DB
+	R2Service                 *service.R2Service
+	UserService               *service.UserService
+	AuthService               *service.AuthService
+	RoleService               *service.RoleService
+	IngredientCategoryService *service.IngredientCategoryService
 }

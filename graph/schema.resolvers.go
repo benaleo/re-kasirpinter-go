@@ -257,76 +257,38 @@ func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.Del
 
 // CreateIngredientCategory is the resolver for the createIngredientCategory field.
 func (r *mutationResolver) CreateIngredientCategory(ctx context.Context, input model.CreateIngredientCategoryInput) (*model.CreateIngredientCategoryResponse, error) {
-	// Create ingredient category DB model
-	categoryDB := model.IngredientCategoryDB{
-		Name:        input.Name,
-		Unit:        input.Unit,
-		ConvertUnit: input.ConvertUnit,
-		IsActive:    input.IsActive,
+	if r.IngredientCategoryService == nil {
+		return &model.CreateIngredientCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
 	}
-
-	// Save to database
-	result := r.DB.Create(&categoryDB)
-	if result.Error != nil {
-		return toGraphQLCreateIngredientCategoryResponse(500, false, fmt.Sprintf("failed to create ingredient category: %v", result.Error), nil), nil
-	}
-
-	// Convert DB model to GraphQL model
-	category := helper.ToGraphQLIngredientCategory(categoryDB)
-
-	return toGraphQLCreateIngredientCategoryResponse(201, true, "ingredient category created successfully", category), nil
+	return r.IngredientCategoryService.CreateIngredientCategory(input)
 }
 
 // UpdateIngredientCategory is the resolver for the updateIngredientCategory field.
 func (r *mutationResolver) UpdateIngredientCategory(ctx context.Context, id int64, input model.UpdateIngredientCategoryInput) (*model.UpdateIngredientCategoryResponse, error) {
-	// Find ingredient category by ID
-	var categoryDB model.IngredientCategoryDB
-	result := r.DB.Where("id = ? AND deleted_at IS NULL", id).First(&categoryDB)
-	if result.Error != nil {
-		return toGraphQLUpdateIngredientCategoryResponse(404, false, "ingredient category not found", nil), nil
+	if r.IngredientCategoryService == nil {
+		return &model.UpdateIngredientCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
 	}
-
-	// Update fields
-	categoryDB.Name = input.Name
-	categoryDB.Unit = input.Unit
-	categoryDB.ConvertUnit = input.ConvertUnit
-	categoryDB.IsActive = input.IsActive
-
-	// Save to database
-	result = r.DB.Save(&categoryDB)
-	if result.Error != nil {
-		return toGraphQLUpdateIngredientCategoryResponse(500, false, fmt.Sprintf("failed to update ingredient category: %v", result.Error), nil), nil
-	}
-
-	// Convert DB model to GraphQL model
-	category := helper.ToGraphQLIngredientCategory(categoryDB)
-
-	return toGraphQLUpdateIngredientCategoryResponse(200, true, "ingredient category updated successfully", category), nil
+	return r.IngredientCategoryService.UpdateIngredientCategory(id, input)
 }
 
 // DeleteIngredientCategory is the resolver for the deleteIngredientCategory field.
 func (r *mutationResolver) DeleteIngredientCategory(ctx context.Context, id int64) (*model.DeleteIngredientCategoryResponse, error) {
-	// Find ingredient category by ID
-	var categoryDB model.IngredientCategoryDB
-	result := r.DB.Where("id = ? AND deleted_at IS NULL", id).First(&categoryDB)
-	if result.Error != nil {
-		return toGraphQLDeleteIngredientCategoryResponse(404, false, "ingredient category not found", nil), nil
+	if r.IngredientCategoryService == nil {
+		return &model.DeleteIngredientCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
 	}
-
-	// Soft delete by setting deleted_at
-	now := time.Now()
-	categoryDB.DeletedAt = &now
-
-	// Save to database
-	result = r.DB.Save(&categoryDB)
-	if result.Error != nil {
-		return toGraphQLDeleteIngredientCategoryResponse(500, false, fmt.Sprintf("failed to delete ingredient category: %v", result.Error), nil), nil
-	}
-
-	// Convert DB model to GraphQL model
-	category := helper.ToGraphQLIngredientCategory(categoryDB)
-
-	return toGraphQLDeleteIngredientCategoryResponse(200, true, "ingredient category deleted successfully", category), nil
+	return r.IngredientCategoryService.DeleteIngredientCategory(id)
 }
 
 // CreateIngredient is the resolver for the createIngredient field.
@@ -679,57 +641,14 @@ func (r *queryResolver) Permissions(ctx context.Context) (*model.PermissionsResp
 
 // IngredientCategories is the resolver for the ingredientCategories field.
 func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error) {
-	// Parse pagination parameters
-	params := helper.ParsePagination(pagination)
-
-	// Build base query
-	baseQuery := r.DB.Model(&model.IngredientCategoryDB{}).Where("deleted_at IS NULL")
-
-	// Filter by is_active if is_options is true
-	getActiveOnly := isOptions != nil && *isOptions
-	if getActiveOnly {
-		baseQuery = baseQuery.Where("is_active = ?", true)
-	}
-
-	// Get total count
-	var total int64
-	countResult := baseQuery.Count(&total)
-	if countResult.Error != nil {
+	if r.IngredientCategoryService == nil {
 		return &model.IngredientCategoriesResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to count ingredient categories: %v", countResult.Error),
+			Message: "ingredient category service not initialized",
 		}, nil
 	}
-
-	// Query ingredient categories with pagination
-	paginationResult := helper.BuildPaginationResult(params, total, 0)
-	var categoriesDB []model.IngredientCategoryDB
-	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&categoriesDB)
-	if result.Error != nil {
-		return &model.IngredientCategoriesResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to retrieve ingredient categories: %v", result.Error),
-		}, nil
-	}
-
-	// Rebuild pagination result with actual item count
-	paginationResult = helper.BuildPaginationResult(params, total, len(categoriesDB))
-
-	// Convert DB models to GraphQL models
-	categories := make([]*model.IngredientCategory, len(categoriesDB))
-	for i, categoryDB := range categoriesDB {
-		categories[i] = helper.ToGraphQLIngredientCategory(categoryDB)
-	}
-
-	return &model.IngredientCategoriesResponse{
-		Code:       200,
-		Success:    true,
-		Message:    "ingredient categories retrieved successfully",
-		Data:       categories,
-		Pagination: paginationResult.PageInfo,
-	}, nil
+	return r.IngredientCategoryService.IngredientCategories(pagination, isOptions)
 }
 
 // Ingredients is the resolver for the ingredients field.
