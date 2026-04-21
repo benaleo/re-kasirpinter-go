@@ -18,4 +18,5 @@ type Resolver struct {
 	AuthService               *service.AuthService
 	RoleService               *service.RoleService
 	IngredientCategoryService *service.IngredientCategoryService
+	IngredientService         *service.IngredientService
 }
