@@ -84,13 +84,19 @@ func main() {
 
 	authService := service.NewAuthService(db)
 
+	// Initialize role service
+	roleService, err := service.NewRoleService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize role service: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 

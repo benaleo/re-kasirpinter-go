@@ -16,4 +16,5 @@ type Resolver struct {
 	R2Service   *service.R2Service
 	UserService *service.UserService
 	AuthService *service.AuthService
+	RoleService *service.RoleService
 }
