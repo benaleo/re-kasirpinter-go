@@ -364,97 +364,28 @@ func (r *mutationResolver) DeleteIngredientStock(ctx context.Context, id int64) 
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
-	// Parse pagination parameters
-	params := helper.ParsePagination(pagination)
-
-	// Build base query with filters
-	baseQuery := r.DB.Model(&model.UserDB{}).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
-
-	// Filter by role_id based on is_user parameter (default: true)
-	getUserWithRole2 := isUser == nil || *isUser
-	if getUserWithRole2 {
-		// Get users with role_id = 2
-		baseQuery = baseQuery.Where("role_id = ?", 2)
-	} else {
-		// Get users excluding role_id = 2
-		baseQuery = baseQuery.Where("role_id != ?", 2)
+	userService, err := service.NewUserService(r.DB)
+	if err != nil {
+		return &model.UsersResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
+		}, nil
 	}
-
-	// Get total count
-	var total int64
-	countResult := baseQuery.Count(&total)
-	if countResult.Error != nil {
-		return nil, countResult.Error
-	}
-
-	// Query users with pagination
-	paginationResult := helper.BuildPaginationResult(params, total, 0)
-	var usersDB []model.UserDB
-	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&usersDB)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	// Rebuild pagination result with actual item count
-	paginationResult = helper.BuildPaginationResult(params, total, len(usersDB))
-
-	// Convert DB models to GraphQL models
-	users := make([]*model.User, len(usersDB))
-	for i, userDB := range usersDB {
-		// Get user role if exists
-		var userRoleDB *model.UserRoleDB
-		if userDB.RoleID != nil {
-			var userRole model.UserRoleDB
-			r.DB.First(&userRole, *userDB.RoleID)
-			if userRole.ID > 0 {
-				userRoleDB = &userRole
-			}
-		}
-
-		users[i] = helper.ToGraphQLUser(userDB, userRoleDB)
-	}
-
-	return &model.UsersResponse{
-		Code:       200,
-		Success:    true,
-		Message:    "users retrieved successfully",
-		Data:       users,
-		Pagination: paginationResult.PageInfo,
-	}, nil
+	return userService.Users(pagination, isUser)
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*model.UserResponse, error) {
-	// Find user by secure_id
-	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
-	if result.Error != nil {
+	userService, err := service.NewUserService(r.DB)
+	if err != nil {
 		return &model.UserResponse{
-			Code:    404,
+			Code:    500,
 			Success: false,
-			Message: "user not found",
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
 		}, nil
 	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	var userRoleDB *model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-		if userRole.ID > 0 {
-			userRoleDB = &userRole
-		}
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	user := helper.ToGraphQLUser(userDB, userRoleDB)
-
-	return &model.UserResponse{
-		Code:    200,
-		Success: true,
-		Message: "user retrieved successfully",
-		Data:    user,
-	}, nil
+	return userService.User(id)
 }
 
 // Roles is the resolver for the roles field.

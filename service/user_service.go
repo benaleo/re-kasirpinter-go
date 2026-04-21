@@ -356,3 +356,96 @@ func (s *UserService) DeleteUser(ctx context.Context, id string) (*model.DeleteU
 		Data:    user,
 	}, nil
 }
+
+func (s *UserService) Users(pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
+	// Parse pagination parameters
+	params := helper.ParsePagination(pagination)
+
+	// Build base query with filters
+	baseQuery := s.DB.Model(&model.UserDB{}).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
+
+	// Filter by role_id based on is_user parameter (default: true)
+	getUserWithRole2 := isUser == nil || *isUser
+	if getUserWithRole2 {
+		// Get users with role_id = 2
+		baseQuery = baseQuery.Where("role_id = ?", 2)
+	} else {
+		// Get users excluding role_id = 2
+		baseQuery = baseQuery.Where("role_id != ?", 2)
+	}
+
+	// Get total count
+	var total int64
+	countResult := baseQuery.Count(&total)
+	if countResult.Error != nil {
+		return nil, countResult.Error
+	}
+
+	// Query users with pagination
+	paginationResult := helper.BuildPaginationResult(params, total, 0)
+	var usersDB []model.UserDB
+	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&usersDB)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Rebuild pagination result with actual item count
+	paginationResult = helper.BuildPaginationResult(params, total, len(usersDB))
+
+	// Convert DB models to GraphQL models
+	users := make([]*model.User, len(usersDB))
+	for i, userDB := range usersDB {
+		// Get user role if exists
+		var userRoleDB *model.UserRoleDB
+		if userDB.RoleID != nil {
+			var userRole model.UserRoleDB
+			s.DB.First(&userRole, *userDB.RoleID)
+			if userRole.ID > 0 {
+				userRoleDB = &userRole
+			}
+		}
+
+		users[i] = helper.ToGraphQLUser(userDB, userRoleDB)
+	}
+
+	return &model.UsersResponse{
+		Code:       200,
+		Success:    true,
+		Message:    "users retrieved successfully",
+		Data:       users,
+		Pagination: paginationResult.PageInfo,
+	}, nil
+}
+
+func (s *UserService) User(id string) (*model.UserResponse, error) {
+	// Find user by secure_id
+	var userDB model.UserDB
+	result := s.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
+	if result.Error != nil {
+		return &model.UserResponse{
+			Code:    404,
+			Success: false,
+			Message: "user not found",
+		}, nil
+	}
+
+	// Get user role if exists
+	var userRole model.UserRoleDB
+	var userRoleDB *model.UserRoleDB
+	if userDB.RoleID != nil {
+		s.DB.First(&userRole, *userDB.RoleID)
+		if userRole.ID > 0 {
+			userRoleDB = &userRole
+		}
+	}
+
+	// Convert DB model to GraphQL model using mapper
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
+
+	return &model.UserResponse{
+		Code:    200,
+		Success: true,
+		Message: "user retrieved successfully",
+		Data:    user,
+	}, nil
+}
