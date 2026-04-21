@@ -31,12 +31,12 @@ type ClientInfo struct {
 }
 
 type Claims struct {
-	UserID    int32
-	Email     string
-	Role      string
-	SecureID  string
-	Purpose   string
-	ExpiresAt time.Time
+	UserID   int32  `json:"user_id"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+	SecureID string `json:"secure_id"`
+	Purpose  string `json:"purpose"`
+	jwt.RegisteredClaims
 }
 
 // Login handles user authentication
@@ -229,7 +229,7 @@ func (s *AuthService) Logout(ctx context.Context, token string, userClaims *Clai
 	}
 
 	// Get the token's expiration time
-	expiresAt := claims.ExpiresAt
+	expiresAt := claims.ExpiresAt.Time
 
 	// Add the token to the blacklist
 	err = s.blacklistToken(token, userClaims.UserID, expiresAt)
@@ -506,19 +506,21 @@ func (s *AuthService) generateJWT(userID int32, email string, role string, secur
 	}
 	expirationTime := time.Now().Add(expiry)
 
-	// Add custom claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":   userID,
-		"email":     email,
-		"role":      role,
-		"secure_id": secureID,
-		"purpose":   purpose,
-		"exp":       expirationTime.Unix(),
-		"iat":       time.Now().Unix(),
-		"nbf":       time.Now().Unix(),
-		"iss":       "kasirpinter",
-	})
+	claims := &Claims{
+		UserID:   userID,
+		Email:    email,
+		Role:     role,
+		SecureID: secureID,
+		Purpose:  purpose,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "kasirpinter",
+		},
+	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
@@ -529,8 +531,9 @@ func (s *AuthService) generateJWT(userID int32, email string, role string, secur
 
 func (s *AuthService) validateJWT(tokenString string) (*Claims, error) {
 	jwtSecret := s.getJWTSecret()
+	claims := &Claims{}
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 
@@ -542,26 +545,7 @@ func (s *AuthService) validateJWT(tokenString string) (*Claims, error) {
 		return nil, fmt.Errorf("invalid token")
 	}
 
-	// Extract claims
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		userID, _ := claims["user_id"].(float64)
-		email, _ := claims["email"].(string)
-		role, _ := claims["role"].(string)
-		secureID, _ := claims["secure_id"].(string)
-		purpose, _ := claims["purpose"].(string)
-		exp, _ := claims["exp"].(float64)
-
-		return &Claims{
-			UserID:    int32(userID),
-			Email:     email,
-			Role:      role,
-			SecureID:  secureID,
-			Purpose:   purpose,
-			ExpiresAt: time.Unix(int64(exp), 0),
-		}, nil
-	}
-
-	return nil, fmt.Errorf("invalid token claims")
+	return claims, nil
 }
 
 func (s *AuthService) blacklistToken(tokenString string, userID int32, expiresAt time.Time) error {

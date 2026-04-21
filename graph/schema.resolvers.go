@@ -12,6 +12,8 @@ import (
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
 	"re-kasirpinter-go/service"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // Login is the resolver for the login field.
@@ -63,12 +65,17 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 
 	// Convert Claims to service.Claims
 	serviceClaims := &service.Claims{
-		UserID:    userClaims.UserID,
-		Email:     userClaims.Email,
-		Role:      userClaims.Role,
-		SecureID:  userClaims.SecureID,
-		Purpose:   userClaims.Purpose,
-		ExpiresAt: userClaims.ExpiresAt.Time,
+		UserID:   userClaims.UserID,
+		Email:    userClaims.Email,
+		Role:     userClaims.Role,
+		SecureID: userClaims.SecureID,
+		Purpose:  userClaims.Purpose,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: userClaims.ExpiresAt,
+			IssuedAt:  userClaims.IssuedAt,
+			NotBefore: userClaims.NotBefore,
+			Issuer:    userClaims.Issuer,
+		},
 	}
 
 	return r.AuthService.Logout(ctx, token, serviceClaims)
@@ -171,12 +178,17 @@ func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPassw
 
 	// Convert Claims to service.Claims
 	serviceClaims := &service.Claims{
-		UserID:    userClaims.UserID,
-		Email:     userClaims.Email,
-		Role:      userClaims.Role,
-		SecureID:  userClaims.SecureID,
-		Purpose:   userClaims.Purpose,
-		ExpiresAt: userClaims.ExpiresAt.Time,
+		UserID:   userClaims.UserID,
+		Email:    userClaims.Email,
+		Role:     userClaims.Role,
+		SecureID: userClaims.SecureID,
+		Purpose:  userClaims.Purpose,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: userClaims.ExpiresAt,
+			IssuedAt:  userClaims.IssuedAt,
+			NotBefore: userClaims.NotBefore,
+			Issuer:    userClaims.Issuer,
+		},
 	}
 
 	return r.AuthService.NewPassword(ctx, input, serviceClaims)
