@@ -424,7 +424,7 @@ func (r *mutationResolver) UpdateProduct(ctx context.Context, id int64, input mo
 			Message: "product service not initialized",
 		}, nil
 	}
-	return r.ProductService.UpdateProduct(id, input)
+	return r.ProductService.UpdateProduct(ctx, id, input)
 }
 
 // DeleteProduct is the resolver for the deleteProduct field.

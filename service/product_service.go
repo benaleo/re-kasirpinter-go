@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
@@ -11,12 +12,21 @@ import (
 )
 
 type ProductService struct {
-	DB *gorm.DB
+	DB        *gorm.DB
+	R2Service *R2Service
 }
 
 func NewProductService(db *gorm.DB) (*ProductService, error) {
+	r2Service, err := NewR2Service()
+	if err != nil {
+		// Log the error but don't fail service creation
+		// Image upload will be optional
+		fmt.Printf("Warning: Failed to initialize R2 service: %v\n", err)
+	}
+
 	return &ProductService{
-		DB: db,
+		DB:        db,
+		R2Service: r2Service,
 	}, nil
 }
 
@@ -72,11 +82,30 @@ func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.C
 	// Generate UUID v4 for secure_id
 	secureID := uuid.New().String()
 
+	// Handle image upload if provided
+	var imageURL *string
+	if input.Image != nil && *input.Image != "" && s.R2Service != nil {
+		imageURLStr, err := s.R2Service.UploadFromBase64(
+			context.Background(),
+			*input.Image,
+			"products",
+			secureID,
+		)
+		if err != nil {
+			return &model.CreateProductResponse{
+				Code:    500,
+				Success: false,
+				Message: fmt.Sprintf("failed to upload image: %v", err),
+			}, nil
+		}
+		imageURL = &imageURLStr
+	}
+
 	// Create product DB model
 	productDB := model.ProductDB{
 		SecureID:    &secureID,
 		Name:        input.Name,
-		Image:       input.Image,
+		Image:       imageURL,
 		CategoryID:  input.CategoryID,
 		Description: input.Description,
 		IsActive:    input.IsActive,
@@ -106,7 +135,7 @@ func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.C
 	}, nil
 }
 
-func (s *ProductService) UpdateProduct(id int64, input model.UpdateProductInput) (*model.UpdateProductResponse, error) {
+func (s *ProductService) UpdateProduct(ctx context.Context, id int64, input model.UpdateProductInput) (*model.UpdateProductResponse, error) {
 	// Find product by ID
 	var productDB model.ProductDB
 	result := s.DB.Where("id = ? AND deleted_at IS NULL", id).First(&productDB)
@@ -118,12 +147,43 @@ func (s *ProductService) UpdateProduct(id int64, input model.UpdateProductInput)
 		}, nil
 	}
 
+	// Handle image upload if provided
+	var imageURL *string
+	if input.Image != nil && *input.Image != "" && s.R2Service != nil {
+		// Use secure_id for upload folder naming
+		secureID := ""
+		if productDB.SecureID != nil {
+			secureID = *productDB.SecureID
+		}
+		if secureID == "" {
+			secureID = fmt.Sprintf("%d", id)
+		}
+
+		imageURLStr, err := s.R2Service.UploadFromBase64(
+			ctx,
+			*input.Image,
+			"products",
+			secureID,
+		)
+		if err != nil {
+			return &model.UpdateProductResponse{
+				Code:    500,
+				Success: false,
+				Message: fmt.Sprintf("failed to upload image: %v", err),
+			}, nil
+		}
+		imageURL = &imageURLStr
+	}
+
 	// Update fields if provided
 	if input.Name != nil {
 		productDB.Name = *input.Name
 	}
-	if input.Image != nil {
-		productDB.Image = input.Image
+	if imageURL != nil {
+		productDB.Image = imageURL
+	} else if input.Image != nil && *input.Image == "" {
+		// If image is explicitly set to empty string, clear it
+		productDB.Image = nil
 	}
 	if input.CategoryID != nil {
 		productDB.CategoryID = input.CategoryID
