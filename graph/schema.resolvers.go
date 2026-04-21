@@ -11,564 +11,561 @@ import (
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
-	"time"
+	"re-kasirpinter-go/service"
 )
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error) {
-	// Get client information from context
-	clientInfo := GetClientInfo(ctx)
-	var ip, browser, os *string
-	if clientInfo != nil {
-		ip = &clientInfo.IP
-		browser = &clientInfo.Browser
-		os = &clientInfo.OS
-	}
-
-	// Check for recent failed login attempts (within last 5 minutes)
-	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
-	var failedAttemptsCount int64
-	r.DB.Model(&model.LoginAuditDB{}).
-		Where("email = ? AND success = ? AND created_at > ?", input.Email, false, fiveMinutesAgo).
-		Count(&failedAttemptsCount)
-
-	// If 3 or more failed attempts in last 5 minutes, block login
-	if failedAttemptsCount >= 3 {
-		// Record this blocked attempt
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		// Calculate when user can try again (5 minutes from now)
-		tryAgainAt := time.Now().Add(5 * time.Minute).Format("2006-01-02 15:04:05")
-
-		return &model.AuthResponse{
-			Code:    429,
-			Success: false,
-			Message: fmt.Sprintf("too many failed login attempts. please wait 5 minutes before trying again [[%s]]", tryAgainAt),
-		}, nil
-	}
-
-	// Find user by email
-	var userDB model.UserDB
-	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
-	if result.Error != nil {
-		// Record failed attempt (user not found)
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		return &model.AuthResponse{
-			Code:    401,
-			Success: false,
-			Message: "invalid email or password",
-		}, nil
-	}
-
-	// Decrypt password from frontend using AES
-	decryptedPassword, err := helper.Decrypt(input.Password)
-	if err != nil {
-		// Record failed attempt (decryption error)
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		return &model.AuthResponse{
-			Code:    401,
-			Success: false,
-			Message: "invalid email or password",
-		}, nil
-	}
-
-	// Check password
-	if !checkPassword(decryptedPassword, userDB.Password) {
-		// Record failed attempt (wrong password)
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		return &model.AuthResponse{
-			Code:    401,
-			Success: false,
-			Message: "invalid email or password",
-		}, nil
-	}
-
-	// Get user role
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Generate JWT token
-	roleName := ""
-	if userRole.ID > 0 {
-		roleName = userRole.Name
-	}
-
-	secureID := ""
-	if userDB.SecureID != nil {
-		secureID = *userDB.SecureID
-	}
-
-	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "login")
-	if err != nil {
+	if r.AuthService == nil {
 		return &model.AuthResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to generate token: %v", err),
+			Message: "auth service not initialized",
 		}, nil
 	}
 
-	// Record successful login attempt
-	loginAudit := model.LoginAuditDB{
-		Email:   input.Email,
-		Success: true,
-		IP:      ip,
-		Browser: browser,
-		OS:      os,
+	// Get client information from context
+	clientInfo := GetClientInfo(ctx)
+	var clientInfoPtr *service.ClientInfo
+	if clientInfo != nil {
+		clientInfoPtr = &service.ClientInfo{
+			IP:      clientInfo.IP,
+			Browser: clientInfo.Browser,
+			OS:      clientInfo.OS,
+		}
 	}
-	r.DB.Create(&loginAudit)
 
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
+	return r.AuthService.Login(ctx, input, clientInfoPtr)
+}
+
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, error) {
+	if r.AuthService == nil {
+		return &model.LogoutResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
 	}
-	user := toGraphQLUser(userDB, userRoleDB)
 
-	return &model.AuthResponse{
-		Code:    200,
-		Success: true,
-		Message: "login successful",
-		Data: &model.AuthData{
-			Token: token,
-			User:  user,
-		},
-	}, nil
+	// Get user claims from context (already authenticated by @auth directive)
+	userClaims := ForContext(ctx)
+	if userClaims == nil {
+		return &model.LogoutResponse{
+			Code:    401,
+			Success: false,
+			Message: "Unauthorized",
+		}, nil
+	}
+
+	// Get the token from context (set by middleware)
+	token := GetToken(ctx)
+
+	// Convert Claims to service.Claims
+	serviceClaims := &service.Claims{
+		UserID:    userClaims.UserID,
+		Email:     userClaims.Email,
+		Role:      userClaims.Role,
+		SecureID:  userClaims.SecureID,
+		Purpose:   userClaims.Purpose,
+		ExpiresAt: userClaims.ExpiresAt.Time,
+	}
+
+	return r.AuthService.Logout(ctx, token, serviceClaims)
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput) (*model.CreateUserResponse, error) {
-	// Generate secure_id (UUID)
-	secureID, err := generateRandomString(16)
+func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error) {
+	userService, err := service.NewUserService(r.DB)
 	if err != nil {
 		return &model.CreateUserResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to generate secure_id: %v", err),
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
 		}, nil
 	}
-
-	// Hash password
-	hashedPassword, err := hashPassword(input.Password)
-	if err != nil {
-		return &model.CreateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to hash password: %v", err),
-		}, nil
-	}
-
-	// Create user DB model
-	userDB := model.UserDB{
-		SecureID: &secureID,
-		Name:     input.Name,
-		Email:    input.Email,
-		Address:  input.Address,
-		Phone:    input.Phone,
-		Password: hashedPassword,
-		IsActive: true,
-		RoleID:   input.RoleID,
-	}
-
-	// Save to database
-	result := r.DB.Create(&userDB)
-	if result.Error != nil {
-		return &model.CreateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to create user: %v", result.Error),
-		}, nil
-	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := toGraphQLUser(userDB, userRoleDB)
-
-	return &model.CreateUserResponse{
-		Code:    201,
-		Success: true,
-		Message: "user created successfully",
-		Data:    user,
-	}, nil
+	return userService.CreateUser(input, isUser)
 }
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error) {
-	// Find user by secure_id
-	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
-	if result.Error != nil {
-		return &model.UpdateUserResponse{
-			Code:    404,
-			Success: false,
-			Message: "user not found",
-		}, nil
-	}
-
-	// Update fields if provided
-	if input.Name != nil {
-		userDB.Name = *input.Name
-	}
-	if input.Email != nil {
-		userDB.Email = *input.Email
-	}
-	if input.Address != nil {
-		userDB.Address = *input.Address
-	}
-	if input.Phone != nil {
-		userDB.Phone = *input.Phone
-	}
-	if input.Avatar != nil {
-		userDB.Avatar = input.Avatar
-	}
-	if input.IsActive != nil {
-		userDB.IsActive = *input.IsActive
-	}
-	if input.RoleID != nil {
-		userDB.RoleID = input.RoleID
-	}
-
-	// Save to database
-	result = r.DB.Save(&userDB)
-	if result.Error != nil {
+	if r.UserService == nil {
 		return &model.UpdateUserResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to update user: %v", result.Error),
+			Message: "user service not initialized",
 		}, nil
 	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := toGraphQLUser(userDB, userRoleDB)
-
-	return &model.UpdateUserResponse{
-		Code:    200,
-		Success: true,
-		Message: "user updated successfully",
-		Data:    user,
-	}, nil
+	return r.UserService.UpdateUser(ctx, id, input)
 }
 
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error) {
-	// Find user by secure_id
-	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
-	if result.Error != nil {
-		return &model.DeleteUserResponse{
-			Code:    404,
-			Success: false,
-			Message: "user not found",
-		}, nil
-	}
-
-	// Soft delete by setting deleted_at and is_active
-	now := time.Now()
-	userDB.DeletedAt = &now
-	userDB.IsActive = false
-
-	// Save to database
-	result = r.DB.Save(&userDB)
-	if result.Error != nil {
+	if r.UserService == nil {
 		return &model.DeleteUserResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to delete user: %v", result.Error),
+			Message: "user service not initialized",
 		}, nil
 	}
-
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := toGraphQLUser(userDB, userRoleDB)
-
-	return &model.DeleteUserResponse{
-		Code:    200,
-		Success: true,
-		Message: "user deleted successfully",
-		Data:    user,
-	}, nil
+	return r.UserService.DeleteUser(ctx, id)
 }
 
 // CreateOtp is the resolver for the createOtp field.
 func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error) {
-	// Check if user exists (optional but good for security)
-	var userDB model.UserDB
-	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
-	if result.Error != nil {
-		return toGraphQLCreateOtpResponse(404, false, "User not found"), nil
-	}
-
-	// Generate 6-digit OTP code
-	code := generateOTPCode()
-
-	// Invalidate any existing OTPs for this email and type
-	r.DB.Model(&model.OtpDB{}).Where("email = ? AND type = ?", input.Email, input.Type).Update("is_valid", false)
-
-	// Create new OTP record
-	otpDB := model.OtpDB{
-		Email:     input.Email,
-		Code:      code,
-		IsValid:   true,
-		ExpiredAt: time.Now().Add(10 * time.Minute),
-		Type:      input.Type,
-	}
-
-	result = r.DB.Create(&otpDB)
-	if result.Error != nil {
-		return toGraphQLCreateOtpResponse(500, false, fmt.Sprintf("failed to create OTP: %v", result.Error)), nil
+	if r.AuthService == nil {
+		return &model.CreateOtpResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
 	}
 
 	// Get client information from context
 	clientInfo := GetClientInfo(ctx)
-	var ip, browser, os *string
+	var clientInfoPtr *service.ClientInfo
 	if clientInfo != nil {
-		ip = &clientInfo.IP
-		browser = &clientInfo.Browser
-		os = &clientInfo.OS
+		clientInfoPtr = &service.ClientInfo{
+			IP:      clientInfo.IP,
+			Browser: clientInfo.Browser,
+			OS:      clientInfo.OS,
+		}
 	}
 
-	// Determine retry value
-	retry := input.Retry != nil && *input.Retry
-
-	// Enqueue email job to background queue
-	err := EnqueueEmailJob(r.DB, input.Email, code, retry, ip, browser, os)
-	if err != nil {
-		// Log the error but still return success (OTP is saved in DB)
-		fmt.Printf("Warning: Failed to enqueue email job: %v\n", err)
-	}
-
-	return toGraphQLCreateOtpResponse(200, true, "Verification code has been sent to your email"), nil
+	return r.AuthService.CreateOtp(ctx, input, clientInfoPtr, EnqueueEmailJob)
 }
 
 // VerifyOtp is the resolver for the verifyOtp field.
 func (r *mutationResolver) VerifyOtp(ctx context.Context, input model.VerifyOtpInput) (*model.VerifyOtpResponse, error) {
-	// Find the OTP record
-	var otpDB model.OtpDB
-	result := r.DB.Where("email = ? AND code = ? AND type = ? AND is_valid = ?", input.Email, input.Code, input.Type, true).First(&otpDB)
-	if result.Error != nil {
-		return toGraphQLVerifyOtpResponse(400, false, "Invalid or expired verification code", nil), nil
+	if r.AuthService == nil {
+		return &model.VerifyOtpResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+			Token:   nil,
+		}, nil
 	}
 
-	// Check if OTP is expired
-	if time.Now().After(otpDB.ExpiredAt) {
-		// Mark as invalid
-		r.DB.Model(&otpDB).Update("is_valid", false)
-		return toGraphQLVerifyOtpResponse(400, false, "Verification code has expired", nil), nil
-	}
-
-	// Find the user
-	var userDB model.UserDB
-	result = r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
-	if result.Error != nil {
-		return toGraphQLVerifyOtpResponse(404, false, "User not found", nil), nil
-	}
-
-	// Get user role
-	var userRole model.UserRoleDB
-	roleName := ""
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-		if userRole.ID > 0 {
-			roleName = userRole.Name
-		}
-	}
-
-	// Generate JWT token for password reset
-	secureID := ""
-	if userDB.SecureID != nil {
-		secureID = *userDB.SecureID
-	}
-
-	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "password_reset")
-	if err != nil {
-		return toGraphQLVerifyOtpResponse(500, false, fmt.Sprintf("failed to generate token: %v", err), nil), nil
-	}
-
-	// Invalidate the OTP (one-time use)
-	r.DB.Model(&otpDB).Update("is_valid", false)
-
-	return toGraphQLVerifyOtpResponse(200, true, "Verification successful", &token), nil
+	return r.AuthService.VerifyOtp(ctx, input)
 }
 
 // NewPassword is the resolver for the newPassword field.
 func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPasswordInput) (*model.NewPasswordResponse, error) {
+	if r.AuthService == nil {
+		return &model.NewPasswordResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
+	}
+
 	// Get user claims from context
 	userClaims := ForContext(ctx)
 	if userClaims == nil {
-		return toGraphQLNewPasswordResponse(401, false, "Unauthorized"), nil
+		return &model.NewPasswordResponse{
+			Code:    401,
+			Success: false,
+			Message: "Unauthorized",
+		}, nil
 	}
 
-	// Verify that the token purpose is password_reset (extra safety check)
-	if userClaims.Purpose != "password_reset" {
-		return toGraphQLNewPasswordResponse(403, false, "Token is not authorized for password reset"), nil
+	// Convert Claims to service.Claims
+	serviceClaims := &service.Claims{
+		UserID:    userClaims.UserID,
+		Email:     userClaims.Email,
+		Role:      userClaims.Role,
+		SecureID:  userClaims.SecureID,
+		Purpose:   userClaims.Purpose,
+		ExpiresAt: userClaims.ExpiresAt.Time,
 	}
 
-	// Find the user by ID
-	var userDB model.UserDB
-	result := r.DB.Where("id = ? AND is_active = ?", userClaims.UserID, true).First(&userDB)
-	if result.Error != nil {
-		return toGraphQLNewPasswordResponse(404, false, "User not found"), nil
-	}
+	return r.AuthService.NewPassword(ctx, input, serviceClaims)
+}
 
-	// Hash the new password
-	hashedPassword, err := hashPassword(input.Password)
+// TestR2Connection is the resolver for the testR2Connection field.
+func (r *mutationResolver) TestR2Connection(ctx context.Context) (string, error) {
+	if r.R2Service == nil {
+		return "R2 service not initialized", nil
+	}
+	err := r.R2Service.TestConnection(ctx)
 	if err != nil {
-		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to hash password: %v", err)), nil
+		return fmt.Sprintf("R2 connection failed: %v", err), nil
+	}
+	return "R2 connection successful", nil
+}
+
+// CreateRole is the resolver for the createRole field.
+func (r *mutationResolver) CreateRole(ctx context.Context, input model.CreateRoleInput) (*model.CreateRoleResponse, error) {
+	if r.RoleService == nil {
+		return &model.CreateRoleResponse{
+			Code:    500,
+			Success: false,
+			Message: "role service not initialized",
+		}, nil
+	}
+	return r.RoleService.CreateRole(input)
+}
+
+// UpdateRole is the resolver for the updateRole field.
+func (r *mutationResolver) UpdateRole(ctx context.Context, id int64, input model.UpdateRoleInput) (*model.UpdateRoleResponse, error) {
+	if r.RoleService == nil {
+		return &model.UpdateRoleResponse{
+			Code:    500,
+			Success: false,
+			Message: "role service not initialized",
+		}, nil
 	}
 
-	// Update the user's password
-	userDB.Password = hashedPassword
-	result = r.DB.Save(&userDB)
-	if result.Error != nil {
-		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to update password: %v", result.Error)), nil
+	// Check if role ID is 1 or 2 (protected roles) - only superadmin can modify
+	if id == 1 || id == 2 {
+		if err := RequireSuperAdmin(ctx); err != nil {
+			return &model.UpdateRoleResponse{
+				Code:    403,
+				Success: false,
+				Message: err.Error(),
+			}, nil
+		}
 	}
 
-	return toGraphQLNewPasswordResponse(200, true, "Password updated successfully"), nil
+	return r.RoleService.UpdateRole(id, input)
+}
+
+// DeleteRole is the resolver for the deleteRole field.
+func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.DeleteRoleResponse, error) {
+	if r.RoleService == nil {
+		return &model.DeleteRoleResponse{
+			Code:    500,
+			Success: false,
+			Message: "role service not initialized",
+		}, nil
+	}
+
+	// Check if role ID is 1 or 2 (protected roles) - only superadmin can delete
+	if id == 1 || id == 2 {
+		if err := RequireSuperAdmin(ctx); err != nil {
+			return &model.DeleteRoleResponse{
+				Code:    403,
+				Success: false,
+				Message: err.Error(),
+			}, nil
+		}
+	}
+
+	return r.RoleService.DeleteRole(id)
+}
+
+// CreateIngredientCategory is the resolver for the createIngredientCategory field.
+func (r *mutationResolver) CreateIngredientCategory(ctx context.Context, input model.CreateIngredientCategoryInput) (*model.CreateIngredientCategoryResponse, error) {
+	if r.IngredientCategoryService == nil {
+		return &model.CreateIngredientCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
+	}
+	return r.IngredientCategoryService.CreateIngredientCategory(input)
+}
+
+// UpdateIngredientCategory is the resolver for the updateIngredientCategory field.
+func (r *mutationResolver) UpdateIngredientCategory(ctx context.Context, id int64, input model.UpdateIngredientCategoryInput) (*model.UpdateIngredientCategoryResponse, error) {
+	if r.IngredientCategoryService == nil {
+		return &model.UpdateIngredientCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
+	}
+	return r.IngredientCategoryService.UpdateIngredientCategory(id, input)
+}
+
+// DeleteIngredientCategory is the resolver for the deleteIngredientCategory field.
+func (r *mutationResolver) DeleteIngredientCategory(ctx context.Context, id int64) (*model.DeleteIngredientCategoryResponse, error) {
+	if r.IngredientCategoryService == nil {
+		return &model.DeleteIngredientCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
+	}
+	return r.IngredientCategoryService.DeleteIngredientCategory(id)
+}
+
+// CreateIngredient is the resolver for the createIngredient field.
+func (r *mutationResolver) CreateIngredient(ctx context.Context, input model.CreateIngredientInput) (*model.CreateIngredientResponse, error) {
+	if r.IngredientService == nil {
+		return &model.CreateIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient service not initialized",
+		}, nil
+	}
+	return r.IngredientService.CreateIngredient(input)
+}
+
+// UpdateIngredient is the resolver for the updateIngredient field.
+func (r *mutationResolver) UpdateIngredient(ctx context.Context, id int64, input model.UpdateIngredientInput) (*model.UpdateIngredientResponse, error) {
+	if r.IngredientService == nil {
+		return &model.UpdateIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient service not initialized",
+		}, nil
+	}
+	return r.IngredientService.UpdateIngredient(id, input)
+}
+
+// DeleteIngredient is the resolver for the deleteIngredient field.
+func (r *mutationResolver) DeleteIngredient(ctx context.Context, id int64) (*model.DeleteIngredientResponse, error) {
+	if r.IngredientService == nil {
+		return &model.DeleteIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient service not initialized",
+		}, nil
+	}
+	return r.IngredientService.DeleteIngredient(id)
+}
+
+// CreateIngredientStock is the resolver for the createIngredientStock field.
+func (r *mutationResolver) CreateIngredientStock(ctx context.Context, input model.CreateIngredientStockInput) (*model.CreateIngredientStockResponse, error) {
+	if r.IngredientStockService == nil {
+		return &model.CreateIngredientStockResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient stock service not initialized",
+		}, nil
+	}
+	return r.IngredientStockService.CreateIngredientStock(input)
+}
+
+// UpdateIngredientStock is the resolver for the updateIngredientStock field.
+func (r *mutationResolver) UpdateIngredientStock(ctx context.Context, id int64, input model.UpdateIngredientStockInput) (*model.UpdateIngredientStockResponse, error) {
+	if r.IngredientStockService == nil {
+		return &model.UpdateIngredientStockResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient stock service not initialized",
+		}, nil
+	}
+	return r.IngredientStockService.UpdateIngredientStock(id, input)
+}
+
+// DeleteIngredientStock is the resolver for the deleteIngredientStock field.
+func (r *mutationResolver) DeleteIngredientStock(ctx context.Context, id int64) (*model.DeleteIngredientStockResponse, error) {
+	if r.IngredientStockService == nil {
+		return &model.DeleteIngredientStockResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient stock service not initialized",
+		}, nil
+	}
+	return r.IngredientStockService.DeleteIngredientStock(id)
+}
+
+// CreateProductCategory is the resolver for the createProductCategory field.
+func (r *mutationResolver) CreateProductCategory(ctx context.Context, input model.CreateProductCategoryInput) (*model.CreateProductCategoryResponse, error) {
+	return r.ProductCategoryService.CreateProductCategory(input)
+}
+
+// UpdateProductCategory is the resolver for the updateProductCategory field.
+func (r *mutationResolver) UpdateProductCategory(ctx context.Context, id int64, input model.UpdateProductCategoryInput) (*model.UpdateProductCategoryResponse, error) {
+	if r.ProductCategoryService == nil {
+		return &model.UpdateProductCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "product category service not initialized",
+		}, nil
+	}
+	return r.ProductCategoryService.UpdateProductCategory(id, input)
+}
+
+// DeleteProductCategory is the resolver for the deleteProductCategory field.
+func (r *mutationResolver) DeleteProductCategory(ctx context.Context, id int64) (*model.DeleteProductCategoryResponse, error) {
+	if r.ProductCategoryService == nil {
+		return &model.DeleteProductCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "product category service not initialized",
+		}, nil
+	}
+	return r.ProductCategoryService.DeleteProductCategory(id)
+}
+
+// CreateProduct is the resolver for the createProduct field.
+func (r *mutationResolver) CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.CreateProductResponse, error) {
+	if r.ProductService == nil {
+		return &model.CreateProductResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.CreateProduct(input)
+}
+
+// UpdateProduct is the resolver for the updateProduct field.
+func (r *mutationResolver) UpdateProduct(ctx context.Context, id int64, input model.UpdateProductInput) (*model.UpdateProductResponse, error) {
+	if r.ProductService == nil {
+		return &model.UpdateProductResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.UpdateProduct(id, input)
+}
+
+// DeleteProduct is the resolver for the deleteProduct field.
+func (r *mutationResolver) DeleteProduct(ctx context.Context, id int64) (*model.DeleteProductResponse, error) {
+	if r.ProductService == nil {
+		return &model.DeleteProductResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.DeleteProduct(id)
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput) (*model.UsersResponse, error) {
-	// Parse pagination parameters
-	params := helper.ParsePagination(pagination)
-
-	// Build base query with filters
-	baseQuery := r.DB.Model(&model.UserDB{}).Where("deleted_at IS NULL").Where("secure_id IS NOT NULL")
-
-	// Get total count
-	var total int64
-	countResult := baseQuery.Count(&total)
-	if countResult.Error != nil {
-		return nil, countResult.Error
+func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
+	userService, err := service.NewUserService(r.DB)
+	if err != nil {
+		return &model.UsersResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
+		}, nil
 	}
-
-	// Query users with pagination
-	paginationResult := helper.BuildPaginationResult(params, total, 0)
-	var usersDB []model.UserDB
-	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&usersDB)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	// Rebuild pagination result with actual item count
-	paginationResult = helper.BuildPaginationResult(params, total, len(usersDB))
-
-	// Convert DB models to GraphQL models
-	users := make([]*model.User, len(usersDB))
-	for i, userDB := range usersDB {
-		// Get user role if exists
-		var userRoleDB *model.UserRoleDB
-		if userDB.RoleID != nil {
-			var userRole model.UserRoleDB
-			r.DB.First(&userRole, *userDB.RoleID)
-			if userRole.ID > 0 {
-				userRoleDB = &userRole
-			}
-		}
-
-		users[i] = toGraphQLUser(userDB, userRoleDB)
-	}
-
-	return &model.UsersResponse{
-		Code:       200,
-		Success:    true,
-		Message:    "users retrieved successfully",
-		Data:       users,
-		Pagination: paginationResult.PageInfo,
-	}, nil
+	return userService.Users(pagination, isUser)
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*model.UserResponse, error) {
-	// Find user by secure_id
-	var userDB model.UserDB
-	result := r.DB.Where("secure_id = ?", id).Where("deleted_at IS NULL").First(&userDB)
-	if result.Error != nil {
+	userService, err := service.NewUserService(r.DB)
+	if err != nil {
 		return &model.UserResponse{
-			Code:    404,
+			Code:    500,
 			Success: false,
-			Message: "user not found",
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
+		}, nil
+	}
+	return userService.User(id)
+}
+
+// Roles is the resolver for the roles field.
+func (r *queryResolver) Roles(ctx context.Context) (*model.RolesResponse, error) {
+	if r.RoleService == nil {
+		return &model.RolesResponse{
+			Code:    500,
+			Success: false,
+			Message: "role service not initialized",
+		}, nil
+	}
+	return r.RoleService.Roles()
+}
+
+// Role is the resolver for the role field.
+func (r *queryResolver) Role(ctx context.Context, id int64) (*model.RoleResponse, error) {
+	if r.RoleService == nil {
+		return &model.RoleResponse{
+			Code:    500,
+			Success: false,
+			Message: "role service not initialized",
+		}, nil
+	}
+	return r.RoleService.Role(id)
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *queryResolver) Permissions(ctx context.Context) (*model.PermissionsResponse, error) {
+	// Query all permissions
+	var permissionsDB []model.UserPermissionDB
+	result := r.DB.Find(&permissionsDB)
+	if result.Error != nil {
+		return &model.PermissionsResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to retrieve permissions: %v", result.Error),
 		}, nil
 	}
 
-	// Get user role if exists
-	var userRole model.UserRoleDB
-	var userRoleDB *model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-		if userRole.ID > 0 {
-			userRoleDB = &userRole
-		}
+	// Convert DB models to GraphQL models
+	permissions := make([]*model.UserPermission, len(permissionsDB))
+	for i, permDB := range permissionsDB {
+		permissions[i] = helper.ToGraphQLUserPermission(permDB)
 	}
 
-	// Convert DB model to GraphQL model using mapper
-	user := toGraphQLUser(userDB, userRoleDB)
-
-	return &model.UserResponse{
+	return &model.PermissionsResponse{
 		Code:    200,
 		Success: true,
-		Message: "user retrieved successfully",
-		Data:    user,
+		Message: "permissions retrieved successfully",
+		Data:    permissions,
 	}, nil
+}
+
+// IngredientCategories is the resolver for the ingredientCategories field.
+func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error) {
+	if r.IngredientCategoryService == nil {
+		return &model.IngredientCategoriesResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient category service not initialized",
+		}, nil
+	}
+	return r.IngredientCategoryService.IngredientCategories(pagination, isOptions)
+}
+
+// Ingredients is the resolver for the ingredients field.
+func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error) {
+	if r.IngredientService == nil {
+		return &model.IngredientsResponse{
+			Code:    500,
+			Success: false,
+			Message: "ingredient service not initialized",
+		}, nil
+	}
+	return r.IngredientService.Ingredients(pagination)
+}
+
+// IngredientStocks is the resolver for the ingredientStocks field.
+func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error) {
+	if r.IngredientStockService == nil {
+		return &model.IngredientStocksResponse{
+			Code:           500,
+			Success:        false,
+			Message:        "ingredient stock service not initialized",
+			IngredientName: nil,
+			TotalStocks:    nil,
+			Unit:           nil,
+			ConvertUnit:    nil,
+		}, nil
+	}
+	return r.IngredientStockService.IngredientStocks(pagination, ingredientID)
+}
+
+// ProductCategories is the resolver for the productCategories field.
+func (r *queryResolver) ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error) {
+	if r.ProductCategoryService == nil {
+		return &model.ProductCategoriesResponse{
+			Code:    500,
+			Success: false,
+			Message: "product category service not initialized",
+		}, nil
+	}
+	return r.ProductCategoryService.ProductCategories(pagination)
+}
+
+// Products is the resolver for the products field.
+func (r *queryResolver) Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error) {
+	if r.ProductService == nil {
+		return &model.ProductsResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.Products(pagination)
 }
 
 // Mutation returns MutationResolver implementation.

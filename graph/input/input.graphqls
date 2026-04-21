@@ -6,9 +6,10 @@ input LoginInput {
 input CreateUserInput {
   name: String!
   email: String!
-  address: String!
+  address: String
   phone: String!
-  password: String!
+  password: String
+  avatar: String
   role_id: Int64
 }
 
@@ -17,6 +18,7 @@ input UpdateUserInput {
   email: String
   address: String
   phone: String
+  password: String
   avatar: String
   is_active: Boolean
   role_id: Int64
@@ -43,4 +45,92 @@ input VerifyOtpInput {
 
 input NewPasswordInput {
   password: String!
+}
+
+input CreateRoleInput {
+  name: String!
+  status: Boolean!
+  permission_ids: [Int64]
+}
+
+input UpdateRoleInput {
+  name: String!
+  status: Boolean!
+  permission_ids: [Int64]
+}
+
+input CreateIngredientCategoryInput {
+  name: String!
+  unit: String!
+  convert_unit: String
+  is_active: Boolean!
+}
+
+input UpdateIngredientCategoryInput {
+  name: String!
+  unit: String!
+  convert_unit: String
+  is_active: Boolean!
+}
+
+input CreateIngredientInput {
+  name: String!
+  category_id: Int64
+  is_active: Boolean!
+}
+
+input UpdateIngredientInput {
+  name: String
+  category_id: Int64
+  is_active: Boolean
+}
+
+input CreateIngredientStockInput {
+  code: String
+  qty: Float!
+  type: IngredientStockType!
+  capital: Float!
+  message: String
+  image: String
+  ingredient_id: Int64!
+}
+
+input UpdateIngredientStockInput {
+  code: String
+  qty: Float
+  type: IngredientStockType
+  capital: Float
+  message: String
+  image: String
+  ingredient_id: Int64
+}
+
+input CreateProductCategoryInput {
+  name: String!
+  description: String
+  parent_id: Int64
+  is_active: Boolean!
+}
+
+input UpdateProductCategoryInput {
+  name: String
+  description: String
+  parent_id: Int64
+  is_active: Boolean
+}
+
+input CreateProductInput {
+  name: String!
+  image: String
+  category_id: Int64
+  description: String
+  is_active: Boolean!
+}
+
+input UpdateProductInput {
+  name: String
+  image: String
+  category_id: Int64
+  description: String
+  is_active: Boolean
 }

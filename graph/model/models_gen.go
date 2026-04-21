@@ -11,6 +11,50 @@ type AuthData struct {
 	User  *User  `json:"user"`
 }
 
+type CreateIngredientCategoryInput struct {
+	Name        string  `json:"name"`
+	Unit        string  `json:"unit"`
+	ConvertUnit *string `json:"convert_unit,omitempty"`
+	IsActive    bool    `json:"is_active"`
+}
+
+type CreateIngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type CreateIngredientInput struct {
+	Name       string `json:"name"`
+	CategoryID *int64 `json:"category_id,omitempty"`
+	IsActive   bool   `json:"is_active"`
+}
+
+type CreateIngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type CreateIngredientStockInput struct {
+	Code         *string             `json:"code,omitempty"`
+	Qty          float64             `json:"qty"`
+	Type         IngredientStockType `json:"type"`
+	Capital      float64             `json:"capital"`
+	Message      *string             `json:"message,omitempty"`
+	Image        *string             `json:"image,omitempty"`
+	IngredientID int64               `json:"ingredient_id"`
+}
+
+type CreateIngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
 type CreateOtpInput struct {
 	Email string `json:"email"`
 	Type  string `json:"type"`
@@ -23,6 +67,48 @@ type CreateOtpResponse struct {
 	Message string `json:"message"`
 }
 
+type CreateProductCategoryInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	ParentID    *int64  `json:"parent_id,omitempty"`
+	IsActive    bool    `json:"is_active"`
+}
+
+type CreateProductCategoryResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *ProductCategory `json:"data,omitempty"`
+}
+
+type CreateProductInput struct {
+	Name        string  `json:"name"`
+	Image       *string `json:"image,omitempty"`
+	CategoryID  *int64  `json:"category_id,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsActive    bool    `json:"is_active"`
+}
+
+type CreateProductResponse struct {
+	Code    int32    `json:"code"`
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Data    *Product `json:"data,omitempty"`
+}
+
+type CreateRoleInput struct {
+	Name          string   `json:"name"`
+	Status        bool     `json:"status"`
+	PermissionIds []*int64 `json:"permission_ids,omitempty"`
+}
+
+type CreateRoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
+}
+
 type CreateUserResponse struct {
 	Code    int32  `json:"code"`
 	Success bool   `json:"success"`
@@ -30,11 +116,148 @@ type CreateUserResponse struct {
 	Data    *User  `json:"data,omitempty"`
 }
 
+type DeleteIngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type DeleteIngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type DeleteIngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
+type DeleteProductCategoryResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *ProductCategory `json:"data,omitempty"`
+}
+
+type DeleteProductResponse struct {
+	Code    int32    `json:"code"`
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Data    *Product `json:"data,omitempty"`
+}
+
+type DeleteRoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
+}
+
 type DeleteUserResponse struct {
 	Code    int32  `json:"code"`
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    *User  `json:"data,omitempty"`
+}
+
+type Ingredient struct {
+	ID          int64               `json:"id"`
+	Name        string              `json:"name"`
+	CategoryID  *int64              `json:"category_id,omitempty"`
+	Category    *IngredientCategory `json:"category,omitempty"`
+	IsActive    bool                `json:"is_active"`
+	DeletedAt   *time.Time          `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time           `json:"created_at"`
+	UpdatedAt   time.Time           `json:"updated_at"`
+	Stocks      []*IngredientStock  `json:"stocks"`
+	TotalStocks float64             `json:"total_stocks"`
+}
+
+type IngredientCategoriesResponse struct {
+	Code       int32                 `json:"code"`
+	Success    bool                  `json:"success"`
+	Message    string                `json:"message"`
+	Data       []*IngredientCategory `json:"data"`
+	Pagination *PageInfo             `json:"pagination,omitempty"`
+}
+
+type IngredientCategory struct {
+	ID          int64      `json:"id"`
+	Name        string     `json:"name"`
+	Unit        string     `json:"unit"`
+	ConvertUnit *string    `json:"convert_unit,omitempty"`
+	IsActive    bool       `json:"is_active"`
+	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+}
+
+type IngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type IngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type IngredientStock struct {
+	ID           int64               `json:"id"`
+	Code         *string             `json:"code,omitempty"`
+	Qty          float64             `json:"qty"`
+	Type         IngredientStockType `json:"type"`
+	Capital      float64             `json:"capital"`
+	CapitalItem  float64             `json:"capital_item"`
+	Message      *string             `json:"message,omitempty"`
+	Image        *string             `json:"image,omitempty"`
+	DeletedAt    *time.Time          `json:"deleted_at,omitempty"`
+	CreatedAt    time.Time           `json:"created_at"`
+	UpdatedAt    time.Time           `json:"updated_at"`
+	IngredientID int64               `json:"ingredient_id"`
+	Ingredient   *Ingredient         `json:"ingredient,omitempty"`
+}
+
+type IngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
+type IngredientStocksResponse struct {
+	Code           int32              `json:"code"`
+	Success        bool               `json:"success"`
+	Message        string             `json:"message"`
+	IngredientName *string            `json:"ingredient_name,omitempty"`
+	TotalStocks    *float64           `json:"total_stocks,omitempty"`
+	Unit           *string            `json:"unit,omitempty"`
+	ConvertUnit    *string            `json:"convert_unit,omitempty"`
+	Data           []*IngredientStock `json:"data"`
+	Pagination     *PageInfo          `json:"pagination,omitempty"`
+}
+
+type IngredientsResponse struct {
+	Code       int32         `json:"code"`
+	Success    bool          `json:"success"`
+	Message    string        `json:"message"`
+	Data       []*Ingredient `json:"data"`
+	Pagination *PageInfo     `json:"pagination,omitempty"`
+}
+
+type LogoutResponse struct {
+	Code    int32  `json:"code"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
 }
 
 type Mutation struct {
@@ -67,7 +290,171 @@ type PaginationInput struct {
 	SortBy *string `json:"sortBy,omitempty"`
 }
 
+type PermissionsResponse struct {
+	Code    int32             `json:"code"`
+	Success bool              `json:"success"`
+	Message string            `json:"message"`
+	Data    []*UserPermission `json:"data"`
+}
+
+type Product struct {
+	ID          int64            `json:"id"`
+	SecureID    *string          `json:"secure_id,omitempty"`
+	Name        string           `json:"name"`
+	Image       *string          `json:"image,omitempty"`
+	CategoryID  *int64           `json:"category_id,omitempty"`
+	Category    *ProductCategory `json:"category,omitempty"`
+	Description *string          `json:"description,omitempty"`
+	IsActive    bool             `json:"is_active"`
+	DeletedAt   *time.Time       `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time        `json:"created_at"`
+	UpdatedAt   time.Time        `json:"updated_at"`
+}
+
+type ProductCategoriesResponse struct {
+	Code       int32              `json:"code"`
+	Success    bool               `json:"success"`
+	Message    string             `json:"message"`
+	Data       []*ProductCategory `json:"data"`
+	Pagination *PageInfo          `json:"pagination,omitempty"`
+}
+
+type ProductCategory struct {
+	ID          int64              `json:"id"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description,omitempty"`
+	ParentID    *int64             `json:"parent_id,omitempty"`
+	Parent      *ProductCategory   `json:"parent,omitempty"`
+	Children    []*ProductCategory `json:"children"`
+	IsActive    bool               `json:"is_active"`
+	DeletedAt   *time.Time         `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+}
+
+type ProductCategoryResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *ProductCategory `json:"data,omitempty"`
+}
+
+type ProductResponse struct {
+	Code    int32    `json:"code"`
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Data    *Product `json:"data,omitempty"`
+}
+
+type ProductsResponse struct {
+	Code       int32      `json:"code"`
+	Success    bool       `json:"success"`
+	Message    string     `json:"message"`
+	Data       []*Product `json:"data"`
+	Pagination *PageInfo  `json:"pagination,omitempty"`
+}
+
 type Query struct {
+}
+
+type RoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
+}
+
+type RolesResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    []*UserRole `json:"data"`
+}
+
+type UpdateIngredientCategoryInput struct {
+	Name        string  `json:"name"`
+	Unit        string  `json:"unit"`
+	ConvertUnit *string `json:"convert_unit,omitempty"`
+	IsActive    bool    `json:"is_active"`
+}
+
+type UpdateIngredientCategoryResponse struct {
+	Code    int32               `json:"code"`
+	Success bool                `json:"success"`
+	Message string              `json:"message"`
+	Data    *IngredientCategory `json:"data,omitempty"`
+}
+
+type UpdateIngredientInput struct {
+	Name       *string `json:"name,omitempty"`
+	CategoryID *int64  `json:"category_id,omitempty"`
+	IsActive   *bool   `json:"is_active,omitempty"`
+}
+
+type UpdateIngredientResponse struct {
+	Code    int32       `json:"code"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    *Ingredient `json:"data,omitempty"`
+}
+
+type UpdateIngredientStockInput struct {
+	Code         *string              `json:"code,omitempty"`
+	Qty          *float64             `json:"qty,omitempty"`
+	Type         *IngredientStockType `json:"type,omitempty"`
+	Capital      *float64             `json:"capital,omitempty"`
+	Message      *string              `json:"message,omitempty"`
+	Image        *string              `json:"image,omitempty"`
+	IngredientID *int64               `json:"ingredient_id,omitempty"`
+}
+
+type UpdateIngredientStockResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *IngredientStock `json:"data,omitempty"`
+}
+
+type UpdateProductCategoryInput struct {
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	ParentID    *int64  `json:"parent_id,omitempty"`
+	IsActive    *bool   `json:"is_active,omitempty"`
+}
+
+type UpdateProductCategoryResponse struct {
+	Code    int32            `json:"code"`
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	Data    *ProductCategory `json:"data,omitempty"`
+}
+
+type UpdateProductInput struct {
+	Name        *string `json:"name,omitempty"`
+	Image       *string `json:"image,omitempty"`
+	CategoryID  *int64  `json:"category_id,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsActive    *bool   `json:"is_active,omitempty"`
+}
+
+type UpdateProductResponse struct {
+	Code    int32    `json:"code"`
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Data    *Product `json:"data,omitempty"`
+}
+
+type UpdateRoleInput struct {
+	Name          string   `json:"name"`
+	Status        bool     `json:"status"`
+	PermissionIds []*int64 `json:"permission_ids,omitempty"`
+}
+
+type UpdateRoleResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *UserRole `json:"data,omitempty"`
 }
 
 type UpdateUserResponse struct {

@@ -45,17 +45,66 @@ type UserRolePermission {
 scalar Time
 scalar Int64
 
+type LogoutResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+}
+
 type Query {
-  users(pagination: PaginationInput): UsersResponse! @auth
+  users(pagination: PaginationInput, is_user: Boolean = true): UsersResponse! @auth
   user(id: String!): UserResponse! @auth
+  # administrator
+  roles: RolesResponse! @auth
+  role(id: Int64!): RoleResponse! @auth
+  permissions: PermissionsResponse! @auth
+  # ingredients
+  ingredientCategories(pagination: PaginationInput, is_options: Boolean = false): IngredientCategoriesResponse! @auth
+  ingredients(pagination: PaginationInput): IngredientsResponse! @auth
+  ingredientStocks(pagination: PaginationInput, ingredient_id: Int64): IngredientStocksResponse! @auth
+  # products
+  productCategories(pagination: PaginationInput): ProductCategoriesResponse! @auth
+  products(pagination: PaginationInput): ProductsResponse! @auth
 }
 
 type Mutation {
   login(input: LoginInput!): AuthResponse!
-  createUser(input: CreateUserInput!): CreateUserResponse! @auth
+  logout: LogoutResponse! @auth
+  createUser(input: CreateUserInput!, is_user: Boolean = true): CreateUserResponse! @auth
   updateUser(id: String!, input: UpdateUserInput!): UpdateUserResponse! @auth
   deleteUser(id: String!): DeleteUserResponse! @auth
   createOtp(input: CreateOtpInput!): CreateOtpResponse!
   verifyOtp(input: VerifyOtpInput!): VerifyOtpResponse!
   newPassword(input: NewPasswordInput!): NewPasswordResponse! @auth
+  testR2Connection: String! @auth
+
+  #administrator
+  createRole(input: CreateRoleInput!): CreateRoleResponse! @auth
+  updateRole(id: Int64!, input: UpdateRoleInput!): UpdateRoleResponse! @auth
+  deleteRole(id: Int64!): DeleteRoleResponse! @auth
+
+  # ingredients category
+  createIngredientCategory(input: CreateIngredientCategoryInput!): CreateIngredientCategoryResponse! @auth
+  updateIngredientCategory(id: Int64!, input: UpdateIngredientCategoryInput!): UpdateIngredientCategoryResponse! @auth
+  deleteIngredientCategory(id: Int64!): DeleteIngredientCategoryResponse! @auth
+
+  # ingredients
+  createIngredient(input: CreateIngredientInput!): CreateIngredientResponse! @auth
+  updateIngredient(id: Int64!, input: UpdateIngredientInput!): UpdateIngredientResponse! @auth
+  deleteIngredient(id: Int64!): DeleteIngredientResponse! @auth
+
+  # ingredient stocks
+  createIngredientStock(input: CreateIngredientStockInput!): CreateIngredientStockResponse! @auth
+  updateIngredientStock(id: Int64!, input: UpdateIngredientStockInput!): UpdateIngredientStockResponse! @auth
+  deleteIngredientStock(id: Int64!): DeleteIngredientStockResponse! @auth
+
+  # product category
+  createProductCategory(input: CreateProductCategoryInput!): CreateProductCategoryResponse! @auth
+  updateProductCategory(id: Int64!, input: UpdateProductCategoryInput!): UpdateProductCategoryResponse! @auth
+  deleteProductCategory(id: Int64!): DeleteProductCategoryResponse! @auth
+
+  # products
+  createProduct(input: CreateProductInput!): CreateProductResponse! @auth
+  updateProduct(id: Int64!, input: UpdateProductInput!): UpdateProductResponse! @auth
+  deleteProduct(id: Int64!): DeleteProductResponse! @auth
 }

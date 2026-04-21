@@ -5,6 +5,7 @@ type UpdateUserInput struct {
 	Email    *string `json:"email,omitempty"`
 	Address  *string `json:"address,omitempty"`
 	Phone    *string `json:"phone,omitempty"`
+	Password *string `json:"password,omitempty"`
 	Avatar   *string `json:"avatar,omitempty"`
 	IsActive *bool   `json:"is_active,omitempty"`
 	RoleID   *int64  `json:"role_id,omitempty"`

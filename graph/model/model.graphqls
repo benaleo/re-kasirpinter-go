@@ -76,3 +76,301 @@ type NewPasswordResponse {
   success: Boolean!
   message: String!
 }
+
+type RolesResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [UserRole!]!
+}
+
+type RoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type PermissionsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [UserPermission!]!
+}
+
+type CreateRoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type UpdateRoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type DeleteRoleResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: UserRole
+}
+
+type IngredientCategoriesResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [IngredientCategory!]!
+  pagination: PageInfo
+}
+
+type IngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type IngredientsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Ingredient!]!
+  pagination: PageInfo
+}
+
+type IngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type CreateIngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type UpdateIngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type DeleteIngredientCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientCategory
+}
+
+type CreateIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type UpdateIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type DeleteIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Ingredient
+}
+
+type IngredientStocksResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  ingredient_name: String
+  total_stocks: Float
+  unit: String
+  convert_unit: String
+  data: [IngredientStock!]!
+  pagination: PageInfo
+}
+
+type IngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type CreateIngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type UpdateIngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type DeleteIngredientStockResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: IngredientStock
+}
+
+type ProductCategoriesResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductCategory!]!
+  pagination: PageInfo
+}
+
+type ProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type CreateProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type UpdateProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type DeleteProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type ProductsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Product!]!
+  pagination: PageInfo
+}
+
+type ProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type CreateProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type UpdateProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type DeleteProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type IngredientCategory {
+  id: Int64!
+  name: String!
+  unit: String!
+  convert_unit: String
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Ingredient {
+  id: Int64!
+  name: String!
+  category_id: Int64
+  category: IngredientCategory
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+  stocks: [IngredientStock!]!
+  total_stocks: Float!
+}
+
+enum IngredientStockType {
+  increase
+  decrease
+}
+
+type IngredientStock {
+  id: Int64!
+  code: String
+  qty: Float!
+  type: IngredientStockType!
+  capital: Float!
+  capital_item: Float!
+  message: String
+  image: String
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+  ingredient_id: Int64!
+  ingredient: Ingredient
+}
+
+type ProductCategory {
+  id: Int64!
+  name: String!
+  description: String
+  parent_id: Int64
+  parent: ProductCategory
+  children: [ProductCategory!]!
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Product {
+  id: Int64!
+  secure_id: String
+  name: String!
+  image: String
+  category_id: Int64
+  category: ProductCategory
+  description: String
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}

@@ -33,6 +33,11 @@ func LoadEnv() error {
 	setDefaultEnv("EMAIL_PORT", os.Getenv("EMAIL_PORT"))
 	setDefaultEnv("EMAIL_USERNAME", os.Getenv("EMAIL_USERNAME"))
 	setDefaultEnv("EMAIL_PASSWORD", os.Getenv("EMAIL_PASSWORD"))
+	setDefaultEnv("CLOUD_STORAGE_URL", os.Getenv("CLOUD_STORAGE_URL"))
+	setDefaultEnv("R2_ACCESS_KEY_ID", os.Getenv("R2_ACCESS_KEY_ID"))
+	setDefaultEnv("R2_SECRET_ACCESS_KEY", os.Getenv("R2_SECRET_ACCESS_KEY"))
+	setDefaultEnv("R2_BUCKET_NAME", os.Getenv("R2_BUCKET_NAME"))
+	setDefaultEnv("R2_REGION", os.Getenv("R2_REGION"))
 
 	return nil
 }
