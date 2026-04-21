@@ -308,3 +308,75 @@ func (i *IngredientStockDB) BeforeUpdate(tx *gorm.DB) error {
 	i.UpdatedAt = time.Now()
 	return nil
 }
+
+// ProductCategoryDB represents the database model for ProductCategory
+type ProductCategoryDB struct {
+	ID          int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name        string     `gorm:"not null" json:"name"`
+	Description *string    `json:"description,omitempty"`
+	ParentID    *int64     `json:"parent_id,omitempty"`
+	IsActive    bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt   *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+
+	// Relations
+	Parent   *ProductCategoryDB  `gorm:"foreignKey:ParentID" json:"parent,omitempty"`
+	Children []ProductCategoryDB `gorm:"foreignKey:ParentID" json:"children,omitempty"`
+	Products []ProductDB         `gorm:"foreignKey:CategoryID" json:"products,omitempty"`
+}
+
+// TableName specifies the table name for ProductCategoryDB
+func (ProductCategoryDB) TableName() string {
+	return "product_categories"
+}
+
+// BeforeCreate hook for ProductCategoryDB
+func (p *ProductCategoryDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ProductCategoryDB
+func (p *ProductCategoryDB) BeforeUpdate(tx *gorm.DB) error {
+	p.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductDB represents the database model for Product
+type ProductDB struct {
+	ID          int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	SecureID    *string    `gorm:"uniqueIndex" json:"secure_id,omitempty"`
+	Name        string     `gorm:"not null" json:"name"`
+	Image       *string    `json:"image,omitempty"`
+	CategoryID  *int64     `json:"category_id,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	IsActive    bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt   *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+
+	// Relations
+	Category *ProductCategoryDB `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+}
+
+// TableName specifies the table name for ProductDB
+func (ProductDB) TableName() string {
+	return "products"
+}
+
+// BeforeCreate hook for ProductDB
+func (p *ProductDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ProductDB
+func (p *ProductDB) BeforeUpdate(tx *gorm.DB) error {
+	p.UpdatedAt = time.Now()
+	return nil
+}

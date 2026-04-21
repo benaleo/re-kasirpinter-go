@@ -148,3 +148,64 @@ func ToGraphQLIngredientStock(ingredientStockDB model.IngredientStockDB) *model.
 
 	return stock
 }
+
+// ToGraphQLProductCategory converts ProductCategoryDB to GraphQL ProductCategory model
+func ToGraphQLProductCategory(productCategoryDB model.ProductCategoryDB) *model.ProductCategory {
+	category := &model.ProductCategory{
+		ID:          productCategoryDB.ID,
+		Name:        productCategoryDB.Name,
+		Description: productCategoryDB.Description,
+		ParentID:    productCategoryDB.ParentID,
+		IsActive:    productCategoryDB.IsActive,
+		DeletedAt:   productCategoryDB.DeletedAt,
+		CreatedAt:   productCategoryDB.CreatedAt,
+		UpdatedAt:   productCategoryDB.UpdatedAt,
+	}
+
+	// Set parent if provided
+	if productCategoryDB.Parent != nil && productCategoryDB.Parent.ID > 0 {
+		category.Parent = ToGraphQLProductCategory(*productCategoryDB.Parent)
+	}
+
+	// Set children if provided (excluding deleted children)
+	if len(productCategoryDB.Children) > 0 {
+		var activeChildren []model.ProductCategoryDB
+		for _, childDB := range productCategoryDB.Children {
+			if childDB.DeletedAt == nil {
+				activeChildren = append(activeChildren, childDB)
+			}
+		}
+		if len(activeChildren) > 0 {
+			children := make([]*model.ProductCategory, len(activeChildren))
+			for i, childDB := range activeChildren {
+				children[i] = ToGraphQLProductCategory(childDB)
+			}
+			category.Children = children
+		}
+	}
+
+	return category
+}
+
+// ToGraphQLProduct converts ProductDB to GraphQL Product model
+func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
+	product := &model.Product{
+		ID:          productDB.ID,
+		SecureID:    productDB.SecureID,
+		Name:        productDB.Name,
+		Image:       productDB.Image,
+		CategoryID:  productDB.CategoryID,
+		Description: productDB.Description,
+		IsActive:    productDB.IsActive,
+		DeletedAt:   productDB.DeletedAt,
+		CreatedAt:   productDB.CreatedAt,
+		UpdatedAt:   productDB.UpdatedAt,
+	}
+
+	// Set category if provided
+	if productDB.Category != nil && productDB.Category.ID > 0 {
+		product.Category = ToGraphQLProductCategory(*productDB.Category)
+	}
+
+	return product
+}

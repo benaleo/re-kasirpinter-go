@@ -231,6 +231,78 @@ type DeleteIngredientStockResponse {
   data: IngredientStock
 }
 
+type ProductCategoriesResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductCategory!]!
+  pagination: PageInfo
+}
+
+type ProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type CreateProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type UpdateProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type DeleteProductCategoryResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductCategory
+}
+
+type ProductsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Product!]!
+  pagination: PageInfo
+}
+
+type ProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type CreateProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type UpdateProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
+type DeleteProductResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Product
+}
+
 type IngredientCategory {
   id: Int64!
   name: String!
@@ -274,4 +346,31 @@ type IngredientStock {
   updated_at: Time!
   ingredient_id: Int64!
   ingredient: Ingredient
+}
+
+type ProductCategory {
+  id: Int64!
+  name: String!
+  description: String
+  parent_id: Int64
+  parent: ProductCategory
+  children: [ProductCategory!]!
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Product {
+  id: Int64!
+  secure_id: String
+  name: String!
+  image: String
+  category_id: Int64
+  category: ProductCategory
+  description: String
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
 }

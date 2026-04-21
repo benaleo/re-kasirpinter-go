@@ -104,3 +104,33 @@ input UpdateIngredientStockInput {
   image: String
   ingredient_id: Int64
 }
+
+input CreateProductCategoryInput {
+  name: String!
+  description: String
+  parent_id: Int64
+  is_active: Boolean!
+}
+
+input UpdateProductCategoryInput {
+  name: String
+  description: String
+  parent_id: Int64
+  is_active: Boolean
+}
+
+input CreateProductInput {
+  name: String!
+  image: String
+  category_id: Int64
+  description: String
+  is_active: Boolean!
+}
+
+input UpdateProductInput {
+  name: String
+  image: String
+  category_id: Int64
+  description: String
+  is_active: Boolean
+}

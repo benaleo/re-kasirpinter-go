@@ -362,6 +362,71 @@ func (r *mutationResolver) DeleteIngredientStock(ctx context.Context, id int64) 
 	return r.IngredientStockService.DeleteIngredientStock(id)
 }
 
+// CreateProductCategory is the resolver for the createProductCategory field.
+func (r *mutationResolver) CreateProductCategory(ctx context.Context, input model.CreateProductCategoryInput) (*model.CreateProductCategoryResponse, error) {
+	return r.ProductCategoryService.CreateProductCategory(input)
+}
+
+// UpdateProductCategory is the resolver for the updateProductCategory field.
+func (r *mutationResolver) UpdateProductCategory(ctx context.Context, id int64, input model.UpdateProductCategoryInput) (*model.UpdateProductCategoryResponse, error) {
+	if r.ProductCategoryService == nil {
+		return &model.UpdateProductCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "product category service not initialized",
+		}, nil
+	}
+	return r.ProductCategoryService.UpdateProductCategory(id, input)
+}
+
+// DeleteProductCategory is the resolver for the deleteProductCategory field.
+func (r *mutationResolver) DeleteProductCategory(ctx context.Context, id int64) (*model.DeleteProductCategoryResponse, error) {
+	if r.ProductCategoryService == nil {
+		return &model.DeleteProductCategoryResponse{
+			Code:    500,
+			Success: false,
+			Message: "product category service not initialized",
+		}, nil
+	}
+	return r.ProductCategoryService.DeleteProductCategory(id)
+}
+
+// CreateProduct is the resolver for the createProduct field.
+func (r *mutationResolver) CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.CreateProductResponse, error) {
+	if r.ProductService == nil {
+		return &model.CreateProductResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.CreateProduct(input)
+}
+
+// UpdateProduct is the resolver for the updateProduct field.
+func (r *mutationResolver) UpdateProduct(ctx context.Context, id int64, input model.UpdateProductInput) (*model.UpdateProductResponse, error) {
+	if r.ProductService == nil {
+		return &model.UpdateProductResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.UpdateProduct(id, input)
+}
+
+// DeleteProduct is the resolver for the deleteProduct field.
+func (r *mutationResolver) DeleteProduct(ctx context.Context, id int64) (*model.DeleteProductResponse, error) {
+	if r.ProductService == nil {
+		return &model.DeleteProductResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.DeleteProduct(id)
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
@@ -477,6 +542,30 @@ func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.
 		}, nil
 	}
 	return r.IngredientStockService.IngredientStocks(pagination, ingredientID)
+}
+
+// ProductCategories is the resolver for the productCategories field.
+func (r *queryResolver) ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error) {
+	if r.ProductCategoryService == nil {
+		return &model.ProductCategoriesResponse{
+			Code:    500,
+			Success: false,
+			Message: "product category service not initialized",
+		}, nil
+	}
+	return r.ProductCategoryService.ProductCategories(pagination)
+}
+
+// Products is the resolver for the products field.
+func (r *queryResolver) Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error) {
+	if r.ProductService == nil {
+		return &model.ProductsResponse{
+			Code:    500,
+			Success: false,
+			Message: "product service not initialized",
+		}, nil
+	}
+	return r.ProductService.Products(pagination)
 }
 
 // Mutation returns MutationResolver implementation.

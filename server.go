@@ -108,13 +108,25 @@ func main() {
 		log.Printf("Warning: Failed to initialize ingredient stock service: %v", err)
 	}
 
+	// Initialize product category service
+	productCategoryService, err := service.NewProductCategoryService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize product category service: %v", err)
+	}
+
+	// Initialize product service
+	productService, err := service.NewProductService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize product service: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 

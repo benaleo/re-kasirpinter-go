@@ -62,6 +62,9 @@ type Query {
   ingredientCategories(pagination: PaginationInput, is_options: Boolean = false): IngredientCategoriesResponse! @auth
   ingredients(pagination: PaginationInput): IngredientsResponse! @auth
   ingredientStocks(pagination: PaginationInput, ingredient_id: Int64): IngredientStocksResponse! @auth
+  # products
+  productCategories(pagination: PaginationInput): ProductCategoriesResponse! @auth
+  products(pagination: PaginationInput): ProductsResponse! @auth
 }
 
 type Mutation {
@@ -80,10 +83,12 @@ type Mutation {
   updateRole(id: Int64!, input: UpdateRoleInput!): UpdateRoleResponse! @auth
   deleteRole(id: Int64!): DeleteRoleResponse! @auth
 
-  # ingredients
+  # ingredients category
   createIngredientCategory(input: CreateIngredientCategoryInput!): CreateIngredientCategoryResponse! @auth
   updateIngredientCategory(id: Int64!, input: UpdateIngredientCategoryInput!): UpdateIngredientCategoryResponse! @auth
   deleteIngredientCategory(id: Int64!): DeleteIngredientCategoryResponse! @auth
+
+  # ingredients
   createIngredient(input: CreateIngredientInput!): CreateIngredientResponse! @auth
   updateIngredient(id: Int64!, input: UpdateIngredientInput!): UpdateIngredientResponse! @auth
   deleteIngredient(id: Int64!): DeleteIngredientResponse! @auth
@@ -92,4 +97,14 @@ type Mutation {
   createIngredientStock(input: CreateIngredientStockInput!): CreateIngredientStockResponse! @auth
   updateIngredientStock(id: Int64!, input: UpdateIngredientStockInput!): UpdateIngredientStockResponse! @auth
   deleteIngredientStock(id: Int64!): DeleteIngredientStockResponse! @auth
+
+  # product category
+  createProductCategory(input: CreateProductCategoryInput!): CreateProductCategoryResponse! @auth
+  updateProductCategory(id: Int64!, input: UpdateProductCategoryInput!): UpdateProductCategoryResponse! @auth
+  deleteProductCategory(id: Int64!): DeleteProductCategoryResponse! @auth
+
+  # products
+  createProduct(input: CreateProductInput!): CreateProductResponse! @auth
+  updateProduct(id: Int64!, input: UpdateProductInput!): UpdateProductResponse! @auth
+  deleteProduct(id: Int64!): DeleteProductResponse! @auth
 }
