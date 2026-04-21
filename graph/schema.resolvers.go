@@ -17,160 +17,38 @@ import (
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error) {
-	// Get client information from context
-	clientInfo := GetClientInfo(ctx)
-	var ip, browser, os *string
-	if clientInfo != nil {
-		ip = &clientInfo.IP
-		browser = &clientInfo.Browser
-		os = &clientInfo.OS
-	}
-
-	// Check for recent failed login attempts (within last 5 minutes)
-	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
-	var failedAttemptsCount int64
-	r.DB.Model(&model.LoginAuditDB{}).
-		Where("email = ? AND success = ? AND created_at > ?", input.Email, false, fiveMinutesAgo).
-		Count(&failedAttemptsCount)
-
-	// If 3 or more failed attempts in last 5 minutes, block login
-	if failedAttemptsCount >= 3 {
-		// Record this blocked attempt
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		// Calculate when user can try again (5 minutes from now)
-		tryAgainAt := time.Now().Add(5 * time.Minute).Format("2006-01-02 15:04:05")
-
-		return &model.AuthResponse{
-			Code:    429,
-			Success: false,
-			Message: fmt.Sprintf("too many failed login attempts. please wait 5 minutes before trying again [[%s]]", tryAgainAt),
-		}, nil
-	}
-
-	// Find user by email
-	var userDB model.UserDB
-	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
-	if result.Error != nil {
-		// Record failed attempt (user not found)
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		return &model.AuthResponse{
-			Code:    401,
-			Success: false,
-			Message: "invalid email or password",
-		}, nil
-	}
-
-	// Decrypt password from frontend using AES
-	decryptedPassword, err := helper.Decrypt(input.Password)
-	if err != nil {
-		// Record failed attempt (decryption error)
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		return &model.AuthResponse{
-			Code:    401,
-			Success: false,
-			Message: "invalid email or password",
-		}, nil
-	}
-
-	// Check password
-	if !helper.CheckPassword(decryptedPassword, userDB.Password) {
-		// Record failed attempt (wrong password)
-		loginAudit := model.LoginAuditDB{
-			Email:   input.Email,
-			Success: false,
-			IP:      ip,
-			Browser: browser,
-			OS:      os,
-		}
-		r.DB.Create(&loginAudit)
-
-		return &model.AuthResponse{
-			Code:    401,
-			Success: false,
-			Message: "invalid email or password",
-		}, nil
-	}
-
-	// Get user role
-	var userRole model.UserRoleDB
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-	}
-
-	// Generate JWT token
-	roleName := ""
-	if userRole.ID > 0 {
-		roleName = userRole.Name
-	}
-
-	secureID := ""
-	if userDB.SecureID != nil {
-		secureID = *userDB.SecureID
-	}
-
-	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "login")
-	if err != nil {
+	if r.AuthService == nil {
 		return &model.AuthResponse{
 			Code:    500,
 			Success: false,
-			Message: fmt.Sprintf("failed to generate token: %v", err),
+			Message: "auth service not initialized",
 		}, nil
 	}
 
-	// Record successful login attempt
-	loginAudit := model.LoginAuditDB{
-		Email:   input.Email,
-		Success: true,
-		IP:      ip,
-		Browser: browser,
-		OS:      os,
+	// Get client information from context
+	clientInfo := GetClientInfo(ctx)
+	var clientInfoPtr *service.ClientInfo
+	if clientInfo != nil {
+		clientInfoPtr = &service.ClientInfo{
+			IP:      clientInfo.IP,
+			Browser: clientInfo.Browser,
+			OS:      clientInfo.OS,
+		}
 	}
-	r.DB.Create(&loginAudit)
 
-	// Convert DB model to GraphQL model using mapper
-	var userRoleDB *model.UserRoleDB
-	if userRole.ID > 0 {
-		userRoleDB = &userRole
-	}
-	user := helper.ToGraphQLUser(userDB, userRoleDB)
-
-	return &model.AuthResponse{
-		Code:    200,
-		Success: true,
-		Message: "login successful",
-		Data: &model.AuthData{
-			Token: token,
-			User:  user,
-		},
-	}, nil
+	return r.AuthService.Login(ctx, input, clientInfoPtr)
 }
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, error) {
+	if r.AuthService == nil {
+		return &model.LogoutResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
+	}
+
 	// Get user claims from context (already authenticated by @auth directive)
 	userClaims := ForContext(ctx)
 	if userClaims == nil {
@@ -183,54 +61,18 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 
 	// Get the token from context (set by middleware)
 	token := GetToken(ctx)
-	if token == "" {
-		return &model.LogoutResponse{
-			Code:    400,
-			Success: false,
-			Message: "Token not found in context",
-		}, nil
+
+	// Convert Claims to service.Claims
+	serviceClaims := &service.Claims{
+		UserID:    userClaims.UserID,
+		Email:     userClaims.Email,
+		Role:      userClaims.Role,
+		SecureID:  userClaims.SecureID,
+		Purpose:   userClaims.Purpose,
+		ExpiresAt: userClaims.ExpiresAt.Time,
 	}
 
-	// Validate the token to get its expiration time
-	claims, err := validateJWT(token)
-	if err != nil {
-		return &model.LogoutResponse{
-			Code:    400,
-			Success: false,
-			Message: "Invalid token",
-		}, nil
-	}
-
-	// Verify that the token belongs to the authenticated user
-	if claims.UserID != userClaims.UserID {
-		return &model.LogoutResponse{
-			Code:    403,
-			Success: false,
-			Message: "Token does not belong to authenticated user",
-		}, nil
-	}
-
-	// Get the token's expiration time
-	expiresAt := claims.ExpiresAt.Time
-
-	// Add the token to the blacklist
-	err = blacklistToken(r.DB, token, userClaims.UserID, expiresAt)
-	if err != nil {
-		return &model.LogoutResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("Failed to blacklist token: %v", err),
-		}, nil
-	}
-
-	// Optionally cleanup expired blacklisted tokens
-	go cleanupExpiredBlacklistedTokens(r.DB)
-
-	return &model.LogoutResponse{
-		Code:    200,
-		Success: true,
-		Message: "logout successful",
-	}, nil
+	return r.AuthService.Logout(ctx, token, serviceClaims)
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -272,164 +114,73 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.De
 
 // CreateOtp is the resolver for the createOtp field.
 func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error) {
-	// Check if user exists (optional but good for security)
-	var userDB model.UserDB
-	result := r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
-	if result.Error != nil {
-		return toGraphQLCreateOtpResponse(404, false, "User not found"), nil
-	}
-
-	// Check if there's a valid OTP created recently (within 30 seconds)
-	var existingOTP model.OtpDB
-	thirtySecondsAgo := time.Now().Add(-30 * time.Second)
-	result = r.DB.Where("email = ? AND type = ? AND is_valid = ? AND created_at > ?", input.Email, input.Type, true, thirtySecondsAgo).Order("created_at DESC").First(&existingOTP)
-
-	if result.Error == nil {
-		// Valid OTP exists recently, return it instead of creating a new one
-		// Get client information from context
-		clientInfo := GetClientInfo(ctx)
-		var ip, browser, os *string
-		if clientInfo != nil {
-			ip = &clientInfo.IP
-			browser = &clientInfo.Browser
-			os = &clientInfo.OS
-		}
-
-		// Determine retry value
-		retry := input.Retry != nil && *input.Retry
-
-		// Enqueue email job (will be skipped by deduplication logic)
-		_ = EnqueueEmailJob(r.DB, input.Email, existingOTP.Code, retry, ip, browser, os)
-
-		return toGraphQLCreateOtpResponse(200, true, "Verification code has been sent to your email"), nil
-	}
-
-	// Generate 6-digit OTP code
-	code := generateOTPCode()
-
-	// Invalidate any existing OTPs for this email and type
-	r.DB.Model(&model.OtpDB{}).Where("email = ? AND type = ?", input.Email, input.Type).Update("is_valid", false)
-
-	// Create new OTP record
-	otpDB := model.OtpDB{
-		Email:     input.Email,
-		Code:      code,
-		IsValid:   true,
-		ExpiredAt: time.Now().Add(10 * time.Minute),
-		Type:      input.Type,
-	}
-
-	result = r.DB.Create(&otpDB)
-	if result.Error != nil {
-		return toGraphQLCreateOtpResponse(500, false, fmt.Sprintf("failed to create OTP: %v", result.Error)), nil
+	if r.AuthService == nil {
+		return &model.CreateOtpResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
 	}
 
 	// Get client information from context
 	clientInfo := GetClientInfo(ctx)
-	var ip, browser, os *string
+	var clientInfoPtr *service.ClientInfo
 	if clientInfo != nil {
-		ip = &clientInfo.IP
-		browser = &clientInfo.Browser
-		os = &clientInfo.OS
+		clientInfoPtr = &service.ClientInfo{
+			IP:      clientInfo.IP,
+			Browser: clientInfo.Browser,
+			OS:      clientInfo.OS,
+		}
 	}
 
-	// Determine retry value
-	retry := input.Retry != nil && *input.Retry
-
-	// Enqueue email job to background queue
-	err := EnqueueEmailJob(r.DB, input.Email, code, retry, ip, browser, os)
-	if err != nil {
-		// Log the error but still return success (OTP is saved in DB)
-		fmt.Printf("Warning: Failed to enqueue email job: %v\n", err)
-	}
-
-	return toGraphQLCreateOtpResponse(200, true, "Verification code has been sent to your email"), nil
+	return r.AuthService.CreateOtp(ctx, input, clientInfoPtr, EnqueueEmailJob)
 }
 
 // VerifyOtp is the resolver for the verifyOtp field.
 func (r *mutationResolver) VerifyOtp(ctx context.Context, input model.VerifyOtpInput) (*model.VerifyOtpResponse, error) {
-	// Find the OTP record
-	var otpDB model.OtpDB
-	result := r.DB.Where("email = ? AND code = ? AND type = ? AND is_valid = ?", input.Email, input.Code, input.Type, true).First(&otpDB)
-	if result.Error != nil {
-		return toGraphQLVerifyOtpResponse(400, false, "Invalid or expired verification code", nil), nil
+	if r.AuthService == nil {
+		return &model.VerifyOtpResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+			Token:   nil,
+		}, nil
 	}
 
-	// Check if OTP is expired
-	if time.Now().After(otpDB.ExpiredAt) {
-		// Mark as invalid
-		r.DB.Model(&otpDB).Update("is_valid", false)
-		return toGraphQLVerifyOtpResponse(400, false, "Verification code has expired", nil), nil
-	}
-
-	// Find the user
-	var userDB model.UserDB
-	result = r.DB.Where("email = ? AND is_active = ?", input.Email, true).First(&userDB)
-	if result.Error != nil {
-		return toGraphQLVerifyOtpResponse(404, false, "User not found", nil), nil
-	}
-
-	// Get user role
-	var userRole model.UserRoleDB
-	roleName := ""
-	if userDB.RoleID != nil {
-		r.DB.First(&userRole, *userDB.RoleID)
-		if userRole.ID > 0 {
-			roleName = userRole.Name
-		}
-	}
-
-	// Generate JWT token for password reset
-	secureID := ""
-	if userDB.SecureID != nil {
-		secureID = *userDB.SecureID
-	}
-
-	token, err := generateJWT(userDB.ID, userDB.Email, roleName, secureID, "password_reset")
-	if err != nil {
-		return toGraphQLVerifyOtpResponse(500, false, fmt.Sprintf("failed to generate token: %v", err), nil), nil
-	}
-
-	// Invalidate the OTP (one-time use)
-	r.DB.Model(&otpDB).Update("is_valid", false)
-
-	return toGraphQLVerifyOtpResponse(200, true, "Verification successful", &token), nil
+	return r.AuthService.VerifyOtp(ctx, input)
 }
 
 // NewPassword is the resolver for the newPassword field.
 func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPasswordInput) (*model.NewPasswordResponse, error) {
+	if r.AuthService == nil {
+		return &model.NewPasswordResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
+	}
+
 	// Get user claims from context
 	userClaims := ForContext(ctx)
 	if userClaims == nil {
-		return toGraphQLNewPasswordResponse(401, false, "Unauthorized"), nil
+		return &model.NewPasswordResponse{
+			Code:    401,
+			Success: false,
+			Message: "Unauthorized",
+		}, nil
 	}
 
-	// Verify that the token purpose is password_reset (extra safety check)
-	if userClaims.Purpose != "password_reset" {
-		return toGraphQLNewPasswordResponse(403, false, "Token is not authorized for password reset"), nil
+	// Convert Claims to service.Claims
+	serviceClaims := &service.Claims{
+		UserID:    userClaims.UserID,
+		Email:     userClaims.Email,
+		Role:      userClaims.Role,
+		SecureID:  userClaims.SecureID,
+		Purpose:   userClaims.Purpose,
+		ExpiresAt: userClaims.ExpiresAt.Time,
 	}
 
-	// Find the user by ID
-	var userDB model.UserDB
-	result := r.DB.Where("id = ? AND is_active = ?", userClaims.UserID, true).First(&userDB)
-	if result.Error != nil {
-		return toGraphQLNewPasswordResponse(404, false, "User not found"), nil
-	}
-
-	// Hash the new password
-	hashedPassword, err := helper.HashPassword(input.Password)
-	if err != nil {
-		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to hash password: %v", err)), nil
-	}
-
-	// Update the user's password
-	userDB.Password = hashedPassword
-	result = r.DB.Save(&userDB)
-	if result.Error != nil {
-		return toGraphQLNewPasswordResponse(500, false, fmt.Sprintf("failed to update password: %v", result.Error)), nil
-	}
-
-	return toGraphQLNewPasswordResponse(200, true, "Password updated successfully"), nil
+	return r.AuthService.NewPassword(ctx, input, serviceClaims)
 }
 
 // TestR2Connection is the resolver for the testR2Connection field.

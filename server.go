@@ -82,13 +82,15 @@ func main() {
 		log.Printf("Warning: Failed to initialize user service: %v", err)
 	}
 
+	authService := service.NewAuthService(db)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 
