@@ -197,11 +197,15 @@ type ComplexityRoot struct {
 	}
 
 	IngredientStocksResponse struct {
-		Code       func(childComplexity int) int
-		Data       func(childComplexity int) int
-		Message    func(childComplexity int) int
-		Pagination func(childComplexity int) int
-		Success    func(childComplexity int) int
+		Code           func(childComplexity int) int
+		ConvertUnit    func(childComplexity int) int
+		Data           func(childComplexity int) int
+		IngredientName func(childComplexity int) int
+		Message        func(childComplexity int) int
+		Pagination     func(childComplexity int) int
+		Success        func(childComplexity int) int
+		TotalStocks    func(childComplexity int) int
+		Unit           func(childComplexity int) int
 	}
 
 	IngredientsResponse struct {
@@ -268,7 +272,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
-		IngredientStocks     func(childComplexity int, pagination *model.PaginationInput) int
+		IngredientStocks     func(childComplexity int, pagination *model.PaginationInput, ingredientID *int64) int
 		Ingredients          func(childComplexity int, pagination *model.PaginationInput) int
 		Permissions          func(childComplexity int) int
 		Role                 func(childComplexity int, id int64) int
@@ -418,7 +422,7 @@ type QueryResolver interface {
 	Permissions(ctx context.Context) (*model.PermissionsResponse, error)
 	IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error)
 	Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error)
-	IngredientStocks(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientStocksResponse, error)
+	IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -1043,12 +1047,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.IngredientStocksResponse.Code(childComplexity), true
+	case "IngredientStocksResponse.convert_unit":
+		if e.ComplexityRoot.IngredientStocksResponse.ConvertUnit == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientStocksResponse.ConvertUnit(childComplexity), true
 	case "IngredientStocksResponse.data":
 		if e.ComplexityRoot.IngredientStocksResponse.Data == nil {
 			break
 		}
 
 		return e.ComplexityRoot.IngredientStocksResponse.Data(childComplexity), true
+	case "IngredientStocksResponse.ingredient_name":
+		if e.ComplexityRoot.IngredientStocksResponse.IngredientName == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientStocksResponse.IngredientName(childComplexity), true
 	case "IngredientStocksResponse.message":
 		if e.ComplexityRoot.IngredientStocksResponse.Message == nil {
 			break
@@ -1067,6 +1083,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.IngredientStocksResponse.Success(childComplexity), true
+	case "IngredientStocksResponse.total_stocks":
+		if e.ComplexityRoot.IngredientStocksResponse.TotalStocks == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientStocksResponse.TotalStocks(childComplexity), true
+	case "IngredientStocksResponse.unit":
+		if e.ComplexityRoot.IngredientStocksResponse.Unit == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientStocksResponse.Unit(childComplexity), true
 
 	case "IngredientsResponse.code":
 		if e.ComplexityRoot.IngredientsResponse.Code == nil {
@@ -1454,7 +1482,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.IngredientStocks(childComplexity, args["pagination"].(*model.PaginationInput)), true
+		return e.ComplexityRoot.Query.IngredientStocks(childComplexity, args["pagination"].(*model.PaginationInput), args["ingredient_id"].(*int64)), true
 	case "Query.ingredients":
 		if e.ComplexityRoot.Query.Ingredients == nil {
 			break
@@ -2322,6 +2350,11 @@ func (ec *executionContext) field_Query_ingredientStocks_args(ctx context.Contex
 		return nil, err
 	}
 	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "ingredient_id", ec.unmarshalOInt642ᚖint64)
+	if err != nil {
+		return nil, err
+	}
+	args["ingredient_id"] = arg1
 	return args, nil
 }
 
@@ -5762,6 +5795,122 @@ func (ec *executionContext) fieldContext_IngredientStocksResponse_message(_ cont
 	return fc, nil
 }
 
+func (ec *executionContext) _IngredientStocksResponse_ingredient_name(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_IngredientStocksResponse_ingredient_name,
+		func(ctx context.Context) (any, error) {
+			return obj.IngredientName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_IngredientStocksResponse_ingredient_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IngredientStocksResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IngredientStocksResponse_total_stocks(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_IngredientStocksResponse_total_stocks,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalStocks, nil
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_IngredientStocksResponse_total_stocks(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IngredientStocksResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IngredientStocksResponse_unit(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_IngredientStocksResponse_unit,
+		func(ctx context.Context) (any, error) {
+			return obj.Unit, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_IngredientStocksResponse_unit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IngredientStocksResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _IngredientStocksResponse_convert_unit(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_IngredientStocksResponse_convert_unit,
+		func(ctx context.Context) (any, error) {
+			return obj.ConvertUnit, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_IngredientStocksResponse_convert_unit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "IngredientStocksResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _IngredientStocksResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -8282,7 +8431,7 @@ func (ec *executionContext) _Query_ingredientStocks(ctx context.Context, field g
 		ec.fieldContext_Query_ingredientStocks,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().IngredientStocks(ctx, fc.Args["pagination"].(*model.PaginationInput))
+			return ec.Resolvers.Query().IngredientStocks(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["ingredient_id"].(*int64))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -8318,6 +8467,14 @@ func (ec *executionContext) fieldContext_Query_ingredientStocks(ctx context.Cont
 				return ec.fieldContext_IngredientStocksResponse_success(ctx, field)
 			case "message":
 				return ec.fieldContext_IngredientStocksResponse_message(ctx, field)
+			case "ingredient_name":
+				return ec.fieldContext_IngredientStocksResponse_ingredient_name(ctx, field)
+			case "total_stocks":
+				return ec.fieldContext_IngredientStocksResponse_total_stocks(ctx, field)
+			case "unit":
+				return ec.fieldContext_IngredientStocksResponse_unit(ctx, field)
+			case "convert_unit":
+				return ec.fieldContext_IngredientStocksResponse_convert_unit(ctx, field)
 			case "data":
 				return ec.fieldContext_IngredientStocksResponse_data(ctx, field)
 			case "pagination":
@@ -14001,6 +14158,14 @@ func (ec *executionContext) _IngredientStocksResponse(ctx context.Context, sel a
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "ingredient_name":
+			out.Values[i] = ec._IngredientStocksResponse_ingredient_name(ctx, field, obj)
+		case "total_stocks":
+			out.Values[i] = ec._IngredientStocksResponse_total_stocks(ctx, field, obj)
+		case "unit":
+			out.Values[i] = ec._IngredientStocksResponse_unit(ctx, field, obj)
+		case "convert_unit":
+			out.Values[i] = ec._IngredientStocksResponse_convert_unit(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._IngredientStocksResponse_data(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

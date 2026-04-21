@@ -195,6 +195,10 @@ type IngredientStocksResponse {
   code: Int!
   success: Boolean!
   message: String!
+  ingredient_name: String
+  total_stocks: Float
+  unit: String
+  convert_unit: String
   data: [IngredientStock!]!
   pagination: PageInfo
 }

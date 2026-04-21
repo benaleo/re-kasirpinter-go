@@ -1158,21 +1158,30 @@ func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.Pagin
 }
 
 // IngredientStocks is the resolver for the ingredientStocks field.
-func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientStocksResponse, error) {
+func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query with ingredient preload
 	baseQuery := r.DB.Model(&model.IngredientStockDB{}).Preload("Ingredient").Preload("Ingredient.Category").Preload("Ingredient.Stocks", "deleted_at IS NULL").Where("deleted_at IS NULL")
 
+	// Filter by ingredient_id if provided
+	if ingredientID != nil {
+		baseQuery = baseQuery.Where("ingredient_id = ?", *ingredientID)
+	}
+
 	// Get total count
 	var total int64
 	countResult := baseQuery.Count(&total)
 	if countResult.Error != nil {
 		return &model.IngredientStocksResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to count ingredient stocks: %v", countResult.Error),
+			Code:           500,
+			Success:        false,
+			Message:        fmt.Sprintf("failed to count ingredient stocks: %v", countResult.Error),
+			IngredientName: nil,
+			TotalStocks:    nil,
+			Unit:           nil,
+			ConvertUnit:    nil,
 		}, nil
 	}
 
@@ -1182,9 +1191,13 @@ func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.
 	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&stocksDB)
 	if result.Error != nil {
 		return &model.IngredientStocksResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to retrieve ingredient stocks: %v", result.Error),
+			Code:           500,
+			Success:        false,
+			Message:        fmt.Sprintf("failed to retrieve ingredient stocks: %v", result.Error),
+			IngredientName: nil,
+			TotalStocks:    nil,
+			Unit:           nil,
+			ConvertUnit:    nil,
 		}, nil
 	}
 
@@ -1197,12 +1210,44 @@ func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.
 		stocks[i] = helper.ToGraphQLIngredientStock(stockDB)
 	}
 
+	// Calculate summary fields if filtered by ingredient
+	var ingredientName *string
+	var totalStocks *float64
+	var unit *string
+	var convertUnit *string
+
+	if ingredientID != nil && len(stocksDB) > 0 {
+		// Get ingredient name from first stock
+		if stocksDB[0].Ingredient != nil {
+			name := stocksDB[0].Ingredient.Name
+			ingredientName = &name
+		}
+
+		// Calculate total stocks
+		total := 0.0
+		for _, stock := range stocksDB {
+			total += stock.Qty
+		}
+		totalStocks = &total
+
+		// Get unit and convert_unit from ingredient's category
+		if stocksDB[0].Ingredient != nil && stocksDB[0].Ingredient.Category != nil {
+			u := stocksDB[0].Ingredient.Category.Unit
+			unit = &u
+			convertUnit = stocksDB[0].Ingredient.Category.ConvertUnit
+		}
+	}
+
 	return &model.IngredientStocksResponse{
-		Code:       200,
-		Success:    true,
-		Message:    "ingredient stocks retrieved successfully",
-		Data:       stocks,
-		Pagination: paginationResult.PageInfo,
+		Code:           200,
+		Success:        true,
+		Message:        "ingredient stocks retrieved successfully",
+		IngredientName: ingredientName,
+		TotalStocks:    totalStocks,
+		Unit:           unit,
+		ConvertUnit:    convertUnit,
+		Data:           stocks,
+		Pagination:     paginationResult.PageInfo,
 	}, nil
 }
 

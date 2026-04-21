@@ -192,11 +192,15 @@ type IngredientStockResponse struct {
 }
 
 type IngredientStocksResponse struct {
-	Code       int32              `json:"code"`
-	Success    bool               `json:"success"`
-	Message    string             `json:"message"`
-	Data       []*IngredientStock `json:"data"`
-	Pagination *PageInfo          `json:"pagination,omitempty"`
+	Code           int32              `json:"code"`
+	Success        bool               `json:"success"`
+	Message        string             `json:"message"`
+	IngredientName *string            `json:"ingredient_name,omitempty"`
+	TotalStocks    *float64           `json:"total_stocks,omitempty"`
+	Unit           *string            `json:"unit,omitempty"`
+	ConvertUnit    *string            `json:"convert_unit,omitempty"`
+	Data           []*IngredientStock `json:"data"`
+	Pagination     *PageInfo          `json:"pagination,omitempty"`
 }
 
 type IngredientsResponse struct {
