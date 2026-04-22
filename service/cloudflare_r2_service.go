@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -17,6 +19,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/chai2010/webp"
 )
 
 type R2Service struct {
@@ -136,23 +139,80 @@ func (r *R2Service) UploadFromBase64(ctx context.Context, base64Data, folder, fi
 	// Try to detect if it's an image and get the format
 	contentType := http.DetectContentType(data)
 	var ext string
+	var uploadData []byte = data
+	var uploadContentType string = contentType
 
-	switch contentType {
-	case "image/jpeg":
-		ext = ".jpg"
-	case "image/png":
-		ext = ".png"
-	case "image/gif":
-		ext = ".gif"
-	case "image/webp":
-		ext = ".webp"
-	default:
-		// If we can't detect, try to decode as image
-		_, format, err := image.DecodeConfig(bytes.NewReader(data))
+	// Convert to WebP if it's an image (but not already WebP)
+	if strings.HasPrefix(contentType, "image/") && contentType != "image/webp" {
+		var img image.Image
+		var err error
+
+		// Try to decode based on content type for better compatibility
+		switch contentType {
+		case "image/jpeg":
+			img, err = jpeg.Decode(bytes.NewReader(data))
+		case "image/png":
+			img, err = png.Decode(bytes.NewReader(data))
+		default:
+			// Try generic decoder for other formats
+			img, _, err = image.Decode(bytes.NewReader(data))
+		}
+
 		if err == nil {
-			ext = "." + format
+			// Encode to WebP
+			webpBuf := new(bytes.Buffer)
+			err = webp.Encode(webpBuf, img, &webp.Options{Lossless: false, Quality: 80})
+			if err == nil {
+				uploadData = webpBuf.Bytes()
+				uploadContentType = "image/webp"
+				ext = ".webp"
+			} else {
+				// If WebP conversion fails, use original format
+				switch contentType {
+				case "image/jpeg":
+					ext = ".jpg"
+				case "image/png":
+					ext = ".png"
+				case "image/gif":
+					ext = ".gif"
+				default:
+					ext = ".bin"
+				}
+			}
 		} else {
-			ext = ".bin"
+			// If decoding fails, use detected content type
+			switch contentType {
+			case "image/jpeg":
+				ext = ".jpg"
+			case "image/png":
+				ext = ".png"
+			case "image/gif":
+				ext = ".gif"
+			case "image/webp":
+				ext = ".webp"
+			default:
+				ext = ".bin"
+			}
+		}
+	} else {
+		// Not an image or already WebP, use as-is
+		switch contentType {
+		case "image/jpeg":
+			ext = ".jpg"
+		case "image/png":
+			ext = ".png"
+		case "image/gif":
+			ext = ".gif"
+		case "image/webp":
+			ext = ".webp"
+		default:
+			// If we can't detect, try to decode as image
+			_, format, err := image.DecodeConfig(bytes.NewReader(data))
+			if err == nil {
+				ext = "." + format
+			} else {
+				ext = ".bin"
+			}
 		}
 	}
 
@@ -168,8 +228,8 @@ func (r *R2Service) UploadFromBase64(ctx context.Context, base64Data, folder, fi
 	_, err := r.Client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(r.BucketName),
 		Key:         aws.String(key),
-		Body:        bytes.NewReader(data),
-		ContentType: aws.String(contentType),
+		Body:        bytes.NewReader(uploadData),
+		ContentType: aws.String(uploadContentType),
 		ACL:         types.ObjectCannedACLPublicRead,
 	})
 	if err != nil {
