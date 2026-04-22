@@ -2,6 +2,7 @@ package helper
 
 import (
 	"re-kasirpinter-go/graph/model"
+	"strings"
 )
 
 // BadRequestResponse creates a standard bad request response
@@ -30,4 +31,12 @@ func SuccessResponse(code int32, message string, data *model.User) *model.Create
 		Message: message,
 		Data:    data,
 	}
+}
+
+// IsDuplicateCodeError checks if the error is a duplicate code constraint violation
+func IsDuplicateCodeError(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "idx_discounts_code")
 }

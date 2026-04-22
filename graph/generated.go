@@ -190,6 +190,8 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Icon        func(childComplexity int) int
 		IsActive    func(childComplexity int) int
+		MaxValue    func(childComplexity int) int
+		MinOrder    func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Quota       func(childComplexity int) int
 		StartAt     func(childComplexity int) int
@@ -1172,6 +1174,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Discount.IsActive(childComplexity), true
+	case "Discount.max_value":
+		if e.ComplexityRoot.Discount.MaxValue == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Discount.MaxValue(childComplexity), true
+	case "Discount.min_order":
+		if e.ComplexityRoot.Discount.MinOrder == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Discount.MinOrder(childComplexity), true
 	case "Discount.name":
 		if e.ComplexityRoot.Discount.Name == nil {
 			break
@@ -4111,6 +4125,10 @@ func (ec *executionContext) fieldContext_CreateDiscountResponse_data(_ context.C
 				return ec.fieldContext_Discount_type(ctx, field)
 			case "value":
 				return ec.fieldContext_Discount_value(ctx, field)
+			case "max_value":
+				return ec.fieldContext_Discount_max_value(ctx, field)
+			case "min_order":
+				return ec.fieldContext_Discount_min_order(ctx, field)
 			case "quota":
 				return ec.fieldContext_Discount_quota(ctx, field)
 			case "start_at":
@@ -5318,6 +5336,10 @@ func (ec *executionContext) fieldContext_DeleteDiscountResponse_data(_ context.C
 				return ec.fieldContext_Discount_type(ctx, field)
 			case "value":
 				return ec.fieldContext_Discount_value(ctx, field)
+			case "max_value":
+				return ec.fieldContext_Discount_max_value(ctx, field)
+			case "min_order":
+				return ec.fieldContext_Discount_min_order(ctx, field)
 			case "quota":
 				return ec.fieldContext_Discount_quota(ctx, field)
 			case "start_at":
@@ -6516,6 +6538,64 @@ func (ec *executionContext) fieldContext_Discount_value(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Discount_max_value(ctx context.Context, field graphql.CollectedField, obj *model.Discount) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Discount_max_value,
+		func(ctx context.Context) (any, error) {
+			return obj.MaxValue, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint32,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Discount_max_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Discount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Discount_min_order(ctx context.Context, field graphql.CollectedField, obj *model.Discount) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Discount_min_order,
+		func(ctx context.Context) (any, error) {
+			return obj.MinOrder, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint32,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Discount_min_order(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Discount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Discount_quota(ctx context.Context, field graphql.CollectedField, obj *model.Discount) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -6844,6 +6924,10 @@ func (ec *executionContext) fieldContext_DiscountResponse_data(_ context.Context
 				return ec.fieldContext_Discount_type(ctx, field)
 			case "value":
 				return ec.fieldContext_Discount_value(ctx, field)
+			case "max_value":
+				return ec.fieldContext_Discount_max_value(ctx, field)
+			case "min_order":
+				return ec.fieldContext_Discount_min_order(ctx, field)
 			case "quota":
 				return ec.fieldContext_Discount_quota(ctx, field)
 			case "start_at":
@@ -6990,6 +7074,10 @@ func (ec *executionContext) fieldContext_DiscountsResponse_data(_ context.Contex
 				return ec.fieldContext_Discount_type(ctx, field)
 			case "value":
 				return ec.fieldContext_Discount_value(ctx, field)
+			case "max_value":
+				return ec.fieldContext_Discount_max_value(ctx, field)
+			case "min_order":
+				return ec.fieldContext_Discount_min_order(ctx, field)
 			case "quota":
 				return ec.fieldContext_Discount_quota(ctx, field)
 			case "start_at":
@@ -14070,6 +14158,10 @@ func (ec *executionContext) fieldContext_UpdateDiscountResponse_data(_ context.C
 				return ec.fieldContext_Discount_type(ctx, field)
 			case "value":
 				return ec.fieldContext_Discount_value(ctx, field)
+			case "max_value":
+				return ec.fieldContext_Discount_max_value(ctx, field)
+			case "min_order":
+				return ec.fieldContext_Discount_min_order(ctx, field)
 			case "quota":
 				return ec.fieldContext_Discount_quota(ctx, field)
 			case "start_at":
@@ -17751,7 +17843,7 @@ func (ec *executionContext) unmarshalInputCreateDiscountInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "icon", "code", "type", "value", "quota", "start_at", "end_at", "is_active"}
+	fieldsInOrder := [...]string{"name", "description", "icon", "code", "type", "value", "max_value", "min_order", "quota", "start_at", "end_at", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17800,6 +17892,20 @@ func (ec *executionContext) unmarshalInputCreateDiscountInput(ctx context.Contex
 				return it, err
 			}
 			it.Value = data
+		case "max_value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max_value"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxValue = data
+		case "min_order":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min_order"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinOrder = data
 		case "quota":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quota"))
 			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
@@ -18401,7 +18507,7 @@ func (ec *executionContext) unmarshalInputUpdateDiscountInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "icon", "code", "type", "value", "quota", "start_at", "end_at", "is_active"}
+	fieldsInOrder := [...]string{"name", "description", "icon", "code", "type", "value", "max_value", "min_order", "quota", "start_at", "end_at", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18450,6 +18556,20 @@ func (ec *executionContext) unmarshalInputUpdateDiscountInput(ctx context.Contex
 				return it, err
 			}
 			it.Value = data
+		case "max_value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max_value"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxValue = data
+		case "min_order":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min_order"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinOrder = data
 		case "quota":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quota"))
 			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
@@ -20026,6 +20146,10 @@ func (ec *executionContext) _Discount(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "max_value":
+			out.Values[i] = ec._Discount_max_value(ctx, field, obj)
+		case "min_order":
+			out.Values[i] = ec._Discount_min_order(ctx, field, obj)
 		case "quota":
 			out.Values[i] = ec._Discount_quota(ctx, field, obj)
 		case "start_at":

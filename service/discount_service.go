@@ -109,6 +109,8 @@ func (s *DiscountService) CreateDiscount(input model.CreateDiscountInput) (*mode
 		Code:        input.Code,
 		Type:        model.DiscountType(input.Type),
 		Value:       input.Value,
+		MaxValue:    input.MaxValue,
+		MinOrder:    input.MinOrder,
 		Quota:       input.Quota,
 		StartAt:     input.StartAt,
 		EndAt:       input.EndAt,
@@ -118,6 +120,13 @@ func (s *DiscountService) CreateDiscount(input model.CreateDiscountInput) (*mode
 	// Save to database
 	result := s.DB.Create(&discountDB)
 	if result.Error != nil {
+		if helper.IsDuplicateCodeError(result.Error) {
+			return &model.CreateDiscountResponse{
+				Code:    400,
+				Success: false,
+				Message: "ups code already created",
+			}, nil
+		}
 		return &model.CreateDiscountResponse{
 			Code:    500,
 			Success: false,
@@ -190,6 +199,12 @@ func (s *DiscountService) UpdateDiscount(ctx context.Context, id int64, input mo
 	if input.Value != nil {
 		discountDB.Value = *input.Value
 	}
+	if input.MaxValue != nil {
+		discountDB.MaxValue = input.MaxValue
+	}
+	if input.MinOrder != nil {
+		discountDB.MinOrder = input.MinOrder
+	}
 	if input.Quota != nil {
 		discountDB.Quota = input.Quota
 	}
@@ -206,6 +221,13 @@ func (s *DiscountService) UpdateDiscount(ctx context.Context, id int64, input mo
 	// Save to database
 	result = s.DB.Save(&discountDB)
 	if result.Error != nil {
+		if helper.IsDuplicateCodeError(result.Error) {
+			return &model.UpdateDiscountResponse{
+				Code:    400,
+				Success: false,
+				Message: "ups code already created",
+			}, nil
+		}
 		return &model.UpdateDiscountResponse{
 			Code:    500,
 			Success: false,

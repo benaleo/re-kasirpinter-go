@@ -388,6 +388,8 @@ type Discount {
   code: String
   type: DiscountType!
   value: Float!
+  max_value: Int
+  min_order: Int
   quota: Int
   start_at: Time
   end_at: Time

@@ -220,6 +220,8 @@ func ToGraphQLDiscount(discountDB model.DiscountDB) *model.Discount {
 		Code:        discountDB.Code,
 		Type:        model.DiscountType(discountDB.Type),
 		Value:       discountDB.Value,
+		MaxValue:    discountDB.MaxValue,
+		MinOrder:    discountDB.MinOrder,
 		Quota:       discountDB.Quota,
 		StartAt:     discountDB.StartAt,
 		EndAt:       discountDB.EndAt,

@@ -398,6 +398,8 @@ type DiscountDB struct {
 	Code        *string      `gorm:"uniqueIndex" json:"code,omitempty"`
 	Type        DiscountType `gorm:"not null" json:"type"`
 	Value       float64      `gorm:"not null" json:"value"`
+	MaxValue    *int32       `json:"max_value,omitempty"`
+	MinOrder    *int32       `json:"min_order,omitempty"`
 	Quota       *int32       `json:"quota,omitempty"`
 	StartAt     *time.Time   `json:"start_at,omitempty"`
 	EndAt       *time.Time   `json:"end_at,omitempty"`

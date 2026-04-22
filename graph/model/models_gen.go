@@ -30,6 +30,8 @@ type CreateDiscountInput struct {
 	Code        *string      `json:"code,omitempty"`
 	Type        DiscountType `json:"type"`
 	Value       float64      `json:"value"`
+	MaxValue    *int32       `json:"max_value,omitempty"`
+	MinOrder    *int32       `json:"min_order,omitempty"`
 	Quota       *int32       `json:"quota,omitempty"`
 	StartAt     *time.Time   `json:"start_at,omitempty"`
 	EndAt       *time.Time   `json:"end_at,omitempty"`
@@ -212,6 +214,8 @@ type Discount struct {
 	Code        *string      `json:"code,omitempty"`
 	Type        DiscountType `json:"type"`
 	Value       float64      `json:"value"`
+	MaxValue    *int32       `json:"max_value,omitempty"`
+	MinOrder    *int32       `json:"min_order,omitempty"`
 	Quota       *int32       `json:"quota,omitempty"`
 	StartAt     *time.Time   `json:"start_at,omitempty"`
 	EndAt       *time.Time   `json:"end_at,omitempty"`
@@ -449,6 +453,8 @@ type UpdateDiscountInput struct {
 	Code        *string       `json:"code,omitempty"`
 	Type        *DiscountType `json:"type,omitempty"`
 	Value       *float64      `json:"value,omitempty"`
+	MaxValue    *int32        `json:"max_value,omitempty"`
+	MinOrder    *int32        `json:"min_order,omitempty"`
 	Quota       *int32        `json:"quota,omitempty"`
 	StartAt     *time.Time    `json:"start_at,omitempty"`
 	EndAt       *time.Time    `json:"end_at,omitempty"`

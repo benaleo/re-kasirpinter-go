@@ -142,6 +142,8 @@ input CreateDiscountInput {
   code: String
   type: DiscountType!
   value: Float!
+  max_value: Int
+  min_order: Int
   quota: Int
   start_at: Time
   end_at: Time
@@ -155,6 +157,8 @@ input UpdateDiscountInput {
   code: String
   type: DiscountType
   value: Float
+  max_value: Int
+  min_order: Int
   quota: Int
   start_at: Time
   end_at: Time
