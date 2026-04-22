@@ -52,8 +52,10 @@ type ComplexityRoot struct {
 	}
 
 	CheckDiscountData struct {
-		Type  func(childComplexity int) int
-		Value func(childComplexity int) int
+		MaxValue func(childComplexity int) int
+		MinOrder func(childComplexity int) int
+		Type     func(childComplexity int) int
+		Value    func(childComplexity int) int
 	}
 
 	CheckDiscountResponse struct {
@@ -669,6 +671,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.AuthResponse.Success(childComplexity), true
 
+	case "CheckDiscountData.max_value":
+		if e.ComplexityRoot.CheckDiscountData.MaxValue == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CheckDiscountData.MaxValue(childComplexity), true
+	case "CheckDiscountData.min_order":
+		if e.ComplexityRoot.CheckDiscountData.MinOrder == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CheckDiscountData.MinOrder(childComplexity), true
 	case "CheckDiscountData.type":
 		if e.ComplexityRoot.CheckDiscountData.Type == nil {
 			break
@@ -3893,6 +3907,64 @@ func (ec *executionContext) fieldContext_CheckDiscountData_value(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _CheckDiscountData_max_value(ctx context.Context, field graphql.CollectedField, obj *model.CheckDiscountData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CheckDiscountData_max_value,
+		func(ctx context.Context) (any, error) {
+			return obj.MaxValue, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CheckDiscountData_max_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CheckDiscountData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CheckDiscountData_min_order(ctx context.Context, field graphql.CollectedField, obj *model.CheckDiscountData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CheckDiscountData_min_order,
+		func(ctx context.Context) (any, error) {
+			return obj.MinOrder, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CheckDiscountData_min_order(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CheckDiscountData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CheckDiscountResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CheckDiscountResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4008,6 +4080,10 @@ func (ec *executionContext) fieldContext_CheckDiscountResponse_data(_ context.Co
 				return ec.fieldContext_CheckDiscountData_type(ctx, field)
 			case "value":
 				return ec.fieldContext_CheckDiscountData_value(ctx, field)
+			case "max_value":
+				return ec.fieldContext_CheckDiscountData_max_value(ctx, field)
+			case "min_order":
+				return ec.fieldContext_CheckDiscountData_min_order(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CheckDiscountData", field.Name)
 		},
@@ -19182,6 +19258,16 @@ func (ec *executionContext) _CheckDiscountData(ctx context.Context, sel ast.Sele
 			}
 		case "value":
 			out.Values[i] = ec._CheckDiscountData_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "max_value":
+			out.Values[i] = ec._CheckDiscountData_max_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "min_order":
+			out.Values[i] = ec._CheckDiscountData_min_order(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

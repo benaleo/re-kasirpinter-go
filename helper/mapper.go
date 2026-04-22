@@ -4,6 +4,14 @@ import (
 	"re-kasirpinter-go/graph/model"
 )
 
+// Float64FromInt32 converts *int32 to float64, returns 0 if nil
+func Float64FromInt32(v *int32) float64 {
+	if v == nil {
+		return 0
+	}
+	return float64(*v)
+}
+
 // ToGraphQLUser converts UserDB to GraphQL User model
 func ToGraphQLUser(userDB model.UserDB, userRoleDB *model.UserRoleDB) *model.User {
 	user := &model.User{

@@ -12,8 +12,10 @@ type AuthData struct {
 }
 
 type CheckDiscountData struct {
-	Type  DiscountType `json:"type"`
-	Value float64      `json:"value"`
+	Type     DiscountType `json:"type"`
+	Value    float64      `json:"value"`
+	MaxValue float64      `json:"max_value"`
+	MinOrder float64      `json:"min_order"`
 }
 
 type CheckDiscountResponse struct {

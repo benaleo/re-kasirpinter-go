@@ -336,8 +336,10 @@ func (s *DiscountService) CheckDiscount(code string) (*model.CheckDiscountRespon
 		Success: true,
 		Message: "discount valid",
 		Data: &model.CheckDiscountData{
-			Type:  model.DiscountType(discountDB.Type),
-			Value: discountDB.Value,
+			Type:     model.DiscountType(discountDB.Type),
+			Value:    discountDB.Value,
+			MaxValue: helper.Float64FromInt32(discountDB.MaxValue),
+			MinOrder: helper.Float64FromInt32(discountDB.MinOrder),
 		},
 	}, nil
 }
