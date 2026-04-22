@@ -374,3 +374,73 @@ type Product {
   created_at: Time!
   updated_at: Time!
 }
+
+enum DiscountType {
+  percent
+  amount
+}
+
+type Discount {
+  id: Int64!
+  name: String!
+  description: String
+  icon: String
+  code: String
+  type: DiscountType!
+  value: Float!
+  quota: Int
+  start_at: Time
+  end_at: Time
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type DiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type DiscountsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Discount!]!
+  pagination: PageInfo
+}
+
+type CreateDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type UpdateDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type DeleteDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type CheckDiscountData {
+  type: DiscountType!
+  value: Float!
+}
+
+type CheckDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: CheckDiscountData
+}

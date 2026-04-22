@@ -13,7 +13,7 @@ import (
 	"re-kasirpinter-go/helper"
 	"re-kasirpinter-go/service"
 
-	"github.com/golang-jwt/jwt/v5"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 // Login is the resolver for the login field.
@@ -439,6 +439,42 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id int64) (*model.
 	return r.ProductService.DeleteProduct(id)
 }
 
+// CreateDiscount is the resolver for the createDiscount field.
+func (r *mutationResolver) CreateDiscount(ctx context.Context, input model.CreateDiscountInput) (*model.CreateDiscountResponse, error) {
+	if r.DiscountService == nil {
+		return &model.CreateDiscountResponse{
+			Code:    500,
+			Success: false,
+			Message: "discount service not initialized",
+		}, nil
+	}
+	return r.DiscountService.CreateDiscount(input)
+}
+
+// UpdateDiscount is the resolver for the updateDiscount field.
+func (r *mutationResolver) UpdateDiscount(ctx context.Context, id int64, input model.UpdateDiscountInput) (*model.UpdateDiscountResponse, error) {
+	if r.DiscountService == nil {
+		return &model.UpdateDiscountResponse{
+			Code:    500,
+			Success: false,
+			Message: "discount service not initialized",
+		}, nil
+	}
+	return r.DiscountService.UpdateDiscount(ctx, id, input)
+}
+
+// DeleteDiscount is the resolver for the deleteDiscount field.
+func (r *mutationResolver) DeleteDiscount(ctx context.Context, id int64) (*model.DeleteDiscountResponse, error) {
+	if r.DiscountService == nil {
+		return &model.DeleteDiscountResponse{
+			Code:    500,
+			Success: false,
+			Message: "discount service not initialized",
+		}, nil
+	}
+	return r.DiscountService.DeleteDiscount(id)
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
@@ -578,6 +614,31 @@ func (r *queryResolver) Products(ctx context.Context, pagination *model.Paginati
 		}, nil
 	}
 	return r.ProductService.Products(pagination)
+}
+
+// Discounts is the resolver for the discounts field.
+func (r *queryResolver) Discounts(ctx context.Context, pagination *model.PaginationInput) (*model.DiscountsResponse, error) {
+	if r.DiscountService == nil {
+		return &model.DiscountsResponse{
+			Code:    500,
+			Success: false,
+			Message: "discount service not initialized",
+		}, nil
+	}
+	return r.DiscountService.Discounts(pagination)
+}
+
+// CheckDiscount is the resolver for the checkDiscount field.
+func (r *queryResolver) CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error) {
+	if r.DiscountService == nil {
+		return &model.CheckDiscountResponse{
+			Code:    500,
+			Success: false,
+			Message: "discount service not initialized",
+			Data:    nil,
+		}, nil
+	}
+	return r.DiscountService.CheckDiscount(code)
 }
 
 // Mutation returns MutationResolver implementation.

@@ -65,6 +65,9 @@ type Query {
   # products
   productCategories(pagination: PaginationInput): ProductCategoriesResponse! @auth
   products(pagination: PaginationInput): ProductsResponse! @auth
+  # discounts
+  discounts(pagination: PaginationInput): DiscountsResponse! @auth
+  checkDiscount(code: String!): CheckDiscountResponse!
 }
 
 type Mutation {
@@ -107,4 +110,9 @@ type Mutation {
   createProduct(input: CreateProductInput!): CreateProductResponse! @auth
   updateProduct(id: Int64!, input: UpdateProductInput!): UpdateProductResponse! @auth
   deleteProduct(id: Int64!): DeleteProductResponse! @auth
+
+  # discounts
+  createDiscount(input: CreateDiscountInput!): CreateDiscountResponse! @auth
+  updateDiscount(id: Int64!, input: UpdateDiscountInput!): UpdateDiscountResponse! @auth
+  deleteDiscount(id: Int64!): DeleteDiscountResponse! @auth
 }

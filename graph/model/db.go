@@ -380,3 +380,48 @@ func (p *ProductDB) BeforeUpdate(tx *gorm.DB) error {
 	p.UpdatedAt = time.Now()
 	return nil
 }
+
+// DiscountType represents the type of discount
+type DiscountType string
+
+const (
+	DiscountTypePercent DiscountType = "percent"
+	DiscountTypeAmount  DiscountType = "amount"
+)
+
+// DiscountDB represents the database model for Discount
+type DiscountDB struct {
+	ID          int64        `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name        string       `gorm:"not null" json:"name"`
+	Description *string      `json:"description,omitempty"`
+	Icon        *string      `json:"icon,omitempty"`
+	Code        *string      `gorm:"uniqueIndex" json:"code,omitempty"`
+	Type        DiscountType `gorm:"not null" json:"type"`
+	Value       float64      `gorm:"not null" json:"value"`
+	Quota       *int32       `json:"quota,omitempty"`
+	StartAt     *time.Time   `json:"start_at,omitempty"`
+	EndAt       *time.Time   `json:"end_at,omitempty"`
+	IsActive    bool         `gorm:"default:true" json:"is_active"`
+	DeletedAt   *time.Time   `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+// TableName specifies the table name for DiscountDB
+func (DiscountDB) TableName() string {
+	return "discounts"
+}
+
+// BeforeCreate hook for DiscountDB
+func (d *DiscountDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	d.CreatedAt = now
+	d.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for DiscountDB
+func (d *DiscountDB) BeforeUpdate(tx *gorm.DB) error {
+	d.UpdatedAt = time.Now()
+	return nil
+}

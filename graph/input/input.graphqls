@@ -134,3 +134,29 @@ input UpdateProductInput {
   description: String
   is_active: Boolean
 }
+
+input CreateDiscountInput {
+  name: String!
+  description: String
+  icon: String
+  code: String
+  type: DiscountType!
+  value: Float!
+  quota: Int
+  start_at: Time
+  end_at: Time
+  is_active: Boolean!
+}
+
+input UpdateDiscountInput {
+  name: String
+  description: String
+  icon: String
+  code: String
+  type: DiscountType
+  value: Float
+  quota: Int
+  start_at: Time
+  end_at: Time
+  is_active: Boolean
+}

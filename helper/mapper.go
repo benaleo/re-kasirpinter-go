@@ -209,3 +209,23 @@ func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 
 	return product
 }
+
+// ToGraphQLDiscount converts DiscountDB to GraphQL Discount model
+func ToGraphQLDiscount(discountDB model.DiscountDB) *model.Discount {
+	return &model.Discount{
+		ID:          discountDB.ID,
+		Name:        discountDB.Name,
+		Description: discountDB.Description,
+		Icon:        discountDB.Icon,
+		Code:        discountDB.Code,
+		Type:        model.DiscountType(discountDB.Type),
+		Value:       discountDB.Value,
+		Quota:       discountDB.Quota,
+		StartAt:     discountDB.StartAt,
+		EndAt:       discountDB.EndAt,
+		IsActive:    discountDB.IsActive,
+		DeletedAt:   discountDB.DeletedAt,
+		CreatedAt:   discountDB.CreatedAt,
+		UpdatedAt:   discountDB.UpdatedAt,
+	}
+}

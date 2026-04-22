@@ -120,13 +120,19 @@ func main() {
 		log.Printf("Warning: Failed to initialize product service: %v", err)
 	}
 
+	// Initialize discount service
+	discountService, err := service.NewDiscountService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize discount service: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService, DiscountService: discountService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 

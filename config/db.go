@@ -57,6 +57,7 @@ func InitDb() (*gorm.DB, error) {
 		&model.IngredientStockDB{},
 		&model.ProductCategoryDB{},
 		&model.ProductDB{},
+		&model.DiscountDB{},
 	)
 
 	if err != nil {

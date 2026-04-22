@@ -11,6 +11,38 @@ type AuthData struct {
 	User  *User  `json:"user"`
 }
 
+type CheckDiscountData struct {
+	Type  DiscountType `json:"type"`
+	Value float64      `json:"value"`
+}
+
+type CheckDiscountResponse struct {
+	Code    int32              `json:"code"`
+	Success bool               `json:"success"`
+	Message string             `json:"message"`
+	Data    *CheckDiscountData `json:"data,omitempty"`
+}
+
+type CreateDiscountInput struct {
+	Name        string       `json:"name"`
+	Description *string      `json:"description,omitempty"`
+	Icon        *string      `json:"icon,omitempty"`
+	Code        *string      `json:"code,omitempty"`
+	Type        DiscountType `json:"type"`
+	Value       float64      `json:"value"`
+	Quota       *int32       `json:"quota,omitempty"`
+	StartAt     *time.Time   `json:"start_at,omitempty"`
+	EndAt       *time.Time   `json:"end_at,omitempty"`
+	IsActive    bool         `json:"is_active"`
+}
+
+type CreateDiscountResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *Discount `json:"data,omitempty"`
+}
+
 type CreateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
@@ -116,6 +148,13 @@ type CreateUserResponse struct {
 	Data    *User  `json:"data,omitempty"`
 }
 
+type DeleteDiscountResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *Discount `json:"data,omitempty"`
+}
+
 type DeleteIngredientCategoryResponse struct {
 	Code    int32               `json:"code"`
 	Success bool                `json:"success"`
@@ -163,6 +202,38 @@ type DeleteUserResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    *User  `json:"data,omitempty"`
+}
+
+type Discount struct {
+	ID          int64        `json:"id"`
+	Name        string       `json:"name"`
+	Description *string      `json:"description,omitempty"`
+	Icon        *string      `json:"icon,omitempty"`
+	Code        *string      `json:"code,omitempty"`
+	Type        DiscountType `json:"type"`
+	Value       float64      `json:"value"`
+	Quota       *int32       `json:"quota,omitempty"`
+	StartAt     *time.Time   `json:"start_at,omitempty"`
+	EndAt       *time.Time   `json:"end_at,omitempty"`
+	IsActive    bool         `json:"is_active"`
+	DeletedAt   *time.Time   `json:"deleted_at,omitempty"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+type DiscountResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *Discount `json:"data,omitempty"`
+}
+
+type DiscountsResponse struct {
+	Code       int32       `json:"code"`
+	Success    bool        `json:"success"`
+	Message    string      `json:"message"`
+	Data       []*Discount `json:"data"`
+	Pagination *PageInfo   `json:"pagination,omitempty"`
 }
 
 type Ingredient struct {
@@ -369,6 +440,26 @@ type RolesResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    []*UserRole `json:"data"`
+}
+
+type UpdateDiscountInput struct {
+	Name        *string       `json:"name,omitempty"`
+	Description *string       `json:"description,omitempty"`
+	Icon        *string       `json:"icon,omitempty"`
+	Code        *string       `json:"code,omitempty"`
+	Type        *DiscountType `json:"type,omitempty"`
+	Value       *float64      `json:"value,omitempty"`
+	Quota       *int32        `json:"quota,omitempty"`
+	StartAt     *time.Time    `json:"start_at,omitempty"`
+	EndAt       *time.Time    `json:"end_at,omitempty"`
+	IsActive    *bool         `json:"is_active,omitempty"`
+}
+
+type UpdateDiscountResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *Discount `json:"data,omitempty"`
 }
 
 type UpdateIngredientCategoryInput struct {
