@@ -617,7 +617,7 @@ func (r *queryResolver) Products(ctx context.Context, pagination *model.Paginati
 }
 
 // Discounts is the resolver for the discounts field.
-func (r *queryResolver) Discounts(ctx context.Context, pagination *model.PaginationInput) (*model.DiscountsResponse, error) {
+func (r *queryResolver) Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error) {
 	if r.DiscountService == nil {
 		return &model.DiscountsResponse{
 			Code:    500,
@@ -625,7 +625,7 @@ func (r *queryResolver) Discounts(ctx context.Context, pagination *model.Paginat
 			Message: "discount service not initialized",
 		}, nil
 	}
-	return r.DiscountService.Discounts(pagination)
+	return r.DiscountService.Discounts(pagination, isActive, isPeriod, isQuota)
 }
 
 // CheckDiscount is the resolver for the checkDiscount field.

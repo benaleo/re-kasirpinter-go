@@ -30,12 +30,28 @@ func NewDiscountService(db *gorm.DB) (*DiscountService, error) {
 	}, nil
 }
 
-func (s *DiscountService) Discounts(pagination *model.PaginationInput) (*model.DiscountsResponse, error) {
+func (s *DiscountService) Discounts(pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query
 	baseQuery := s.DB.Model(&model.DiscountDB{}).Where("deleted_at IS NULL")
+
+	// Apply is_active filter
+	if isActive != nil && *isActive {
+		baseQuery = baseQuery.Where("is_active = ?", true)
+	}
+
+	// Apply is_period filter: current time between start_at and end_at
+	if isPeriod != nil && *isPeriod {
+		now := time.Now()
+		baseQuery = baseQuery.Where("(start_at IS NULL OR start_at <= ?) AND (end_at IS NULL OR end_at >= ?)", now, now)
+	}
+
+	// Apply is_quota filter: quota > 0
+	if isQuota != nil && *isQuota {
+		baseQuery = baseQuery.Where("quota > 0")
+	}
 
 	// Get total count
 	var total int64

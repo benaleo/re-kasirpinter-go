@@ -426,7 +426,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		CheckDiscount        func(childComplexity int, code string) int
-		Discounts            func(childComplexity int, pagination *model.PaginationInput) int
+		Discounts            func(childComplexity int, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) int
 		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
 		IngredientStocks     func(childComplexity int, pagination *model.PaginationInput, ingredientID *int64) int
 		Ingredients          func(childComplexity int, pagination *model.PaginationInput) int
@@ -613,7 +613,7 @@ type QueryResolver interface {
 	IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error)
 	ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error)
 	Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error)
-	Discounts(ctx context.Context, pagination *model.PaginationInput) (*model.DiscountsResponse, error)
+	Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error)
 	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
 }
 
@@ -2354,7 +2354,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Discounts(childComplexity, args["pagination"].(*model.PaginationInput)), true
+		return e.ComplexityRoot.Query.Discounts(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool), args["is_period"].(*bool), args["is_quota"].(*bool)), true
 	case "Query.ingredientCategories":
 		if e.ComplexityRoot.Query.IngredientCategories == nil {
 			break
@@ -3456,6 +3456,21 @@ func (ec *executionContext) field_Query_discounts_args(ctx context.Context, rawA
 		return nil, err
 	}
 	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_active", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_active"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "is_period", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_period"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "is_quota", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_quota"] = arg3
 	return args, nil
 }
 
@@ -13540,7 +13555,7 @@ func (ec *executionContext) _Query_discounts(ctx context.Context, field graphql.
 		ec.fieldContext_Query_discounts,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Discounts(ctx, fc.Args["pagination"].(*model.PaginationInput))
+			return ec.Resolvers.Query().Discounts(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_active"].(*bool), fc.Args["is_period"].(*bool), fc.Args["is_quota"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
