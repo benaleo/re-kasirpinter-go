@@ -13,7 +13,7 @@ import (
 	"re-kasirpinter-go/helper"
 	"re-kasirpinter-go/service"
 
-	"github.com/golang-jwt/jwt/v5"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 // Login is the resolver for the login field.
@@ -439,6 +439,96 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id int64) (*model.
 	return r.ProductService.DeleteProduct(id)
 }
 
+// CreateProductVariant is the resolver for the createProductVariant field.
+func (r *mutationResolver) CreateProductVariant(ctx context.Context, input model.CreateProductVariantInput) (*model.CreateProductVariantResponse, error) {
+	if r.ProductVariantService == nil {
+		return toGraphQLCreateProductVariantResponse(500, false, "service not initialized", nil), nil
+	}
+
+	variantDB, err := r.ProductVariantService.Create(ctx, input)
+	if err != nil {
+		return toGraphQLCreateProductVariantResponse(400, false, err.Error(), nil), nil
+	}
+
+	variant := helper.ToGraphQLProductVariant(*variantDB)
+	return toGraphQLCreateProductVariantResponse(200, true, "Product variant created successfully", variant), nil
+}
+
+// UpdateProductVariant is the resolver for the updateProductVariant field.
+func (r *mutationResolver) UpdateProductVariant(ctx context.Context, id int64, input model.UpdateProductVariantInput) (*model.UpdateProductVariantResponse, error) {
+	if r.ProductVariantService == nil {
+		return toGraphQLUpdateProductVariantResponse(500, false, "service not initialized", nil), nil
+	}
+
+	variantDB, err := r.ProductVariantService.Update(ctx, id, input)
+	if err != nil {
+		return toGraphQLUpdateProductVariantResponse(400, false, err.Error(), nil), nil
+	}
+
+	variant := helper.ToGraphQLProductVariant(*variantDB)
+	return toGraphQLUpdateProductVariantResponse(200, true, "Product variant updated successfully", variant), nil
+}
+
+// DeleteProductVariant is the resolver for the deleteProductVariant field.
+func (r *mutationResolver) DeleteProductVariant(ctx context.Context, id int64) (*model.DeleteProductVariantResponse, error) {
+	if r.ProductVariantService == nil {
+		return toGraphQLDeleteProductVariantResponse(500, false, "service not initialized", nil), nil
+	}
+
+	variantDB, err := r.ProductVariantService.Delete(ctx, id)
+	if err != nil {
+		return toGraphQLDeleteProductVariantResponse(400, false, err.Error(), nil), nil
+	}
+
+	variant := helper.ToGraphQLProductVariant(*variantDB)
+	return toGraphQLDeleteProductVariantResponse(200, true, "Product variant deleted successfully", variant), nil
+}
+
+// CreateProductIngredient is the resolver for the createProductIngredient field.
+func (r *mutationResolver) CreateProductIngredient(ctx context.Context, input model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error) {
+	if r.ProductIngredientService == nil {
+		return toGraphQLCreateProductIngredientResponse(500, false, "service not initialized", nil), nil
+	}
+
+	productIngredientDB, err := r.ProductIngredientService.Create(ctx, input)
+	if err != nil {
+		return toGraphQLCreateProductIngredientResponse(400, false, err.Error(), nil), nil
+	}
+
+	productIngredient := helper.ToGraphQLProductIngredient(*productIngredientDB)
+	return toGraphQLCreateProductIngredientResponse(200, true, "Product ingredient created successfully", productIngredient), nil
+}
+
+// UpdateProductIngredient is the resolver for the updateProductIngredient field.
+func (r *mutationResolver) UpdateProductIngredient(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.UpdateProductIngredientResponse, error) {
+	if r.ProductIngredientService == nil {
+		return toGraphQLUpdateProductIngredientResponse(500, false, "service not initialized", nil), nil
+	}
+
+	productIngredientDB, err := r.ProductIngredientService.Update(ctx, id, input)
+	if err != nil {
+		return toGraphQLUpdateProductIngredientResponse(400, false, err.Error(), nil), nil
+	}
+
+	productIngredient := helper.ToGraphQLProductIngredient(*productIngredientDB)
+	return toGraphQLUpdateProductIngredientResponse(200, true, "Product ingredient updated successfully", productIngredient), nil
+}
+
+// DeleteProductIngredient is the resolver for the deleteProductIngredient field.
+func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, id int64) (*model.DeleteProductIngredientResponse, error) {
+	if r.ProductIngredientService == nil {
+		return toGraphQLDeleteProductIngredientResponse(500, false, "service not initialized", nil), nil
+	}
+
+	productIngredientDB, err := r.ProductIngredientService.Delete(ctx, id)
+	if err != nil {
+		return toGraphQLDeleteProductIngredientResponse(400, false, err.Error(), nil), nil
+	}
+
+	productIngredient := helper.ToGraphQLProductIngredient(*productIngredientDB)
+	return toGraphQLDeleteProductIngredientResponse(200, true, "Product ingredient deleted successfully", productIngredient), nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
@@ -578,6 +668,36 @@ func (r *queryResolver) Products(ctx context.Context, pagination *model.Paginati
 		}, nil
 	}
 	return r.ProductService.Products(pagination)
+}
+
+// ProductVariants is the resolver for the productVariants field.
+func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID *int64, isActive *bool) (*model.ProductVariantsResponse, error) {
+	if r.ProductVariantService == nil {
+		return toGraphQLProductVariantsResponse(500, false, "service not initialized", nil, nil), nil
+	}
+
+	variantsDB, pageInfo, err := r.ProductVariantService.GetAll(ctx, pagination, productID, isActive)
+	if err != nil {
+		return toGraphQLProductVariantsResponse(400, false, err.Error(), nil, nil), nil
+	}
+
+	variants := helper.ToGraphQLProductVariantSlice(variantsDB)
+	return toGraphQLProductVariantsResponse(200, true, "Product variants retrieved successfully", variants, pageInfo), nil
+}
+
+// ProductIngredients is the resolver for the productIngredients field.
+func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID *int64, isActive *bool) (*model.ProductIngredientsResponse, error) {
+	if r.ProductIngredientService == nil {
+		return toGraphQLProductIngredientsResponse(500, false, "service not initialized", nil, nil), nil
+	}
+
+	productIngredientsDB, pageInfo, err := r.ProductIngredientService.GetAll(ctx, pagination, variantID, isActive)
+	if err != nil {
+		return toGraphQLProductIngredientsResponse(400, false, err.Error(), nil, nil), nil
+	}
+
+	productIngredients := helper.ToGraphQLProductIngredientSlice(productIngredientsDB)
+	return toGraphQLProductIngredientsResponse(200, true, "Product ingredients retrieved successfully", productIngredients, pageInfo), nil
 }
 
 // Mutation returns MutationResolver implementation.

@@ -134,3 +134,32 @@ input UpdateProductInput {
   description: String
   is_active: Boolean
 }
+
+input CreateProductVariantInput {
+  image: String
+  product_id: Int64!
+  name: String!
+  price: Float!
+  price_original: Float
+  is_active: Boolean!
+}
+
+input UpdateProductVariantInput {
+  image: String
+  name: String
+  price: Float
+  price_original: Float
+  is_active: Boolean
+}
+
+input CreateProductIngredientInput {
+  variant_id: Int64!
+  ingredient_id: Int64!
+  ingredient_value: Float!
+  unit: String!
+}
+
+input UpdateProductIngredientInput {
+  ingredient_value: Float
+  unit: String
+}

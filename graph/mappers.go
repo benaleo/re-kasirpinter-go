@@ -114,3 +114,97 @@ func toGraphQLIngredientStocksResponse(code int32, success bool, message string,
 		Pagination: pagination,
 	}
 }
+
+// Response mappers for ProductVariant
+func toGraphQLCreateProductVariantResponse(code int32, success bool, message string, data *model.ProductVariant) *model.CreateProductVariantResponse {
+	return &model.CreateProductVariantResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLUpdateProductVariantResponse(code int32, success bool, message string, data *model.ProductVariant) *model.UpdateProductVariantResponse {
+	return &model.UpdateProductVariantResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLDeleteProductVariantResponse(code int32, success bool, message string, data *model.ProductVariant) *model.DeleteProductVariantResponse {
+	return &model.DeleteProductVariantResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLProductVariantsResponse(code int32, success bool, message string, data []*model.ProductVariant, pagination *model.PageInfo) *model.ProductVariantsResponse {
+	return &model.ProductVariantsResponse{
+		Code:       code,
+		Success:    success,
+		Message:    message,
+		Data:       data,
+		Pagination: pagination,
+	}
+}
+
+func toGraphQLProductVariantResponse(code int32, success bool, message string, data *model.ProductVariant) *model.ProductVariantResponse {
+	return &model.ProductVariantResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+// Response mappers for ProductIngredient
+func toGraphQLCreateProductIngredientResponse(code int32, success bool, message string, data *model.ProductIngredient) *model.CreateProductIngredientResponse {
+	return &model.CreateProductIngredientResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLUpdateProductIngredientResponse(code int32, success bool, message string, data *model.ProductIngredient) *model.UpdateProductIngredientResponse {
+	return &model.UpdateProductIngredientResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLDeleteProductIngredientResponse(code int32, success bool, message string, data *model.ProductIngredient) *model.DeleteProductIngredientResponse {
+	return &model.DeleteProductIngredientResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}
+
+func toGraphQLProductIngredientsResponse(code int32, success bool, message string, data []*model.ProductIngredient, pagination *model.PageInfo) *model.ProductIngredientsResponse {
+	return &model.ProductIngredientsResponse{
+		Code:       code,
+		Success:    success,
+		Message:    message,
+		Data:       data,
+		Pagination: pagination,
+	}
+}
+
+func toGraphQLProductIngredientResponse(code int32, success bool, message string, data *model.ProductIngredient) *model.ProductIngredientResponse {
+	return &model.ProductIngredientResponse{
+		Code:    code,
+		Success: success,
+		Message: message,
+		Data:    data,
+	}
+}

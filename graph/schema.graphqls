@@ -65,6 +65,8 @@ type Query {
   # products
   productCategories(pagination: PaginationInput): ProductCategoriesResponse! @auth
   products(pagination: PaginationInput): ProductsResponse! @auth
+  productVariants(pagination: PaginationInput, product_id: Int64, is_active: Boolean): ProductVariantsResponse! @auth
+  productIngredients(pagination: PaginationInput, variant_id: Int64, is_active: Boolean): ProductIngredientsResponse! @auth
 }
 
 type Mutation {
@@ -107,4 +109,14 @@ type Mutation {
   createProduct(input: CreateProductInput!): CreateProductResponse! @auth
   updateProduct(id: Int64!, input: UpdateProductInput!): UpdateProductResponse! @auth
   deleteProduct(id: Int64!): DeleteProductResponse! @auth
+
+  # product variants
+  createProductVariant(input: CreateProductVariantInput!): CreateProductVariantResponse! @auth
+  updateProductVariant(id: Int64!, input: UpdateProductVariantInput!): UpdateProductVariantResponse! @auth
+  deleteProductVariant(id: Int64!): DeleteProductVariantResponse! @auth
+
+  # product ingredients
+  createProductIngredient(input: CreateProductIngredientInput!): CreateProductIngredientResponse! @auth
+  updateProductIngredient(id: Int64!, input: UpdateProductIngredientInput!): UpdateProductIngredientResponse! @auth
+  deleteProductIngredient(id: Int64!): DeleteProductIngredientResponse! @auth
 }

@@ -207,5 +207,96 @@ func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 		product.Category = ToGraphQLProductCategory(*productDB.Category)
 	}
 
+	// Set variants if provided (excluding deleted variants)
+	if len(productDB.Variants) > 0 {
+		var activeVariants []model.ProductVariantDB
+		for _, variantDB := range productDB.Variants {
+			if variantDB.DeletedAt == nil {
+				activeVariants = append(activeVariants, variantDB)
+			}
+		}
+		if len(activeVariants) > 0 {
+			variants := make([]*model.ProductVariant, len(activeVariants))
+			for i, variantDB := range activeVariants {
+				variants[i] = ToGraphQLProductVariant(variantDB)
+			}
+			product.Variants = variants
+		}
+	}
+
 	return product
+}
+
+// ToGraphQLProductVariant converts ProductVariantDB to GraphQL ProductVariant model
+func ToGraphQLProductVariant(productVariantDB model.ProductVariantDB) *model.ProductVariant {
+	variant := &model.ProductVariant{
+		ID:            productVariantDB.ID,
+		Image:         productVariantDB.Image,
+		ProductID:     productVariantDB.ProductID,
+		Name:          productVariantDB.Name,
+		Price:         productVariantDB.Price,
+		PriceOriginal: productVariantDB.PriceOriginal,
+		IsActive:      productVariantDB.IsActive,
+		DeletedAt:     productVariantDB.DeletedAt,
+		CreatedAt:     productVariantDB.CreatedAt,
+		UpdatedAt:     productVariantDB.UpdatedAt,
+	}
+
+	// Set product if provided
+	if productVariantDB.Product != nil && productVariantDB.Product.ID > 0 {
+		variant.Product = ToGraphQLProduct(*productVariantDB.Product)
+	}
+
+	// Set ingredients if provided
+	if len(productVariantDB.Ingredients) > 0 {
+		ingredients := make([]*model.ProductIngredient, len(productVariantDB.Ingredients))
+		for i, ingredientDB := range productVariantDB.Ingredients {
+			ingredients[i] = ToGraphQLProductIngredient(ingredientDB)
+		}
+		variant.Ingredients = ingredients
+	}
+
+	return variant
+}
+
+// ToGraphQLProductIngredient converts ProductIngredientDB to GraphQL ProductIngredient model
+func ToGraphQLProductIngredient(productIngredientDB model.ProductIngredientDB) *model.ProductIngredient {
+	ingredient := &model.ProductIngredient{
+		ID:              productIngredientDB.ID,
+		VariantID:       productIngredientDB.VariantID,
+		IngredientID:    productIngredientDB.IngredientID,
+		IngredientValue: productIngredientDB.IngredientValue,
+		Unit:            productIngredientDB.Unit,
+		CreatedAt:       productIngredientDB.CreatedAt,
+	}
+
+	// Set variant if provided
+	if productIngredientDB.Variant != nil && productIngredientDB.Variant.ID > 0 {
+		ingredient.Variant = ToGraphQLProductVariant(*productIngredientDB.Variant)
+	}
+
+	// Set ingredient if provided
+	if productIngredientDB.Ingredient != nil && productIngredientDB.Ingredient.ID > 0 {
+		ingredient.Ingredient = ToGraphQLIngredient(*productIngredientDB.Ingredient)
+	}
+
+	return ingredient
+}
+
+// ToGraphQLProductVariantSlice converts []*ProductVariantDB to []*model.ProductVariant
+func ToGraphQLProductVariantSlice(productVariantsDB []*model.ProductVariantDB) []*model.ProductVariant {
+	variants := make([]*model.ProductVariant, len(productVariantsDB))
+	for i, variantDB := range productVariantsDB {
+		variants[i] = ToGraphQLProductVariant(*variantDB)
+	}
+	return variants
+}
+
+// ToGraphQLProductIngredientSlice converts []*ProductIngredientDB to []*model.ProductIngredient
+func ToGraphQLProductIngredientSlice(productIngredientsDB []*model.ProductIngredientDB) []*model.ProductIngredient {
+	ingredients := make([]*model.ProductIngredient, len(productIngredientsDB))
+	for i, ingredientDB := range productIngredientsDB {
+		ingredients[i] = ToGraphQLProductIngredient(*ingredientDB)
+	}
+	return ingredients
 }
