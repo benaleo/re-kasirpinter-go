@@ -360,6 +360,7 @@ type ProductDB struct {
 
 	// Relations
 	Category *ProductCategoryDB `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Variants []ProductVariantDB `gorm:"foreignKey:ProductID" json:"variants,omitempty"`
 }
 
 // TableName specifies the table name for ProductDB
@@ -425,5 +426,75 @@ func (d *DiscountDB) BeforeCreate(tx *gorm.DB) error {
 // BeforeUpdate hook for DiscountDB
 func (d *DiscountDB) BeforeUpdate(tx *gorm.DB) error {
 	d.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductVariantDB represents the database model for ProductVariant
+type ProductVariantDB struct {
+	ID            int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Image         *string    `json:"image,omitempty"`
+	ProductID     int64      `gorm:"not null;index" json:"product_id"`
+	Name          string     `gorm:"not null" json:"name"`
+	Price         float64    `gorm:"not null" json:"price"`
+	PriceOriginal *float64   `json:"price_original,omitempty"`
+	IsActive      bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt     *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
+
+	// Relations
+	Product     *ProductDB            `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	Ingredients []ProductIngredientDB `gorm:"foreignKey:VariantID" json:"ingredients,omitempty"`
+}
+
+// TableName specifies the table name for ProductVariantDB
+func (ProductVariantDB) TableName() string {
+	return "product_variants"
+}
+
+// BeforeCreate hook for ProductVariantDB
+func (p *ProductVariantDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ProductVariantDB
+func (p *ProductVariantDB) BeforeUpdate(tx *gorm.DB) error {
+	p.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductIngredientDB represents the database model for ProductIngredient
+type ProductIngredientDB struct {
+	ID              int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	VariantID       int64     `gorm:"not null;index" json:"variant_id"`
+	IngredientID    int64     `gorm:"not null;index" json:"ingredient_id"`
+	IngredientValue float64   `gorm:"not null" json:"ingredient_value"`
+	Unit            string    `gorm:"not null" json:"unit"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+
+	// Relations
+	Variant    *ProductVariantDB `gorm:"foreignKey:VariantID" json:"variant,omitempty"`
+	Ingredient *IngredientDB     `gorm:"foreignKey:IngredientID" json:"ingredient,omitempty"`
+}
+
+// TableName specifies the table name for ProductIngredientDB with unique constraint
+func (ProductIngredientDB) TableName() string {
+	return "product_ingredients"
+}
+
+// AddUniqueIndexes adds the unique constraint for variant_id and ingredient_id
+func (ProductIngredientDB) AddUniqueIndexes(db *gorm.DB) error {
+	return db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_variant_ingredient ON product_ingredients(variant_id, ingredient_id)").Error
+}
+
+// BeforeCreate hook for ProductIngredientDB
+func (p *ProductIngredientDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
 	return nil
 }

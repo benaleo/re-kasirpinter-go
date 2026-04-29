@@ -68,6 +68,8 @@ type Query {
   # discounts
   discounts(pagination: PaginationInput, is_active: Boolean, is_period: Boolean, is_quota: Boolean): DiscountsResponse! @auth
   checkDiscount(code: String!): CheckDiscountResponse!
+  productVariants(pagination: PaginationInput, product_id: Int64, is_active: Boolean): ProductVariantsResponse! @auth
+  productIngredients(pagination: PaginationInput, variant_id: Int64, is_active: Boolean): ProductIngredientsResponse! @auth
 }
 
 type Mutation {
@@ -115,4 +117,13 @@ type Mutation {
   createDiscount(input: CreateDiscountInput!): CreateDiscountResponse! @auth
   updateDiscount(id: Int64!, input: UpdateDiscountInput!): UpdateDiscountResponse! @auth
   deleteDiscount(id: Int64!): DeleteDiscountResponse! @auth
+  # product variants
+  createProductVariant(input: CreateProductVariantInput!): CreateProductVariantResponse! @auth
+  updateProductVariant(id: Int64!, input: UpdateProductVariantInput!): UpdateProductVariantResponse! @auth
+  deleteProductVariant(id: Int64!): DeleteProductVariantResponse! @auth
+
+  # product ingredients
+  createProductIngredient(input: CreateProductIngredientInput!): CreateProductIngredientResponse! @auth
+  updateProductIngredient(id: Int64!, input: UpdateProductIngredientInput!): UpdateProductIngredientResponse! @auth
+  deleteProductIngredient(id: Int64!): DeleteProductIngredientResponse! @auth
 }

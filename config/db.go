@@ -59,10 +59,18 @@ func InitDb() (*gorm.DB, error) {
 		&model.ProductCategoryDB{},
 		&model.ProductDB{},
 		&model.DiscountDB{},
+		&model.ProductVariantDB{},
+		&model.ProductIngredientDB{},
 	)
 
 	if err != nil {
 		return nil, err
+	}
+
+	// Add unique constraints
+	productIngredientModel := model.ProductIngredientDB{}
+	if err := productIngredientModel.AddUniqueIndexes(db); err != nil {
+		fmt.Println("Warning: Failed to add unique constraint for product_ingredients:", err)
 	}
 
 	// Seed data

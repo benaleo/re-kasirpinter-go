@@ -303,6 +303,78 @@ type DeleteProductResponse {
   data: Product
 }
 
+type ProductVariantsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductVariant!]!
+  pagination: PageInfo
+}
+
+type ProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type CreateProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type UpdateProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type DeleteProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type ProductIngredientsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductIngredient!]!
+  pagination: PageInfo
+}
+
+type ProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductIngredient
+}
+
+type CreateProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductIngredient
+}
+
+type UpdateProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductIngredient
+}
+
+type DeleteProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductIngredient
+}
+
 type IngredientCategory {
   id: Int64!
   name: String!
@@ -373,6 +445,7 @@ type Product {
   deleted_at: Time
   created_at: Time!
   updated_at: Time!
+  variants: [ProductVariant!]!
 }
 
 enum DiscountType {
@@ -447,4 +520,31 @@ type CheckDiscountResponse {
   success: Boolean!
   message: String!
   data: CheckDiscountData
+}
+
+type ProductVariant {
+  id: Int64!
+  image: String
+  product_id: Int64!
+  product: Product
+  name: String!
+  price: Float!
+  price_original: Float
+  ingredients: [ProductIngredient!]!
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type ProductIngredient {
+  id: Int64!
+  variant_id: Int64!
+  variant: ProductVariant
+  ingredient_id: Int64!
+  ingredient: Ingredient
+  ingredient_value: Float!
+  unit: String!
+  created_at: Time!
+  updated_at: Time!
 }

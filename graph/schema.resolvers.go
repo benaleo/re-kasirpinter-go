@@ -10,635 +10,256 @@ import (
 	"fmt"
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
-	"re-kasirpinter-go/helper"
-	"re-kasirpinter-go/service"
-
-	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input input.LoginInput) (*model.AuthResponse, error) {
-	if r.AuthService == nil {
-		return &model.AuthResponse{
-			Code:    500,
-			Success: false,
-			Message: "auth service not initialized",
-		}, nil
-	}
-
-	// Get client information from context
-	clientInfo := GetClientInfo(ctx)
-	var clientInfoPtr *service.ClientInfo
-	if clientInfo != nil {
-		clientInfoPtr = &service.ClientInfo{
-			IP:      clientInfo.IP,
-			Browser: clientInfo.Browser,
-			OS:      clientInfo.OS,
-		}
-	}
-
-	return r.AuthService.Login(ctx, input, clientInfoPtr)
+	panic(fmt.Errorf("not implemented: Login - login"))
 }
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, error) {
-	if r.AuthService == nil {
-		return &model.LogoutResponse{
-			Code:    500,
-			Success: false,
-			Message: "auth service not initialized",
-		}, nil
-	}
-
-	// Get user claims from context (already authenticated by @auth directive)
-	userClaims := ForContext(ctx)
-	if userClaims == nil {
-		return &model.LogoutResponse{
-			Code:    401,
-			Success: false,
-			Message: "Unauthorized",
-		}, nil
-	}
-
-	// Get the token from context (set by middleware)
-	token := GetToken(ctx)
-
-	// Convert Claims to service.Claims
-	serviceClaims := &service.Claims{
-		UserID:   userClaims.UserID,
-		Email:    userClaims.Email,
-		Role:     userClaims.Role,
-		SecureID: userClaims.SecureID,
-		Purpose:  userClaims.Purpose,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: userClaims.ExpiresAt,
-			IssuedAt:  userClaims.IssuedAt,
-			NotBefore: userClaims.NotBefore,
-			Issuer:    userClaims.Issuer,
-		},
-	}
-
-	return r.AuthService.Logout(ctx, token, serviceClaims)
+	panic(fmt.Errorf("not implemented: Logout - logout"))
 }
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error) {
-	userService, err := service.NewUserService(r.DB)
-	if err != nil {
-		return &model.CreateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to initialize user service: %v", err),
-		}, nil
-	}
-	return userService.CreateUser(input, isUser)
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
 }
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input input.UpdateUserInput) (*model.UpdateUserResponse, error) {
-	if r.UserService == nil {
-		return &model.UpdateUserResponse{
-			Code:    500,
-			Success: false,
-			Message: "user service not initialized",
-		}, nil
-	}
-	return r.UserService.UpdateUser(ctx, id, input)
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
 }
 
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.DeleteUserResponse, error) {
-	if r.UserService == nil {
-		return &model.DeleteUserResponse{
-			Code:    500,
-			Success: false,
-			Message: "user service not initialized",
-		}, nil
-	}
-	return r.UserService.DeleteUser(ctx, id)
+	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
 }
 
 // CreateOtp is the resolver for the createOtp field.
 func (r *mutationResolver) CreateOtp(ctx context.Context, input model.CreateOtpInput) (*model.CreateOtpResponse, error) {
-	if r.AuthService == nil {
-		return &model.CreateOtpResponse{
-			Code:    500,
-			Success: false,
-			Message: "auth service not initialized",
-		}, nil
-	}
-
-	// Get client information from context
-	clientInfo := GetClientInfo(ctx)
-	var clientInfoPtr *service.ClientInfo
-	if clientInfo != nil {
-		clientInfoPtr = &service.ClientInfo{
-			IP:      clientInfo.IP,
-			Browser: clientInfo.Browser,
-			OS:      clientInfo.OS,
-		}
-	}
-
-	return r.AuthService.CreateOtp(ctx, input, clientInfoPtr, EnqueueEmailJob)
+	panic(fmt.Errorf("not implemented: CreateOtp - createOtp"))
 }
 
 // VerifyOtp is the resolver for the verifyOtp field.
 func (r *mutationResolver) VerifyOtp(ctx context.Context, input model.VerifyOtpInput) (*model.VerifyOtpResponse, error) {
-	if r.AuthService == nil {
-		return &model.VerifyOtpResponse{
-			Code:    500,
-			Success: false,
-			Message: "auth service not initialized",
-			Token:   nil,
-		}, nil
-	}
-
-	return r.AuthService.VerifyOtp(ctx, input)
+	panic(fmt.Errorf("not implemented: VerifyOtp - verifyOtp"))
 }
 
 // NewPassword is the resolver for the newPassword field.
 func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPasswordInput) (*model.NewPasswordResponse, error) {
-	if r.AuthService == nil {
-		return &model.NewPasswordResponse{
-			Code:    500,
-			Success: false,
-			Message: "auth service not initialized",
-		}, nil
-	}
-
-	// Get user claims from context
-	userClaims := ForContext(ctx)
-	if userClaims == nil {
-		return &model.NewPasswordResponse{
-			Code:    401,
-			Success: false,
-			Message: "Unauthorized",
-		}, nil
-	}
-
-	// Convert Claims to service.Claims
-	serviceClaims := &service.Claims{
-		UserID:   userClaims.UserID,
-		Email:    userClaims.Email,
-		Role:     userClaims.Role,
-		SecureID: userClaims.SecureID,
-		Purpose:  userClaims.Purpose,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: userClaims.ExpiresAt,
-			IssuedAt:  userClaims.IssuedAt,
-			NotBefore: userClaims.NotBefore,
-			Issuer:    userClaims.Issuer,
-		},
-	}
-
-	return r.AuthService.NewPassword(ctx, input, serviceClaims)
+	panic(fmt.Errorf("not implemented: NewPassword - newPassword"))
 }
 
 // TestR2Connection is the resolver for the testR2Connection field.
 func (r *mutationResolver) TestR2Connection(ctx context.Context) (string, error) {
-	if r.R2Service == nil {
-		return "R2 service not initialized", nil
-	}
-	err := r.R2Service.TestConnection(ctx)
-	if err != nil {
-		return fmt.Sprintf("R2 connection failed: %v", err), nil
-	}
-	return "R2 connection successful", nil
+	panic(fmt.Errorf("not implemented: TestR2Connection - testR2Connection"))
 }
 
 // CreateRole is the resolver for the createRole field.
 func (r *mutationResolver) CreateRole(ctx context.Context, input model.CreateRoleInput) (*model.CreateRoleResponse, error) {
-	if r.RoleService == nil {
-		return &model.CreateRoleResponse{
-			Code:    500,
-			Success: false,
-			Message: "role service not initialized",
-		}, nil
-	}
-	return r.RoleService.CreateRole(input)
+	panic(fmt.Errorf("not implemented: CreateRole - createRole"))
 }
 
 // UpdateRole is the resolver for the updateRole field.
 func (r *mutationResolver) UpdateRole(ctx context.Context, id int64, input model.UpdateRoleInput) (*model.UpdateRoleResponse, error) {
-	if r.RoleService == nil {
-		return &model.UpdateRoleResponse{
-			Code:    500,
-			Success: false,
-			Message: "role service not initialized",
-		}, nil
-	}
-
-	// Check if role ID is 1 or 2 (protected roles) - only superadmin can modify
-	if id == 1 || id == 2 {
-		if err := RequireSuperAdmin(ctx); err != nil {
-			return &model.UpdateRoleResponse{
-				Code:    403,
-				Success: false,
-				Message: err.Error(),
-			}, nil
-		}
-	}
-
-	return r.RoleService.UpdateRole(id, input)
+	panic(fmt.Errorf("not implemented: UpdateRole - updateRole"))
 }
 
 // DeleteRole is the resolver for the deleteRole field.
 func (r *mutationResolver) DeleteRole(ctx context.Context, id int64) (*model.DeleteRoleResponse, error) {
-	if r.RoleService == nil {
-		return &model.DeleteRoleResponse{
-			Code:    500,
-			Success: false,
-			Message: "role service not initialized",
-		}, nil
-	}
-
-	// Check if role ID is 1 or 2 (protected roles) - only superadmin can delete
-	if id == 1 || id == 2 {
-		if err := RequireSuperAdmin(ctx); err != nil {
-			return &model.DeleteRoleResponse{
-				Code:    403,
-				Success: false,
-				Message: err.Error(),
-			}, nil
-		}
-	}
-
-	return r.RoleService.DeleteRole(id)
+	panic(fmt.Errorf("not implemented: DeleteRole - deleteRole"))
 }
 
 // CreateIngredientCategory is the resolver for the createIngredientCategory field.
 func (r *mutationResolver) CreateIngredientCategory(ctx context.Context, input model.CreateIngredientCategoryInput) (*model.CreateIngredientCategoryResponse, error) {
-	if r.IngredientCategoryService == nil {
-		return &model.CreateIngredientCategoryResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient category service not initialized",
-		}, nil
-	}
-	return r.IngredientCategoryService.CreateIngredientCategory(input)
+	panic(fmt.Errorf("not implemented: CreateIngredientCategory - createIngredientCategory"))
 }
 
 // UpdateIngredientCategory is the resolver for the updateIngredientCategory field.
 func (r *mutationResolver) UpdateIngredientCategory(ctx context.Context, id int64, input model.UpdateIngredientCategoryInput) (*model.UpdateIngredientCategoryResponse, error) {
-	if r.IngredientCategoryService == nil {
-		return &model.UpdateIngredientCategoryResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient category service not initialized",
-		}, nil
-	}
-	return r.IngredientCategoryService.UpdateIngredientCategory(id, input)
+	panic(fmt.Errorf("not implemented: UpdateIngredientCategory - updateIngredientCategory"))
 }
 
 // DeleteIngredientCategory is the resolver for the deleteIngredientCategory field.
 func (r *mutationResolver) DeleteIngredientCategory(ctx context.Context, id int64) (*model.DeleteIngredientCategoryResponse, error) {
-	if r.IngredientCategoryService == nil {
-		return &model.DeleteIngredientCategoryResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient category service not initialized",
-		}, nil
-	}
-	return r.IngredientCategoryService.DeleteIngredientCategory(id)
+	panic(fmt.Errorf("not implemented: DeleteIngredientCategory - deleteIngredientCategory"))
 }
 
 // CreateIngredient is the resolver for the createIngredient field.
 func (r *mutationResolver) CreateIngredient(ctx context.Context, input model.CreateIngredientInput) (*model.CreateIngredientResponse, error) {
-	if r.IngredientService == nil {
-		return &model.CreateIngredientResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient service not initialized",
-		}, nil
-	}
-	return r.IngredientService.CreateIngredient(input)
+	panic(fmt.Errorf("not implemented: CreateIngredient - createIngredient"))
 }
 
 // UpdateIngredient is the resolver for the updateIngredient field.
 func (r *mutationResolver) UpdateIngredient(ctx context.Context, id int64, input model.UpdateIngredientInput) (*model.UpdateIngredientResponse, error) {
-	if r.IngredientService == nil {
-		return &model.UpdateIngredientResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient service not initialized",
-		}, nil
-	}
-	return r.IngredientService.UpdateIngredient(id, input)
+	panic(fmt.Errorf("not implemented: UpdateIngredient - updateIngredient"))
 }
 
 // DeleteIngredient is the resolver for the deleteIngredient field.
 func (r *mutationResolver) DeleteIngredient(ctx context.Context, id int64) (*model.DeleteIngredientResponse, error) {
-	if r.IngredientService == nil {
-		return &model.DeleteIngredientResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient service not initialized",
-		}, nil
-	}
-	return r.IngredientService.DeleteIngredient(id)
+	panic(fmt.Errorf("not implemented: DeleteIngredient - deleteIngredient"))
 }
 
 // CreateIngredientStock is the resolver for the createIngredientStock field.
 func (r *mutationResolver) CreateIngredientStock(ctx context.Context, input model.CreateIngredientStockInput) (*model.CreateIngredientStockResponse, error) {
-	if r.IngredientStockService == nil {
-		return &model.CreateIngredientStockResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient stock service not initialized",
-		}, nil
-	}
-	return r.IngredientStockService.CreateIngredientStock(input)
+	panic(fmt.Errorf("not implemented: CreateIngredientStock - createIngredientStock"))
 }
 
 // UpdateIngredientStock is the resolver for the updateIngredientStock field.
 func (r *mutationResolver) UpdateIngredientStock(ctx context.Context, id int64, input model.UpdateIngredientStockInput) (*model.UpdateIngredientStockResponse, error) {
-	if r.IngredientStockService == nil {
-		return &model.UpdateIngredientStockResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient stock service not initialized",
-		}, nil
-	}
-	return r.IngredientStockService.UpdateIngredientStock(id, input)
+	panic(fmt.Errorf("not implemented: UpdateIngredientStock - updateIngredientStock"))
 }
 
 // DeleteIngredientStock is the resolver for the deleteIngredientStock field.
 func (r *mutationResolver) DeleteIngredientStock(ctx context.Context, id int64) (*model.DeleteIngredientStockResponse, error) {
-	if r.IngredientStockService == nil {
-		return &model.DeleteIngredientStockResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient stock service not initialized",
-		}, nil
-	}
-	return r.IngredientStockService.DeleteIngredientStock(id)
+	panic(fmt.Errorf("not implemented: DeleteIngredientStock - deleteIngredientStock"))
 }
 
 // CreateProductCategory is the resolver for the createProductCategory field.
 func (r *mutationResolver) CreateProductCategory(ctx context.Context, input model.CreateProductCategoryInput) (*model.CreateProductCategoryResponse, error) {
-	return r.ProductCategoryService.CreateProductCategory(input)
+	panic(fmt.Errorf("not implemented: CreateProductCategory - createProductCategory"))
 }
 
 // UpdateProductCategory is the resolver for the updateProductCategory field.
 func (r *mutationResolver) UpdateProductCategory(ctx context.Context, id int64, input model.UpdateProductCategoryInput) (*model.UpdateProductCategoryResponse, error) {
-	if r.ProductCategoryService == nil {
-		return &model.UpdateProductCategoryResponse{
-			Code:    500,
-			Success: false,
-			Message: "product category service not initialized",
-		}, nil
-	}
-	return r.ProductCategoryService.UpdateProductCategory(id, input)
+	panic(fmt.Errorf("not implemented: UpdateProductCategory - updateProductCategory"))
 }
 
 // DeleteProductCategory is the resolver for the deleteProductCategory field.
 func (r *mutationResolver) DeleteProductCategory(ctx context.Context, id int64) (*model.DeleteProductCategoryResponse, error) {
-	if r.ProductCategoryService == nil {
-		return &model.DeleteProductCategoryResponse{
-			Code:    500,
-			Success: false,
-			Message: "product category service not initialized",
-		}, nil
-	}
-	return r.ProductCategoryService.DeleteProductCategory(id)
+	panic(fmt.Errorf("not implemented: DeleteProductCategory - deleteProductCategory"))
 }
 
 // CreateProduct is the resolver for the createProduct field.
 func (r *mutationResolver) CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.CreateProductResponse, error) {
-	if r.ProductService == nil {
-		return &model.CreateProductResponse{
-			Code:    500,
-			Success: false,
-			Message: "product service not initialized",
-		}, nil
-	}
-	return r.ProductService.CreateProduct(input)
+	panic(fmt.Errorf("not implemented: CreateProduct - createProduct"))
 }
 
 // UpdateProduct is the resolver for the updateProduct field.
 func (r *mutationResolver) UpdateProduct(ctx context.Context, id int64, input model.UpdateProductInput) (*model.UpdateProductResponse, error) {
-	if r.ProductService == nil {
-		return &model.UpdateProductResponse{
-			Code:    500,
-			Success: false,
-			Message: "product service not initialized",
-		}, nil
-	}
-	return r.ProductService.UpdateProduct(ctx, id, input)
+	panic(fmt.Errorf("not implemented: UpdateProduct - updateProduct"))
 }
 
 // DeleteProduct is the resolver for the deleteProduct field.
 func (r *mutationResolver) DeleteProduct(ctx context.Context, id int64) (*model.DeleteProductResponse, error) {
-	if r.ProductService == nil {
-		return &model.DeleteProductResponse{
-			Code:    500,
-			Success: false,
-			Message: "product service not initialized",
-		}, nil
-	}
-	return r.ProductService.DeleteProduct(id)
+	panic(fmt.Errorf("not implemented: DeleteProduct - deleteProduct"))
 }
 
 // CreateDiscount is the resolver for the createDiscount field.
 func (r *mutationResolver) CreateDiscount(ctx context.Context, input model.CreateDiscountInput) (*model.CreateDiscountResponse, error) {
-	if r.DiscountService == nil {
-		return &model.CreateDiscountResponse{
-			Code:    500,
-			Success: false,
-			Message: "discount service not initialized",
-		}, nil
-	}
-	return r.DiscountService.CreateDiscount(input)
+	panic(fmt.Errorf("not implemented: CreateDiscount - createDiscount"))
 }
 
 // UpdateDiscount is the resolver for the updateDiscount field.
 func (r *mutationResolver) UpdateDiscount(ctx context.Context, id int64, input model.UpdateDiscountInput) (*model.UpdateDiscountResponse, error) {
-	if r.DiscountService == nil {
-		return &model.UpdateDiscountResponse{
-			Code:    500,
-			Success: false,
-			Message: "discount service not initialized",
-		}, nil
-	}
-	return r.DiscountService.UpdateDiscount(ctx, id, input)
+	panic(fmt.Errorf("not implemented: UpdateDiscount - updateDiscount"))
 }
 
 // DeleteDiscount is the resolver for the deleteDiscount field.
 func (r *mutationResolver) DeleteDiscount(ctx context.Context, id int64) (*model.DeleteDiscountResponse, error) {
-	if r.DiscountService == nil {
-		return &model.DeleteDiscountResponse{
-			Code:    500,
-			Success: false,
-			Message: "discount service not initialized",
-		}, nil
-	}
-	return r.DiscountService.DeleteDiscount(id)
+	panic(fmt.Errorf("not implemented: DeleteDiscount - deleteDiscount"))
+}
+
+// CreateProductVariant is the resolver for the createProductVariant field.
+func (r *mutationResolver) CreateProductVariant(ctx context.Context, input model.CreateProductVariantInput) (*model.CreateProductVariantResponse, error) {
+	panic(fmt.Errorf("not implemented: CreateProductVariant - createProductVariant"))
+}
+
+// UpdateProductVariant is the resolver for the updateProductVariant field.
+func (r *mutationResolver) UpdateProductVariant(ctx context.Context, id int64, input model.UpdateProductVariantInput) (*model.UpdateProductVariantResponse, error) {
+	panic(fmt.Errorf("not implemented: UpdateProductVariant - updateProductVariant"))
+}
+
+// DeleteProductVariant is the resolver for the deleteProductVariant field.
+func (r *mutationResolver) DeleteProductVariant(ctx context.Context, id int64) (*model.DeleteProductVariantResponse, error) {
+	panic(fmt.Errorf("not implemented: DeleteProductVariant - deleteProductVariant"))
+}
+
+// CreateProductIngredient is the resolver for the createProductIngredient field.
+func (r *mutationResolver) CreateProductIngredient(ctx context.Context, input model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error) {
+	panic(fmt.Errorf("not implemented: CreateProductIngredient - createProductIngredient"))
+}
+
+// UpdateProductIngredient is the resolver for the updateProductIngredient field.
+func (r *mutationResolver) UpdateProductIngredient(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.UpdateProductIngredientResponse, error) {
+	panic(fmt.Errorf("not implemented: UpdateProductIngredient - updateProductIngredient"))
+}
+
+// DeleteProductIngredient is the resolver for the deleteProductIngredient field.
+func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, id int64) (*model.DeleteProductIngredientResponse, error) {
+	panic(fmt.Errorf("not implemented: DeleteProductIngredient - deleteProductIngredient"))
 }
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
-	userService, err := service.NewUserService(r.DB)
-	if err != nil {
-		return &model.UsersResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to initialize user service: %v", err),
-		}, nil
-	}
-	return userService.Users(pagination, isUser)
+	panic(fmt.Errorf("not implemented: Users - users"))
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*model.UserResponse, error) {
-	userService, err := service.NewUserService(r.DB)
-	if err != nil {
-		return &model.UserResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to initialize user service: %v", err),
-		}, nil
-	}
-	return userService.User(id)
+	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // Roles is the resolver for the roles field.
 func (r *queryResolver) Roles(ctx context.Context) (*model.RolesResponse, error) {
-	if r.RoleService == nil {
-		return &model.RolesResponse{
-			Code:    500,
-			Success: false,
-			Message: "role service not initialized",
-		}, nil
-	}
-	return r.RoleService.Roles()
+	panic(fmt.Errorf("not implemented: Roles - roles"))
 }
 
 // Role is the resolver for the role field.
 func (r *queryResolver) Role(ctx context.Context, id int64) (*model.RoleResponse, error) {
-	if r.RoleService == nil {
-		return &model.RoleResponse{
-			Code:    500,
-			Success: false,
-			Message: "role service not initialized",
-		}, nil
-	}
-	return r.RoleService.Role(id)
+	panic(fmt.Errorf("not implemented: Role - role"))
 }
 
 // Permissions is the resolver for the permissions field.
 func (r *queryResolver) Permissions(ctx context.Context) (*model.PermissionsResponse, error) {
-	// Query all permissions
-	var permissionsDB []model.UserPermissionDB
-	result := r.DB.Find(&permissionsDB)
-	if result.Error != nil {
-		return &model.PermissionsResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to retrieve permissions: %v", result.Error),
-		}, nil
-	}
-
-	// Convert DB models to GraphQL models
-	permissions := make([]*model.UserPermission, len(permissionsDB))
-	for i, permDB := range permissionsDB {
-		permissions[i] = helper.ToGraphQLUserPermission(permDB)
-	}
-
-	return &model.PermissionsResponse{
-		Code:    200,
-		Success: true,
-		Message: "permissions retrieved successfully",
-		Data:    permissions,
-	}, nil
+	panic(fmt.Errorf("not implemented: Permissions - permissions"))
 }
 
 // IngredientCategories is the resolver for the ingredientCategories field.
 func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error) {
-	if r.IngredientCategoryService == nil {
-		return &model.IngredientCategoriesResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient category service not initialized",
-		}, nil
-	}
-	return r.IngredientCategoryService.IngredientCategories(pagination, isOptions)
+	panic(fmt.Errorf("not implemented: IngredientCategories - ingredientCategories"))
 }
 
 // Ingredients is the resolver for the ingredients field.
 func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error) {
-	if r.IngredientService == nil {
-		return &model.IngredientsResponse{
-			Code:    500,
-			Success: false,
-			Message: "ingredient service not initialized",
-		}, nil
-	}
-	return r.IngredientService.Ingredients(pagination)
+	panic(fmt.Errorf("not implemented: Ingredients - ingredients"))
 }
 
 // IngredientStocks is the resolver for the ingredientStocks field.
 func (r *queryResolver) IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error) {
-	if r.IngredientStockService == nil {
-		return &model.IngredientStocksResponse{
-			Code:           500,
-			Success:        false,
-			Message:        "ingredient stock service not initialized",
-			IngredientName: nil,
-			TotalStocks:    nil,
-			Unit:           nil,
-			ConvertUnit:    nil,
-		}, nil
-	}
-	return r.IngredientStockService.IngredientStocks(pagination, ingredientID)
+	panic(fmt.Errorf("not implemented: IngredientStocks - ingredientStocks"))
 }
 
 // ProductCategories is the resolver for the productCategories field.
 func (r *queryResolver) ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error) {
-	if r.ProductCategoryService == nil {
-		return &model.ProductCategoriesResponse{
-			Code:    500,
-			Success: false,
-			Message: "product category service not initialized",
-		}, nil
-	}
-	return r.ProductCategoryService.ProductCategories(pagination)
+	panic(fmt.Errorf("not implemented: ProductCategories - productCategories"))
 }
 
 // Products is the resolver for the products field.
 func (r *queryResolver) Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error) {
-	if r.ProductService == nil {
-		return &model.ProductsResponse{
-			Code:    500,
-			Success: false,
-			Message: "product service not initialized",
-		}, nil
-	}
-	return r.ProductService.Products(pagination)
+	panic(fmt.Errorf("not implemented: Products - products"))
 }
 
 // Discounts is the resolver for the discounts field.
 func (r *queryResolver) Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error) {
-	if r.DiscountService == nil {
-		return &model.DiscountsResponse{
-			Code:    500,
-			Success: false,
-			Message: "discount service not initialized",
-		}, nil
-	}
-	return r.DiscountService.Discounts(pagination, isActive, isPeriod, isQuota)
+	panic(fmt.Errorf("not implemented: Discounts - discounts"))
 }
 
 // CheckDiscount is the resolver for the checkDiscount field.
 func (r *queryResolver) CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error) {
-	if r.DiscountService == nil {
-		return &model.CheckDiscountResponse{
-			Code:    500,
-			Success: false,
-			Message: "discount service not initialized",
-			Data:    nil,
-		}, nil
-	}
-	return r.DiscountService.CheckDiscount(code)
+	panic(fmt.Errorf("not implemented: CheckDiscount - checkDiscount"))
+}
+
+// ProductVariants is the resolver for the productVariants field.
+func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID *int64, isActive *bool) (*model.ProductVariantsResponse, error) {
+	panic(fmt.Errorf("not implemented: ProductVariants - productVariants"))
+}
+
+// ProductIngredients is the resolver for the productIngredients field.
+func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID *int64, isActive *bool) (*model.ProductIngredientsResponse, error) {
+	panic(fmt.Errorf("not implemented: ProductIngredients - productIngredients"))
 }
 
 // Mutation returns MutationResolver implementation.
