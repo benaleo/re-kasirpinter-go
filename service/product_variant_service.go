@@ -124,15 +124,15 @@ func (s *ProductVariantService) Delete(ctx context.Context, id int64) (*model.Pr
 	return &variant, nil
 }
 
-func (s *ProductVariantService) GetAll(ctx context.Context, pagination *model.PaginationInput, productID *int64, isActive *bool) ([]*model.ProductVariantDB, *model.PageInfo, error) {
+func (s *ProductVariantService) GetAll(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) ([]*model.ProductVariantDB, *model.PageInfo, error) {
 	var variants []*model.ProductVariantDB
 	var total int64
 
 	// Build query
 	query := s.DB.Where("deleted_at IS NULL")
 
-	if productID != nil {
-		query = query.Where("product_id = ?", *productID)
+	if productID != 0 {
+		query = query.Where("product_id = ?", productID)
 	}
 
 	if isActive != nil {
