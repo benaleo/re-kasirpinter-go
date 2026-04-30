@@ -470,6 +470,7 @@ type ProductIngredient struct {
 	IngredientValue float64         `json:"ingredient_value"`
 	Unit            string          `json:"unit"`
 	CreatedAt       time.Time       `json:"created_at"`
+	UpdatedAt       time.Time       `json:"updated_at"`
 }
 
 type ProductIngredientResponse struct {
@@ -502,11 +503,11 @@ type ProductVariant struct {
 	Name          string               `json:"name"`
 	Price         float64              `json:"price"`
 	PriceOriginal *float64             `json:"price_original,omitempty"`
+	Ingredients   []*ProductIngredient `json:"ingredients"`
 	IsActive      bool                 `json:"is_active"`
 	DeletedAt     *time.Time           `json:"deleted_at,omitempty"`
 	CreatedAt     time.Time            `json:"created_at"`
 	UpdatedAt     time.Time            `json:"updated_at"`
-	Ingredients   []*ProductIngredient `json:"ingredients"`
 }
 
 type ProductVariantResponse struct {
