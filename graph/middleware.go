@@ -2,8 +2,11 @@ package graph
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -219,4 +222,65 @@ func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) 
 	}
 
 	return next(ctx)
+}
+
+// LoggingInterceptor logs GraphQL request details
+type LoggingInterceptor struct{}
+
+func (li *LoggingInterceptor) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+	startTime := time.Now()
+
+	// Get request context info
+	clientInfo := GetClientInfo(ctx)
+	userClaims := ForContext(ctx)
+
+	// Get GraphQL operation name
+	operationContext := graphql.GetOperationContext(ctx)
+	operationName := "unknown"
+	if operationContext != nil && operationContext.Operation != nil {
+		operationName = operationContext.Operation.Name
+	}
+
+	// Execute the response handler
+	resp := next(ctx)
+
+	// Calculate duration
+	duration := time.Since(startTime)
+
+	// Determine status
+	status := "SUCCESS"
+	if resp != nil && len(resp.Errors) > 0 {
+		status = "FAILED"
+	}
+
+	// Extract user ID if available
+	userID := "N/A"
+	if userClaims != nil {
+		userID = fmt.Sprintf("%d", userClaims.UserID)
+	}
+
+	// Extract IP
+	ip := "N/A"
+	if clientInfo != nil {
+		ip = clientInfo.IP
+	}
+
+	// Log the request
+	log.Printf("IP: %s | User ID: %s | Method: %s | Status: %s | Duration: %v",
+		ip,
+		userID,
+		operationName,
+		status,
+		duration,
+	)
+
+	return resp
+}
+
+func (li *LoggingInterceptor) ExtensionName() string {
+	return "LoggingInterceptor"
+}
+
+func (li *LoggingInterceptor) Validate(schema graphql.ExecutableSchema) error {
+	return nil
 }

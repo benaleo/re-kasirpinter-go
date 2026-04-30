@@ -155,6 +155,7 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New[string](100),
 	})
+	srv.Use(&graph.LoggingInterceptor{})
 
 	// Wrap handlers with CORS middleware
 	mux := http.NewServeMux()
