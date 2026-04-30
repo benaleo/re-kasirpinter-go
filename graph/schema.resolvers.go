@@ -804,7 +804,7 @@ func (r *queryResolver) CheckDiscount(ctx context.Context, code string) (*model.
 }
 
 // ProductVariants is the resolver for the productVariants field.
-func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID *int64, isActive *bool) (*model.ProductVariantsResponse, error) {
+func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error) {
 	if r.ProductVariantService == nil {
 		return &model.ProductVariantsResponse{
 			Code:    500,
@@ -838,7 +838,7 @@ func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.P
 }
 
 // ProductIngredients is the resolver for the productIngredients field.
-func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID *int64, isActive *bool) (*model.ProductIngredientsResponse, error) {
+func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error) {
 	if r.ProductIngredientService == nil {
 		return &model.ProductIngredientsResponse{
 			Code:    500,
@@ -847,7 +847,7 @@ func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *mode
 		}, nil
 	}
 
-	productIngredientsDB, pageInfo, err := r.ProductIngredientService.GetAll(ctx, pagination, variantID, isActive)
+	productIngredientsDB, pageInfo, err := r.ProductIngredientService.GetAll(ctx, pagination, variantID)
 	if err != nil {
 		return &model.ProductIngredientsResponse{
 			Code:    500,

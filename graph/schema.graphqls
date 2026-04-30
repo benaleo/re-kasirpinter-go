@@ -69,9 +69,9 @@ type Query {
   discounts(pagination: PaginationInput, is_active: Boolean, is_period: Boolean, is_quota: Boolean): DiscountsResponse! @auth
   checkDiscount(code: String!): CheckDiscountResponse!
   #product variant
-  productVariants(pagination: PaginationInput, product_id: Int64, is_active: Boolean): ProductVariantsResponse! @auth
+  productVariants(pagination: PaginationInput, product_id: Int64!, is_active: Boolean): ProductVariantsResponse! @auth
   #product ingredient
-  productIngredients(pagination: PaginationInput, variant_id: Int64, is_active: Boolean): ProductIngredientsResponse! @auth
+  productIngredients(pagination: PaginationInput, variant_id: Int64!): ProductIngredientsResponse! @auth
 }
 
 type Mutation {

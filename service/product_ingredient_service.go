@@ -88,15 +88,15 @@ func (s *ProductIngredientService) Delete(ctx context.Context, id int64) (*model
 	return &productIngredient, nil
 }
 
-func (s *ProductIngredientService) GetAll(ctx context.Context, pagination *model.PaginationInput, variantID *int64, isActive *bool) ([]*model.ProductIngredientDB, *model.PageInfo, error) {
+func (s *ProductIngredientService) GetAll(ctx context.Context, pagination *model.PaginationInput, variantID int64) ([]*model.ProductIngredientDB, *model.PageInfo, error) {
 	var productIngredients []*model.ProductIngredientDB
 	var total int64
 
 	// Build query
 	query := s.DB.Model(&model.ProductIngredientDB{})
 
-	if variantID != nil {
-		query = query.Where("variant_id = ?", *variantID)
+	if variantID != 0 {
+		query = query.Where("variant_id = ?", variantID)
 	}
 
 	// Get total count

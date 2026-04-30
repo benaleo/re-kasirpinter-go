@@ -526,8 +526,8 @@ type ComplexityRoot struct {
 		Ingredients          func(childComplexity int, pagination *model.PaginationInput) int
 		Permissions          func(childComplexity int) int
 		ProductCategories    func(childComplexity int, pagination *model.PaginationInput) int
-		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID *int64, isActive *bool) int
-		ProductVariants      func(childComplexity int, pagination *model.PaginationInput, productID *int64, isActive *bool) int
+		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID int64) int
+		ProductVariants      func(childComplexity int, pagination *model.PaginationInput, productID int64, isActive *bool) int
 		Products             func(childComplexity int, pagination *model.PaginationInput) int
 		Role                 func(childComplexity int, id int64) int
 		Roles                func(childComplexity int) int
@@ -731,8 +731,8 @@ type QueryResolver interface {
 	Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error)
 	Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error)
 	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
-	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID *int64, isActive *bool) (*model.ProductVariantsResponse, error)
-	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID *int64, isActive *bool) (*model.ProductIngredientsResponse, error)
+	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
+	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -2958,7 +2958,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.ProductIngredients(childComplexity, args["pagination"].(*model.PaginationInput), args["variant_id"].(*int64), args["is_active"].(*bool)), true
+		return e.ComplexityRoot.Query.ProductIngredients(childComplexity, args["pagination"].(*model.PaginationInput), args["variant_id"].(int64)), true
 	case "Query.productVariants":
 		if e.ComplexityRoot.Query.ProductVariants == nil {
 			break
@@ -2969,7 +2969,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.ProductVariants(childComplexity, args["pagination"].(*model.PaginationInput), args["product_id"].(*int64), args["is_active"].(*bool)), true
+		return e.ComplexityRoot.Query.ProductVariants(childComplexity, args["pagination"].(*model.PaginationInput), args["product_id"].(int64), args["is_active"].(*bool)), true
 	case "Query.products":
 		if e.ComplexityRoot.Query.Products == nil {
 			break
@@ -4230,16 +4230,11 @@ func (ec *executionContext) field_Query_productIngredients_args(ctx context.Cont
 		return nil, err
 	}
 	args["pagination"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "variant_id", ec.unmarshalOInt642ᚖint64)
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "variant_id", ec.unmarshalNInt642int64)
 	if err != nil {
 		return nil, err
 	}
 	args["variant_id"] = arg1
-	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "is_active", ec.unmarshalOBoolean2ᚖbool)
-	if err != nil {
-		return nil, err
-	}
-	args["is_active"] = arg2
 	return args, nil
 }
 
@@ -4251,7 +4246,7 @@ func (ec *executionContext) field_Query_productVariants_args(ctx context.Context
 		return nil, err
 	}
 	args["pagination"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "product_id", ec.unmarshalOInt642ᚖint64)
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "product_id", ec.unmarshalNInt642int64)
 	if err != nil {
 		return nil, err
 	}
@@ -16826,7 +16821,7 @@ func (ec *executionContext) _Query_productVariants(ctx context.Context, field gr
 		ec.fieldContext_Query_productVariants,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().ProductVariants(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["product_id"].(*int64), fc.Args["is_active"].(*bool))
+			return ec.Resolvers.Query().ProductVariants(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["product_id"].(int64), fc.Args["is_active"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -16892,7 +16887,7 @@ func (ec *executionContext) _Query_productIngredients(ctx context.Context, field
 		ec.fieldContext_Query_productIngredients,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().ProductIngredients(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["variant_id"].(*int64), fc.Args["is_active"].(*bool))
+			return ec.Resolvers.Query().ProductIngredients(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["variant_id"].(int64))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
