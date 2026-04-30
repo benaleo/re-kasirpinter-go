@@ -298,6 +298,7 @@ func ToGraphQLProductIngredient(productIngredientDB model.ProductIngredientDB) *
 		IngredientValue: productIngredientDB.IngredientValue,
 		Unit:            productIngredientDB.Unit,
 		CreatedAt:       productIngredientDB.CreatedAt,
+		UpdatedAt:       productIngredientDB.UpdatedAt,
 	}
 
 	// Set variant if available
