@@ -523,7 +523,7 @@ type ComplexityRoot struct {
 		Discounts            func(childComplexity int, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) int
 		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
 		IngredientStocks     func(childComplexity int, pagination *model.PaginationInput, ingredientID *int64) int
-		Ingredients          func(childComplexity int, pagination *model.PaginationInput) int
+		Ingredients          func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
 		Permissions          func(childComplexity int) int
 		ProductCategories    func(childComplexity int, pagination *model.PaginationInput) int
 		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID int64) int
@@ -725,7 +725,7 @@ type QueryResolver interface {
 	Role(ctx context.Context, id int64) (*model.RoleResponse, error)
 	Permissions(ctx context.Context) (*model.PermissionsResponse, error)
 	IngredientCategories(ctx context.Context, pagination *model.PaginationInput, isOptions *bool) (*model.IngredientCategoriesResponse, error)
-	Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error)
+	Ingredients(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.IngredientsResponse, error)
 	IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error)
 	ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error)
 	Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error)
@@ -2929,7 +2929,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Ingredients(childComplexity, args["pagination"].(*model.PaginationInput)), true
+		return e.ComplexityRoot.Query.Ingredients(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool)), true
 
 	case "Query.permissions":
 		if e.ComplexityRoot.Query.Permissions == nil {
@@ -4208,6 +4208,11 @@ func (ec *executionContext) field_Query_ingredients_args(ctx context.Context, ra
 		return nil, err
 	}
 	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_active", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_active"] = arg1
 	return args, nil
 }
 
@@ -16432,7 +16437,7 @@ func (ec *executionContext) _Query_ingredients(ctx context.Context, field graphq
 		ec.fieldContext_Query_ingredients,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Ingredients(ctx, fc.Args["pagination"].(*model.PaginationInput))
+			return ec.Resolvers.Query().Ingredients(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_active"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next

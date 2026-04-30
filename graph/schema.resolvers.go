@@ -727,7 +727,7 @@ func (r *queryResolver) IngredientCategories(ctx context.Context, pagination *mo
 }
 
 // Ingredients is the resolver for the ingredients field.
-func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.PaginationInput) (*model.IngredientsResponse, error) {
+func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.IngredientsResponse, error) {
 	if r.IngredientService == nil {
 		return &model.IngredientsResponse{
 			Code:    500,
@@ -735,7 +735,7 @@ func (r *queryResolver) Ingredients(ctx context.Context, pagination *model.Pagin
 			Message: "ingredient service not initialized",
 		}, nil
 	}
-	return r.IngredientService.Ingredients(pagination)
+	return r.IngredientService.Ingredients(pagination, isActive)
 }
 
 // IngredientStocks is the resolver for the ingredientStocks field.
