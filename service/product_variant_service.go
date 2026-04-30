@@ -36,17 +36,22 @@ func (s *ProductVariantService) Create(ctx context.Context, input model.CreatePr
 
 	// Handle image upload if provided
 	var imageURL *string
-	if input.Image != nil && *input.Image != "" && s.R2Service != nil {
-		imageURLStr, err := s.R2Service.UploadFromBase64(
-			context.Background(),
-			*input.Image,
-			"product-variants",
-			fmt.Sprintf("%d", input.ProductID),
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to upload image: %v", err)
+	if input.Image != nil && *input.Image != "" {
+		// If image is already a URL, use it directly
+		if len(*input.Image) >= 4 && (*input.Image)[:4] == "http" {
+			imageURL = input.Image
+		} else if s.R2Service != nil {
+			imageURLStr, err := s.R2Service.UploadFromBase64(
+				context.Background(),
+				*input.Image,
+				"product-variants",
+				fmt.Sprintf("%d", input.ProductID),
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to upload image: %v", err)
+			}
+			imageURL = &imageURLStr
 		}
-		imageURL = &imageURLStr
 	}
 
 	variant := &model.ProductVariantDB{
@@ -74,18 +79,23 @@ func (s *ProductVariantService) Update(ctx context.Context, id int64, input mode
 	// Update fields if provided
 	if input.Image != nil {
 		// Handle image upload if provided
-		if *input.Image != "" && s.R2Service != nil {
-			imageURLStr, err := s.R2Service.UploadFromBase64(
-				context.Background(),
-				*input.Image,
-				"product-variants",
-				fmt.Sprintf("%d", variant.ProductID),
-			)
-			if err != nil {
-				return nil, fmt.Errorf("failed to upload image: %v", err)
+		if *input.Image != "" {
+			// If image is already a URL, use it directly
+			if len(*input.Image) >= 4 && (*input.Image)[:4] == "http" {
+				variant.Image = input.Image
+			} else if s.R2Service != nil {
+				imageURLStr, err := s.R2Service.UploadFromBase64(
+					context.Background(),
+					*input.Image,
+					"product-variants",
+					fmt.Sprintf("%d", variant.ProductID),
+				)
+				if err != nil {
+					return nil, fmt.Errorf("failed to upload image: %v", err)
+				}
+				variant.Image = &imageURLStr
 			}
-			variant.Image = &imageURLStr
-		} else if *input.Image == "" {
+		} else {
 			// If empty string, set to nil (remove image)
 			variant.Image = nil
 		}
