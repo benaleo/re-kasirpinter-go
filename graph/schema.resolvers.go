@@ -477,17 +477,83 @@ func (r *mutationResolver) DeleteDiscount(ctx context.Context, id int64) (*model
 
 // CreateProductVariant is the resolver for the createProductVariant field.
 func (r *mutationResolver) CreateProductVariant(ctx context.Context, input model.CreateProductVariantInput) (*model.CreateProductVariantResponse, error) {
-	panic(fmt.Errorf("not implemented: CreateProductVariant - createProductVariant"))
+	if r.ProductVariantService == nil {
+		return &model.CreateProductVariantResponse{
+			Code:    500,
+			Success: false,
+			Message: "product variant service not initialized",
+		}, nil
+	}
+
+	variantDB, err := r.ProductVariantService.Create(ctx, input)
+	if err != nil {
+		return &model.CreateProductVariantResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to create product variant: %v", err),
+		}, nil
+	}
+
+	return &model.CreateProductVariantResponse{
+		Code:    200,
+		Success: true,
+		Message: "product variant created successfully",
+		Data:    helper.ToGraphQLProductVariant(*variantDB),
+	}, nil
 }
 
 // UpdateProductVariant is the resolver for the updateProductVariant field.
 func (r *mutationResolver) UpdateProductVariant(ctx context.Context, id int64, input model.UpdateProductVariantInput) (*model.UpdateProductVariantResponse, error) {
-	panic(fmt.Errorf("not implemented: UpdateProductVariant - updateProductVariant"))
+	if r.ProductVariantService == nil {
+		return &model.UpdateProductVariantResponse{
+			Code:    500,
+			Success: false,
+			Message: "product variant service not initialized",
+		}, nil
+	}
+
+	variantDB, err := r.ProductVariantService.Update(ctx, id, input)
+	if err != nil {
+		return &model.UpdateProductVariantResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to update product variant: %v", err),
+		}, nil
+	}
+
+	return &model.UpdateProductVariantResponse{
+		Code:    200,
+		Success: true,
+		Message: "product variant updated successfully",
+		Data:    helper.ToGraphQLProductVariant(*variantDB),
+	}, nil
 }
 
 // DeleteProductVariant is the resolver for the deleteProductVariant field.
 func (r *mutationResolver) DeleteProductVariant(ctx context.Context, id int64) (*model.DeleteProductVariantResponse, error) {
-	panic(fmt.Errorf("not implemented: DeleteProductVariant - deleteProductVariant"))
+	if r.ProductVariantService == nil {
+		return &model.DeleteProductVariantResponse{
+			Code:    500,
+			Success: false,
+			Message: "product variant service not initialized",
+		}, nil
+	}
+
+	variantDB, err := r.ProductVariantService.Delete(ctx, id)
+	if err != nil {
+		return &model.DeleteProductVariantResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to delete product variant: %v", err),
+		}, nil
+	}
+
+	return &model.DeleteProductVariantResponse{
+		Code:    200,
+		Success: true,
+		Message: "product variant deleted successfully",
+		Data:    helper.ToGraphQLProductVariant(*variantDB),
+	}, nil
 }
 
 // CreateProductIngredient is the resolver for the createProductIngredient field.

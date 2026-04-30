@@ -127,7 +127,10 @@ func main() {
 	}
 
 	// Initialize product variant service
-	productVariantService := service.NewProductVariantService(db)
+	productVariantService, err := service.NewProductVariantService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize product variant service: %v", err)
+	}
 
 	// Initialize product ingredient service
 	productIngredientService := service.NewProductIngredientService(db)

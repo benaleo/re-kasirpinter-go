@@ -2,17 +2,29 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"re-kasirpinter-go/graph/model"
 
 	"gorm.io/gorm"
 )
 
 type ProductVariantService struct {
-	DB *gorm.DB
+	DB        *gorm.DB
+	R2Service *R2Service
 }
 
-func NewProductVariantService(db *gorm.DB) *ProductVariantService {
-	return &ProductVariantService{DB: db}
+func NewProductVariantService(db *gorm.DB) (*ProductVariantService, error) {
+	r2Service, err := NewR2Service()
+	if err != nil {
+		// Log the error but don't fail service creation
+		// Image upload will be optional
+		fmt.Printf("Warning: Failed to initialize R2 service: %v\n", err)
+	}
+
+	return &ProductVariantService{
+		DB:        db,
+		R2Service: r2Service,
+	}, nil
 }
 
 func (s *ProductVariantService) Create(ctx context.Context, input model.CreateProductVariantInput) (*model.ProductVariantDB, error) {
@@ -22,8 +34,23 @@ func (s *ProductVariantService) Create(ctx context.Context, input model.CreatePr
 		return nil, err
 	}
 
+	// Handle image upload if provided
+	var imageURL *string
+	if input.Image != nil && *input.Image != "" && s.R2Service != nil {
+		imageURLStr, err := s.R2Service.UploadFromBase64(
+			context.Background(),
+			*input.Image,
+			"product-variants",
+			fmt.Sprintf("%d", input.ProductID),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to upload image: %v", err)
+		}
+		imageURL = &imageURLStr
+	}
+
 	variant := &model.ProductVariantDB{
-		Image:         input.Image,
+		Image:         imageURL,
 		ProductID:     input.ProductID,
 		Name:          input.Name,
 		Price:         input.Price,
@@ -46,7 +73,22 @@ func (s *ProductVariantService) Update(ctx context.Context, id int64, input mode
 
 	// Update fields if provided
 	if input.Image != nil {
-		variant.Image = input.Image
+		// Handle image upload if provided
+		if *input.Image != "" && s.R2Service != nil {
+			imageURLStr, err := s.R2Service.UploadFromBase64(
+				context.Background(),
+				*input.Image,
+				"product-variants",
+				fmt.Sprintf("%d", variant.ProductID),
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to upload image: %v", err)
+			}
+			variant.Image = &imageURLStr
+		} else if *input.Image == "" {
+			// If empty string, set to nil (remove image)
+			variant.Image = nil
+		}
 	}
 	if input.Name != nil {
 		variant.Name = *input.Name
