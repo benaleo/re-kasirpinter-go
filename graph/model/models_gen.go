@@ -125,10 +125,10 @@ type CreateProductIngredientInput struct {
 }
 
 type CreateProductIngredientResponse struct {
-	Code    int32              `json:"code"`
-	Success bool               `json:"success"`
-	Message string             `json:"message"`
-	Data    *ProductIngredient `json:"data,omitempty"`
+	Code    int32                `json:"code"`
+	Success bool                 `json:"success"`
+	Message string               `json:"message"`
+	Data    []*ProductIngredient `json:"data,omitempty"`
 }
 
 type CreateProductInput struct {
@@ -218,10 +218,10 @@ type DeleteProductCategoryResponse struct {
 }
 
 type DeleteProductIngredientResponse struct {
-	Code    int32              `json:"code"`
-	Success bool               `json:"success"`
-	Message string             `json:"message"`
-	Data    *ProductIngredient `json:"data,omitempty"`
+	Code    int32                `json:"code"`
+	Success bool                 `json:"success"`
+	Message string               `json:"message"`
+	Data    []*ProductIngredient `json:"data,omitempty"`
 }
 
 type DeleteProductResponse struct {

@@ -15,43 +15,51 @@ func NewProductIngredientService(db *gorm.DB) *ProductIngredientService {
 	return &ProductIngredientService{DB: db}
 }
 
-func (s *ProductIngredientService) Create(ctx context.Context, input model.CreateProductIngredientInput) (*model.ProductIngredientDB, error) {
-	// Check if variant exists
-	var variant model.ProductVariantDB
-	if err := s.DB.Where("id = ? AND deleted_at IS NULL", input.VariantID).First(&variant).Error; err != nil {
-		return nil, err
+func (s *ProductIngredientService) Create(ctx context.Context, input []*model.CreateProductIngredientInput) ([]*model.ProductIngredientDB, error) {
+	var productIngredients []*model.ProductIngredientDB
+
+	for _, item := range input {
+		// Check if variant exists
+		var variant model.ProductVariantDB
+		if err := s.DB.Where("id = ? AND deleted_at IS NULL", item.VariantID).First(&variant).Error; err != nil {
+			return nil, err
+		}
+
+		// Check if ingredient exists
+		var ingredient model.IngredientDB
+		if err := s.DB.Where("id = ? AND deleted_at IS NULL", item.IngredientID).First(&ingredient).Error; err != nil {
+			return nil, err
+		}
+
+		// Check if this combination already exists
+		var existing model.ProductIngredientDB
+		err := s.DB.Where("variant_id = ? AND ingredient_id = ?", item.VariantID, item.IngredientID).First(&existing).Error
+		if err == nil {
+			return nil, gorm.ErrDuplicatedKey
+		}
+
+		productIngredient := &model.ProductIngredientDB{
+			VariantID:       item.VariantID,
+			IngredientID:    item.IngredientID,
+			IngredientValue: item.IngredientValue,
+			Unit:            item.Unit,
+		}
+
+		if err := s.DB.Create(productIngredient).Error; err != nil {
+			return nil, err
+		}
+
+		productIngredients = append(productIngredients, productIngredient)
 	}
 
-	// Check if ingredient exists
-	var ingredient model.IngredientDB
-	if err := s.DB.Where("id = ? AND deleted_at IS NULL", input.IngredientID).First(&ingredient).Error; err != nil {
-		return nil, err
+	// Preload variant and ingredient relationships for all created items
+	for _, productIngredient := range productIngredients {
+		if err := s.DB.Preload("Variant").Preload("Ingredient").First(productIngredient, productIngredient.ID).Error; err != nil {
+			return nil, err
+		}
 	}
 
-	// Check if this combination already exists
-	var existing model.ProductIngredientDB
-	err := s.DB.Where("variant_id = ? AND ingredient_id = ?", input.VariantID, input.IngredientID).First(&existing).Error
-	if err == nil {
-		return nil, gorm.ErrDuplicatedKey
-	}
-
-	productIngredient := &model.ProductIngredientDB{
-		VariantID:       input.VariantID,
-		IngredientID:    input.IngredientID,
-		IngredientValue: input.IngredientValue,
-		Unit:            input.Unit,
-	}
-
-	if err := s.DB.Create(productIngredient).Error; err != nil {
-		return nil, err
-	}
-
-	// Preload variant and ingredient relationships
-	if err := s.DB.Preload("Variant").Preload("Ingredient").First(productIngredient, productIngredient.ID).Error; err != nil {
-		return nil, err
-	}
-
-	return productIngredient, nil
+	return productIngredients, nil
 }
 
 func (s *ProductIngredientService) Update(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.ProductIngredientDB, error) {
@@ -75,17 +83,17 @@ func (s *ProductIngredientService) Update(ctx context.Context, id int64, input m
 	return &productIngredient, nil
 }
 
-func (s *ProductIngredientService) Delete(ctx context.Context, id int64) (*model.ProductIngredientDB, error) {
-	var productIngredient model.ProductIngredientDB
-	if err := s.DB.Where("id = ?", id).First(&productIngredient).Error; err != nil {
+func (s *ProductIngredientService) Delete(ctx context.Context, variantID int64) ([]*model.ProductIngredientDB, error) {
+	var productIngredients []*model.ProductIngredientDB
+	if err := s.DB.Where("variant_id = ?", variantID).Find(&productIngredients).Error; err != nil {
 		return nil, err
 	}
 
-	if err := s.DB.Delete(&productIngredient).Error; err != nil {
+	if err := s.DB.Where("variant_id = ?", variantID).Delete(&model.ProductIngredientDB{}).Error; err != nil {
 		return nil, err
 	}
 
-	return &productIngredient, nil
+	return productIngredients, nil
 }
 
 func (s *ProductIngredientService) GetAll(ctx context.Context, pagination *model.PaginationInput, variantID int64) ([]*model.ProductIngredientDB, *model.PageInfo, error) {

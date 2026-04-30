@@ -126,7 +126,6 @@ type Mutation {
   deleteProductVariant(id: Int64!): DeleteProductVariantResponse! @auth
 
   # product ingredients
-  createProductIngredient(input: CreateProductIngredientInput!): CreateProductIngredientResponse! @auth
-  updateProductIngredient(id: Int64!, input: UpdateProductIngredientInput!): UpdateProductIngredientResponse! @auth
-  deleteProductIngredient(id: Int64!): DeleteProductIngredientResponse! @auth
+  createProductIngredient(input: [CreateProductIngredientInput!]!): CreateProductIngredientResponse! @auth
+  deleteProductIngredient(variant_id: Int64!): DeleteProductIngredientResponse! @auth
 }

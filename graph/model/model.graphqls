@@ -358,7 +358,7 @@ type CreateProductIngredientResponse {
   code: Int!
   success: Boolean!
   message: String!
-  data: ProductIngredient
+  data: [ProductIngredient]
 }
 
 type UpdateProductIngredientResponse {
@@ -372,7 +372,7 @@ type DeleteProductIngredientResponse {
   code: Int!
   success: Boolean!
   message: String!
-  data: ProductIngredient
+  data: [ProductIngredient]
 }
 
 type IngredientCategory {

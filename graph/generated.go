@@ -348,7 +348,7 @@ type ComplexityRoot struct {
 		CreateOtp                func(childComplexity int, input model.CreateOtpInput) int
 		CreateProduct            func(childComplexity int, input model.CreateProductInput) int
 		CreateProductCategory    func(childComplexity int, input model.CreateProductCategoryInput) int
-		CreateProductIngredient  func(childComplexity int, input model.CreateProductIngredientInput) int
+		CreateProductIngredient  func(childComplexity int, input []*model.CreateProductIngredientInput) int
 		CreateProductVariant     func(childComplexity int, input model.CreateProductVariantInput) int
 		CreateRole               func(childComplexity int, input model.CreateRoleInput) int
 		CreateUser               func(childComplexity int, input input.CreateUserInput, isUser *bool) int
@@ -358,7 +358,7 @@ type ComplexityRoot struct {
 		DeleteIngredientStock    func(childComplexity int, id int64) int
 		DeleteProduct            func(childComplexity int, id int64) int
 		DeleteProductCategory    func(childComplexity int, id int64) int
-		DeleteProductIngredient  func(childComplexity int, id int64) int
+		DeleteProductIngredient  func(childComplexity int, variantID int64) int
 		DeleteProductVariant     func(childComplexity int, id int64) int
 		DeleteRole               func(childComplexity int, id int64) int
 		DeleteUser               func(childComplexity int, id string) int
@@ -372,7 +372,6 @@ type ComplexityRoot struct {
 		UpdateIngredientStock    func(childComplexity int, id int64, input model.UpdateIngredientStockInput) int
 		UpdateProduct            func(childComplexity int, id int64, input model.UpdateProductInput) int
 		UpdateProductCategory    func(childComplexity int, id int64, input model.UpdateProductCategoryInput) int
-		UpdateProductIngredient  func(childComplexity int, id int64, input model.UpdateProductIngredientInput) int
 		UpdateProductVariant     func(childComplexity int, id int64, input model.UpdateProductVariantInput) int
 		UpdateRole               func(childComplexity int, id int64, input model.UpdateRoleInput) int
 		UpdateUser               func(childComplexity int, id string, input input.UpdateUserInput) int
@@ -714,9 +713,8 @@ type MutationResolver interface {
 	CreateProductVariant(ctx context.Context, input model.CreateProductVariantInput) (*model.CreateProductVariantResponse, error)
 	UpdateProductVariant(ctx context.Context, id int64, input model.UpdateProductVariantInput) (*model.UpdateProductVariantResponse, error)
 	DeleteProductVariant(ctx context.Context, id int64) (*model.DeleteProductVariantResponse, error)
-	CreateProductIngredient(ctx context.Context, input model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error)
-	UpdateProductIngredient(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.UpdateProductIngredientResponse, error)
-	DeleteProductIngredient(ctx context.Context, id int64) (*model.DeleteProductIngredientResponse, error)
+	CreateProductIngredient(ctx context.Context, input []*model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error)
+	DeleteProductIngredient(ctx context.Context, variantID int64) (*model.DeleteProductIngredientResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
@@ -1996,7 +1994,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.CreateProductIngredient(childComplexity, args["input"].(model.CreateProductIngredientInput)), true
+		return e.ComplexityRoot.Mutation.CreateProductIngredient(childComplexity, args["input"].([]*model.CreateProductIngredientInput)), true
 	case "Mutation.createProductVariant":
 		if e.ComplexityRoot.Mutation.CreateProductVariant == nil {
 			break
@@ -2106,7 +2104,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.DeleteProductIngredient(childComplexity, args["id"].(int64)), true
+		return e.ComplexityRoot.Mutation.DeleteProductIngredient(childComplexity, args["variant_id"].(int64)), true
 	case "Mutation.deleteProductVariant":
 		if e.ComplexityRoot.Mutation.DeleteProductVariant == nil {
 			break
@@ -2240,17 +2238,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdateProductCategory(childComplexity, args["id"].(int64), args["input"].(model.UpdateProductCategoryInput)), true
-	case "Mutation.updateProductIngredient":
-		if e.ComplexityRoot.Mutation.UpdateProductIngredient == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateProductIngredient_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.UpdateProductIngredient(childComplexity, args["id"].(int64), args["input"].(model.UpdateProductIngredientInput)), true
 	case "Mutation.updateProductVariant":
 		if e.ComplexityRoot.Mutation.UpdateProductVariant == nil {
 			break
@@ -3760,7 +3747,7 @@ func (ec *executionContext) field_Mutation_createProductCategory_args(ctx contex
 func (ec *executionContext) field_Mutation_createProductIngredient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductIngredientInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInput)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductIngredientInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInputᚄ)
 	if err != nil {
 		return nil, err
 	}
@@ -3875,11 +3862,11 @@ func (ec *executionContext) field_Mutation_deleteProductCategory_args(ctx contex
 func (ec *executionContext) field_Mutation_deleteProductIngredient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNInt642int64)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "variant_id", ec.unmarshalNInt642int64)
 	if err != nil {
 		return nil, err
 	}
-	args["id"] = arg0
+	args["variant_id"] = arg0
 	return args, nil
 }
 
@@ -4022,22 +4009,6 @@ func (ec *executionContext) field_Mutation_updateProductCategory_args(ctx contex
 	}
 	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductCategoryInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductCategoryInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateProductIngredient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNInt642int64)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductIngredientInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductIngredientInput)
 	if err != nil {
 		return nil, err
 	}
@@ -5701,7 +5672,7 @@ func (ec *executionContext) _CreateProductIngredientResponse_data(ctx context.Co
 			return obj.Data, nil
 		},
 		nil,
-		ec.marshalOProductIngredient2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient,
+		ec.marshalOProductIngredient2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient,
 		true,
 		false,
 	)
@@ -7105,7 +7076,7 @@ func (ec *executionContext) _DeleteProductIngredientResponse_data(ctx context.Co
 			return obj.Data, nil
 		},
 		nil,
-		ec.marshalOProductIngredient2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient,
+		ec.marshalOProductIngredient2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient,
 		true,
 		false,
 	)
@@ -12703,7 +12674,7 @@ func (ec *executionContext) _Mutation_createProductIngredient(ctx context.Contex
 		ec.fieldContext_Mutation_createProductIngredient,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateProductIngredient(ctx, fc.Args["input"].(model.CreateProductIngredientInput))
+			return ec.Resolvers.Mutation().CreateProductIngredient(ctx, fc.Args["input"].([]*model.CreateProductIngredientInput))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -12759,70 +12730,6 @@ func (ec *executionContext) fieldContext_Mutation_createProductIngredient(ctx co
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateProductIngredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_updateProductIngredient,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().UpdateProductIngredient(ctx, fc.Args["id"].(int64), fc.Args["input"].(model.UpdateProductIngredientInput))
-		},
-		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
-			directive0 := next
-
-			directive1 := func(ctx context.Context) (any, error) {
-				if ec.Directives.Auth == nil {
-					var zeroVal *model.UpdateProductIngredientResponse
-					return zeroVal, errors.New("directive auth is not implemented")
-				}
-				return ec.Directives.Auth(ctx, nil, directive0)
-			}
-
-			next = directive1
-			return next
-		},
-		ec.marshalNUpdateProductIngredientResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductIngredientResponse,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateProductIngredient(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "code":
-				return ec.fieldContext_UpdateProductIngredientResponse_code(ctx, field)
-			case "success":
-				return ec.fieldContext_UpdateProductIngredientResponse_success(ctx, field)
-			case "message":
-				return ec.fieldContext_UpdateProductIngredientResponse_message(ctx, field)
-			case "data":
-				return ec.fieldContext_UpdateProductIngredientResponse_data(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type UpdateProductIngredientResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateProductIngredient_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_deleteProductIngredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -12831,7 +12738,7 @@ func (ec *executionContext) _Mutation_deleteProductIngredient(ctx context.Contex
 		ec.fieldContext_Mutation_deleteProductIngredient,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().DeleteProductIngredient(ctx, fc.Args["id"].(int64))
+			return ec.Resolvers.Mutation().DeleteProductIngredient(ctx, fc.Args["variant_id"].(int64))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -25171,13 +25078,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateProductIngredient":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateProductIngredient(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "deleteProductIngredient":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProductIngredient(ctx, field)
@@ -27979,9 +27879,24 @@ func (ec *executionContext) marshalNCreateProductCategoryResponse2ᚖreᚑkasirp
 	return ec._CreateProductCategoryResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateProductIngredientInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInput(ctx context.Context, v any) (model.CreateProductIngredientInput, error) {
+func (ec *executionContext) unmarshalNCreateProductIngredientInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInputᚄ(ctx context.Context, v any) ([]*model.CreateProductIngredientInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.CreateProductIngredientInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateProductIngredientInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateProductIngredientInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInput(ctx context.Context, v any) (*model.CreateProductIngredientInput, error) {
 	res, err := ec.unmarshalInputCreateProductIngredientInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNCreateProductIngredientResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateProductIngredientResponse) graphql.Marshaler {
@@ -28833,25 +28748,6 @@ func (ec *executionContext) marshalNUpdateProductCategoryResponse2ᚖreᚑkasirp
 	return ec._UpdateProductCategoryResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateProductIngredientInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductIngredientInput(ctx context.Context, v any) (model.UpdateProductIngredientInput, error) {
-	res, err := ec.unmarshalInputUpdateProductIngredientInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNUpdateProductIngredientResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductIngredientResponse(ctx context.Context, sel ast.SelectionSet, v model.UpdateProductIngredientResponse) graphql.Marshaler {
-	return ec._UpdateProductIngredientResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNUpdateProductIngredientResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductIngredientResponse(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProductIngredientResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._UpdateProductIngredientResponse(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNUpdateProductInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductInput(ctx context.Context, v any) (model.UpdateProductInput, error) {
 	res, err := ec.unmarshalInputUpdateProductInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -29414,6 +29310,19 @@ func (ec *executionContext) marshalOProductCategory2ᚖreᚑkasirpinterᚑgoᚋg
 		return graphql.Null
 	}
 	return ec._ProductCategory(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProductIngredient2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient(ctx context.Context, sel ast.SelectionSet, v []*model.ProductIngredient) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalOProductIngredient2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient(ctx, sel, v[i])
+	})
+
+	return ret
 }
 
 func (ec *executionContext) marshalOProductIngredient2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient(ctx context.Context, sel ast.SelectionSet, v *model.ProductIngredient) graphql.Marshaler {

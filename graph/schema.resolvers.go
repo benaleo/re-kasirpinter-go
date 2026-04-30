@@ -557,7 +557,7 @@ func (r *mutationResolver) DeleteProductVariant(ctx context.Context, id int64) (
 }
 
 // CreateProductIngredient is the resolver for the createProductIngredient field.
-func (r *mutationResolver) CreateProductIngredient(ctx context.Context, input model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error) {
+func (r *mutationResolver) CreateProductIngredient(ctx context.Context, input []*model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error) {
 	if r.ProductIngredientService == nil {
 		return &model.CreateProductIngredientResponse{
 			Code:    500,
@@ -575,43 +575,22 @@ func (r *mutationResolver) CreateProductIngredient(ctx context.Context, input mo
 		}, nil
 	}
 
+	// Convert all created items to GraphQL format
+	var data []*model.ProductIngredient
+	for _, item := range productIngredientDB {
+		data = append(data, helper.ToGraphQLProductIngredient(*item))
+	}
+
 	return &model.CreateProductIngredientResponse{
 		Code:    200,
 		Success: true,
-		Message: "product ingredient created successfully",
-		Data:    helper.ToGraphQLProductIngredient(*productIngredientDB),
-	}, nil
-}
-
-// UpdateProductIngredient is the resolver for the updateProductIngredient field.
-func (r *mutationResolver) UpdateProductIngredient(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.UpdateProductIngredientResponse, error) {
-	if r.ProductIngredientService == nil {
-		return &model.UpdateProductIngredientResponse{
-			Code:    500,
-			Success: false,
-			Message: "product ingredient service not initialized",
-		}, nil
-	}
-
-	productIngredientDB, err := r.ProductIngredientService.Update(ctx, id, input)
-	if err != nil {
-		return &model.UpdateProductIngredientResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to update product ingredient: %v", err),
-		}, nil
-	}
-
-	return &model.UpdateProductIngredientResponse{
-		Code:    200,
-		Success: true,
-		Message: "product ingredient updated successfully",
-		Data:    helper.ToGraphQLProductIngredient(*productIngredientDB),
+		Message: "product ingredient saved successfully",
+		Data:    data,
 	}, nil
 }
 
 // DeleteProductIngredient is the resolver for the deleteProductIngredient field.
-func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, id int64) (*model.DeleteProductIngredientResponse, error) {
+func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, variantID int64) (*model.DeleteProductIngredientResponse, error) {
 	if r.ProductIngredientService == nil {
 		return &model.DeleteProductIngredientResponse{
 			Code:    500,
@@ -620,7 +599,7 @@ func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, id int64
 		}, nil
 	}
 
-	productIngredientDB, err := r.ProductIngredientService.Delete(ctx, id)
+	productIngredientDB, err := r.ProductIngredientService.Delete(ctx, variantID)
 	if err != nil {
 		return &model.DeleteProductIngredientResponse{
 			Code:    500,
@@ -629,11 +608,17 @@ func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, id int64
 		}, nil
 	}
 
+	// Convert all deleted items to GraphQL format
+	var data []*model.ProductIngredient
+	for _, item := range productIngredientDB {
+		data = append(data, helper.ToGraphQLProductIngredient(*item))
+	}
+
 	return &model.DeleteProductIngredientResponse{
 		Code:    200,
 		Success: true,
 		Message: "product ingredient deleted successfully",
-		Data:    helper.ToGraphQLProductIngredient(*productIngredientDB),
+		Data:    data,
 	}, nil
 }
 

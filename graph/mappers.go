@@ -163,7 +163,7 @@ func toGraphQLProductVariantResponse(code int32, success bool, message string, d
 }
 
 // Response mappers for ProductIngredient
-func toGraphQLCreateProductIngredientResponse(code int32, success bool, message string, data *model.ProductIngredient) *model.CreateProductIngredientResponse {
+func toGraphQLCreateProductIngredientResponse(code int32, success bool, message string, data []*model.ProductIngredient) *model.CreateProductIngredientResponse {
 	return &model.CreateProductIngredientResponse{
 		Code:    code,
 		Success: success,
@@ -181,7 +181,7 @@ func toGraphQLUpdateProductIngredientResponse(code int32, success bool, message 
 	}
 }
 
-func toGraphQLDeleteProductIngredientResponse(code int32, success bool, message string, data *model.ProductIngredient) *model.DeleteProductIngredientResponse {
+func toGraphQLDeleteProductIngredientResponse(code int32, success bool, message string, data []*model.ProductIngredient) *model.DeleteProductIngredientResponse {
 	return &model.DeleteProductIngredientResponse{
 		Code:    code,
 		Success: success,
