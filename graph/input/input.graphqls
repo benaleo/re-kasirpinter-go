@@ -171,6 +171,7 @@ input CreateProductVariantInput {
   name: String!
   price: Float!
   price_original: Float
+  is_unlimited: Boolean!
   is_active: Boolean!
 }
 
@@ -179,6 +180,7 @@ input UpdateProductVariantInput {
   name: String
   price: Float
   price_original: Float
+  is_unlimited: Boolean
   is_active: Boolean
 }
 

@@ -487,6 +487,7 @@ type ComplexityRoot struct {
 		Image          func(childComplexity int) int
 		Ingredients    func(childComplexity int) int
 		IsActive       func(childComplexity int) int
+		IsUnlimited    func(childComplexity int) int
 		Name           func(childComplexity int) int
 		Price          func(childComplexity int) int
 		PriceOriginal  func(childComplexity int) int
@@ -2745,6 +2746,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.ProductVariant.IsActive(childComplexity), true
+	case "ProductVariant.is_unlimited":
+		if e.ComplexityRoot.ProductVariant.IsUnlimited == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductVariant.IsUnlimited(childComplexity), true
 	case "ProductVariant.name":
 		if e.ComplexityRoot.ProductVariant.Name == nil {
 			break
@@ -5989,6 +5996,8 @@ func (ec *executionContext) fieldContext_CreateProductVariantResponse_data(_ con
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -7395,6 +7404,8 @@ func (ec *executionContext) fieldContext_DeleteProductVariantResponse_data(_ con
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -13629,6 +13640,8 @@ func (ec *executionContext) fieldContext_Product_variants(_ context.Context, fie
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -14401,6 +14414,8 @@ func (ec *executionContext) fieldContext_ProductIngredient_variant(_ context.Con
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -15380,6 +15395,35 @@ func (ec *executionContext) fieldContext_ProductVariant_available_stock(_ contex
 	return fc, nil
 }
 
+func (ec *executionContext) _ProductVariant_is_unlimited(ctx context.Context, field graphql.CollectedField, obj *model.ProductVariant) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductVariant_is_unlimited,
+		func(ctx context.Context) (any, error) {
+			return obj.IsUnlimited, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductVariant_is_unlimited(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductVariant",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProductVariant_is_active(ctx context.Context, field graphql.CollectedField, obj *model.ProductVariant) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -15625,6 +15669,8 @@ func (ec *executionContext) fieldContext_ProductVariantResponse_data(_ context.C
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -15769,6 +15815,8 @@ func (ec *executionContext) fieldContext_ProductVariantsResponse_data(_ context.
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -18400,6 +18448,8 @@ func (ec *executionContext) fieldContext_UpdateProductVariantResponse_data(_ con
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
 			case "available_stock":
 				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
+			case "is_unlimited":
+				return ec.fieldContext_ProductVariant_is_unlimited(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -21859,7 +21909,7 @@ func (ec *executionContext) unmarshalInputCreateProductVariantInput(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"image", "product_id", "name", "price", "price_original", "is_active"}
+	fieldsInOrder := [...]string{"image", "product_id", "name", "price", "price_original", "is_unlimited", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -21901,6 +21951,13 @@ func (ec *executionContext) unmarshalInputCreateProductVariantInput(ctx context.
 				return it, err
 			}
 			it.PriceOriginal = data
+		case "is_unlimited":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_unlimited"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsUnlimited = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
@@ -22581,7 +22638,7 @@ func (ec *executionContext) unmarshalInputUpdateProductVariantInput(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"image", "name", "price", "price_original", "is_active"}
+	fieldsInOrder := [...]string{"image", "name", "price", "price_original", "is_unlimited", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -22616,6 +22673,13 @@ func (ec *executionContext) unmarshalInputUpdateProductVariantInput(ctx context.
 				return it, err
 			}
 			it.PriceOriginal = data
+		case "is_unlimited":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_unlimited"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsUnlimited = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -25859,6 +25923,11 @@ func (ec *executionContext) _ProductVariant(ctx context.Context, sel ast.Selecti
 			}
 		case "available_stock":
 			out.Values[i] = ec._ProductVariant_available_stock(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "is_unlimited":
+			out.Values[i] = ec._ProductVariant_is_unlimited(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

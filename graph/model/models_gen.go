@@ -152,6 +152,7 @@ type CreateProductVariantInput struct {
 	Name          string   `json:"name"`
 	Price         float64  `json:"price"`
 	PriceOriginal *float64 `json:"price_original,omitempty"`
+	IsUnlimited   bool     `json:"is_unlimited"`
 	IsActive      bool     `json:"is_active"`
 }
 
@@ -505,6 +506,7 @@ type ProductVariant struct {
 	PriceOriginal  *float64             `json:"price_original,omitempty"`
 	Ingredients    []*ProductIngredient `json:"ingredients"`
 	AvailableStock float64              `json:"available_stock"`
+	IsUnlimited    bool                 `json:"is_unlimited"`
 	IsActive       bool                 `json:"is_active"`
 	DeletedAt      *time.Time           `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time            `json:"created_at"`
@@ -663,6 +665,7 @@ type UpdateProductVariantInput struct {
 	Name          *string  `json:"name,omitempty"`
 	Price         *float64 `json:"price,omitempty"`
 	PriceOriginal *float64 `json:"price_original,omitempty"`
+	IsUnlimited   *bool    `json:"is_unlimited,omitempty"`
 	IsActive      *bool    `json:"is_active,omitempty"`
 }
 

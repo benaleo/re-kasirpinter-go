@@ -60,6 +60,7 @@ func (s *ProductVariantService) Create(ctx context.Context, input model.CreatePr
 		Name:          input.Name,
 		Price:         input.Price,
 		PriceOriginal: input.PriceOriginal,
+		IsUnlimited:   input.IsUnlimited,
 		IsActive:      input.IsActive,
 	}
 
@@ -108,6 +109,9 @@ func (s *ProductVariantService) Update(ctx context.Context, id int64, input mode
 	}
 	if input.PriceOriginal != nil {
 		variant.PriceOriginal = input.PriceOriginal
+	}
+	if input.IsUnlimited != nil {
+		variant.IsUnlimited = *input.IsUnlimited
 	}
 	if input.IsActive != nil {
 		variant.IsActive = *input.IsActive

@@ -532,6 +532,7 @@ type ProductVariant {
   price_original: Float
   ingredients: [ProductIngredient!]!
   available_stock: Float!
+  is_unlimited: Boolean!
   is_active: Boolean!
   deleted_at: Time
   created_at: Time!

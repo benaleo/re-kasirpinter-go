@@ -266,6 +266,7 @@ func ToGraphQLProductVariant(productVariantDB model.ProductVariantDB) *model.Pro
 		Name:          productVariantDB.Name,
 		Price:         productVariantDB.Price,
 		PriceOriginal: productVariantDB.PriceOriginal,
+		IsUnlimited:   productVariantDB.IsUnlimited,
 		IsActive:      productVariantDB.IsActive,
 		DeletedAt:     productVariantDB.DeletedAt,
 		CreatedAt:     productVariantDB.CreatedAt,
@@ -285,49 +286,54 @@ func ToGraphQLProductVariant(productVariantDB model.ProductVariantDB) *model.Pro
 		}
 		variant.Ingredients = ingredients
 
-		// Calculate available stock based on ingredient availability
-		// For each ingredient, calculate how many units can be made
-		// The variant's available stock is the minimum of all these calculations
-		var availableStock float64 = -1 // -1 means unlimited or no ingredients
-		for _, ingredientDB := range productVariantDB.Ingredients {
-			if ingredientDB.Ingredient != nil {
-				// Calculate total stock for this ingredient
-				var totalStock float64
-				for _, stock := range ingredientDB.Ingredient.Stocks {
-					if stock.DeletedAt != nil {
-						continue
+		// If is_unlimited is true, set available_stock to -1 to indicate unlimited
+		if productVariantDB.IsUnlimited {
+			variant.AvailableStock = -1
+		} else {
+			// Calculate available stock based on ingredient availability
+			// For each ingredient, calculate how many units can be made
+			// The variant's available stock is the minimum of all these calculations
+			var availableStock float64 = -1 // -1 means no ingredients
+			for _, ingredientDB := range productVariantDB.Ingredients {
+				if ingredientDB.Ingredient != nil {
+					// Calculate total stock for this ingredient
+					var totalStock float64
+					for _, stock := range ingredientDB.Ingredient.Stocks {
+						if stock.DeletedAt != nil {
+							continue
+						}
+						if stock.Type == model.IngredientStockTypeIncrease {
+							totalStock += stock.Qty
+						} else if stock.Type == model.IngredientStockTypeDecrease {
+							totalStock -= stock.Qty
+						}
 					}
-					if stock.Type == model.IngredientStockTypeIncrease {
-						totalStock += stock.Qty
-					} else if stock.Type == model.IngredientStockTypeDecrease {
-						totalStock -= stock.Qty
-					}
-				}
 
-				// Calculate how many units can be made from this ingredient
-				if ingredientDB.IngredientValue > 0 {
-					unitsFromIngredient := totalStock / ingredientDB.IngredientValue
-					if availableStock == -1 || unitsFromIngredient < availableStock {
-						availableStock = unitsFromIngredient
+					// Calculate how many units can be made from this ingredient
+					if ingredientDB.IngredientValue > 0 {
+						unitsFromIngredient := totalStock / ingredientDB.IngredientValue
+						if availableStock == -1 || unitsFromIngredient < availableStock {
+							availableStock = unitsFromIngredient
+						}
 					}
 				}
 			}
+
+			// If availableStock is still -1, set it to 0 (no ingredients defined)
+			if availableStock == -1 {
+				availableStock = 0
+			}
+
+			// Ensure stock is not negative
+			if availableStock < 0 {
+				availableStock = 0
+			}
+
+			// Floor to integer (no decimals)
+			availableStock = float64(int(availableStock))
+
+			variant.AvailableStock = availableStock
 		}
-
-		// If availableStock is still -1, set it to 0 (no ingredients defined)
-		if availableStock == -1 {
-			availableStock = 0
-		}
-
-		// Ensure stock is not negative
-		if availableStock < 0 {
-			availableStock = 0
-		}
-
-		// Floor to integer (no decimals)
-		availableStock = float64(int(availableStock))
-
-		variant.AvailableStock = availableStock
 	} else {
 		variant.AvailableStock = 0
 	}

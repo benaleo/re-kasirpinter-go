@@ -437,6 +437,7 @@ type ProductVariantDB struct {
 	Name          string     `gorm:"not null" json:"name"`
 	Price         float64    `gorm:"not null" json:"price"`
 	PriceOriginal *float64   `json:"price_original,omitempty"`
+	IsUnlimited   bool       `gorm:"default:true" json:"is_unlimited"`
 	IsActive      bool       `gorm:"default:true" json:"is_active"`
 	DeletedAt     *time.Time `gorm:"index" json:"deleted_at,omitempty"`
 	CreatedAt     time.Time  `json:"created_at"`
