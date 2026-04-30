@@ -558,17 +558,83 @@ func (r *mutationResolver) DeleteProductVariant(ctx context.Context, id int64) (
 
 // CreateProductIngredient is the resolver for the createProductIngredient field.
 func (r *mutationResolver) CreateProductIngredient(ctx context.Context, input model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error) {
-	panic(fmt.Errorf("not implemented: CreateProductIngredient - createProductIngredient"))
+	if r.ProductIngredientService == nil {
+		return &model.CreateProductIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: "product ingredient service not initialized",
+		}, nil
+	}
+
+	productIngredientDB, err := r.ProductIngredientService.Create(ctx, input)
+	if err != nil {
+		return &model.CreateProductIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to create product ingredient: %v", err),
+		}, nil
+	}
+
+	return &model.CreateProductIngredientResponse{
+		Code:    200,
+		Success: true,
+		Message: "product ingredient created successfully",
+		Data:    helper.ToGraphQLProductIngredient(*productIngredientDB),
+	}, nil
 }
 
 // UpdateProductIngredient is the resolver for the updateProductIngredient field.
 func (r *mutationResolver) UpdateProductIngredient(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.UpdateProductIngredientResponse, error) {
-	panic(fmt.Errorf("not implemented: UpdateProductIngredient - updateProductIngredient"))
+	if r.ProductIngredientService == nil {
+		return &model.UpdateProductIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: "product ingredient service not initialized",
+		}, nil
+	}
+
+	productIngredientDB, err := r.ProductIngredientService.Update(ctx, id, input)
+	if err != nil {
+		return &model.UpdateProductIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to update product ingredient: %v", err),
+		}, nil
+	}
+
+	return &model.UpdateProductIngredientResponse{
+		Code:    200,
+		Success: true,
+		Message: "product ingredient updated successfully",
+		Data:    helper.ToGraphQLProductIngredient(*productIngredientDB),
+	}, nil
 }
 
 // DeleteProductIngredient is the resolver for the deleteProductIngredient field.
 func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, id int64) (*model.DeleteProductIngredientResponse, error) {
-	panic(fmt.Errorf("not implemented: DeleteProductIngredient - deleteProductIngredient"))
+	if r.ProductIngredientService == nil {
+		return &model.DeleteProductIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: "product ingredient service not initialized",
+		}, nil
+	}
+
+	productIngredientDB, err := r.ProductIngredientService.Delete(ctx, id)
+	if err != nil {
+		return &model.DeleteProductIngredientResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to delete product ingredient: %v", err),
+		}, nil
+	}
+
+	return &model.DeleteProductIngredientResponse{
+		Code:    200,
+		Success: true,
+		Message: "product ingredient deleted successfully",
+		Data:    helper.ToGraphQLProductIngredient(*productIngredientDB),
+	}, nil
 }
 
 // Users is the resolver for the users field.
@@ -773,7 +839,33 @@ func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.P
 
 // ProductIngredients is the resolver for the productIngredients field.
 func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID *int64, isActive *bool) (*model.ProductIngredientsResponse, error) {
-	panic(fmt.Errorf("not implemented: ProductIngredients - productIngredients"))
+	if r.ProductIngredientService == nil {
+		return &model.ProductIngredientsResponse{
+			Code:    500,
+			Success: false,
+			Message: "product ingredient service not initialized",
+		}, nil
+	}
+
+	productIngredientsDB, pageInfo, err := r.ProductIngredientService.GetAll(ctx, pagination, variantID, isActive)
+	if err != nil {
+		return &model.ProductIngredientsResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to retrieve product ingredients: %v", err),
+		}, nil
+	}
+
+	// Convert DB models to GraphQL models
+	productIngredients := helper.ToGraphQLProductIngredientSlice(productIngredientsDB)
+
+	return &model.ProductIngredientsResponse{
+		Code:       200,
+		Success:    true,
+		Message:    "product ingredients retrieved successfully",
+		Data:       productIngredients,
+		Pagination: pageInfo,
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

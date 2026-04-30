@@ -46,12 +46,17 @@ func (s *ProductIngredientService) Create(ctx context.Context, input model.Creat
 		return nil, err
 	}
 
+	// Preload variant and ingredient relationships
+	if err := s.DB.Preload("Variant").Preload("Ingredient").First(productIngredient, productIngredient.ID).Error; err != nil {
+		return nil, err
+	}
+
 	return productIngredient, nil
 }
 
 func (s *ProductIngredientService) Update(ctx context.Context, id int64, input model.UpdateProductIngredientInput) (*model.ProductIngredientDB, error) {
 	var productIngredient model.ProductIngredientDB
-	if err := s.DB.Where("id = ?", id).First(&productIngredient).Error; err != nil {
+	if err := s.DB.Preload("Variant").Preload("Ingredient").Where("id = ?", id).First(&productIngredient).Error; err != nil {
 		return nil, err
 	}
 
@@ -89,7 +94,7 @@ func (s *ProductIngredientService) GetAll(ctx context.Context, pagination *model
 
 	// Build query
 	query := s.DB.Model(&model.ProductIngredientDB{})
-	
+
 	if variantID != nil {
 		query = query.Where("variant_id = ?", *variantID)
 	}
@@ -103,7 +108,7 @@ func (s *ProductIngredientService) GetAll(ctx context.Context, pagination *model
 	limit := int(*pagination.Limit)
 	offset := (int(*pagination.Page) - 1) * limit
 
-	if err := query.Limit(limit).Offset(offset).Find(&productIngredients).Error; err != nil {
+	if err := query.Preload("Variant").Preload("Ingredient").Limit(limit).Offset(offset).Find(&productIngredients).Error; err != nil {
 		return nil, nil, err
 	}
 
@@ -111,10 +116,10 @@ func (s *ProductIngredientService) GetAll(ctx context.Context, pagination *model
 	totalPages := int((total + int64(limit) - 1) / int64(limit))
 	pageInfo := &model.PageInfo{
 		CurrentPage:     *pagination.Page,
-		PerPage:        *pagination.Limit,
-		TotalItems:     int32(total),
-		TotalPages:     int32(totalPages),
-		HasNextPage:    *pagination.Page < int32(totalPages),
+		PerPage:         *pagination.Limit,
+		TotalItems:      int32(total),
+		TotalPages:      int32(totalPages),
+		HasNextPage:     *pagination.Page < int32(totalPages),
 		HasPreviousPage: *pagination.Page > 1,
 	}
 
