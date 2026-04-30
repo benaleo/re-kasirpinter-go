@@ -277,13 +277,59 @@ func ToGraphQLProductVariant(productVariantDB model.ProductVariantDB) *model.Pro
 		variant.Product = ToGraphQLProduct(*productVariantDB.Product)
 	}
 
-	// Set ingredients if available
+	// Set ingredients if available and calculate available stock
 	if len(productVariantDB.Ingredients) > 0 {
 		ingredients := make([]*model.ProductIngredient, len(productVariantDB.Ingredients))
 		for i, ingredientDB := range productVariantDB.Ingredients {
 			ingredients[i] = ToGraphQLProductIngredient(ingredientDB)
 		}
 		variant.Ingredients = ingredients
+
+		// Calculate available stock based on ingredient availability
+		// For each ingredient, calculate how many units can be made
+		// The variant's available stock is the minimum of all these calculations
+		var availableStock float64 = -1 // -1 means unlimited or no ingredients
+		for _, ingredientDB := range productVariantDB.Ingredients {
+			if ingredientDB.Ingredient != nil {
+				// Calculate total stock for this ingredient
+				var totalStock float64
+				for _, stock := range ingredientDB.Ingredient.Stocks {
+					if stock.DeletedAt != nil {
+						continue
+					}
+					if stock.Type == model.IngredientStockTypeIncrease {
+						totalStock += stock.Qty
+					} else if stock.Type == model.IngredientStockTypeDecrease {
+						totalStock -= stock.Qty
+					}
+				}
+
+				// Calculate how many units can be made from this ingredient
+				if ingredientDB.IngredientValue > 0 {
+					unitsFromIngredient := totalStock / ingredientDB.IngredientValue
+					if availableStock == -1 || unitsFromIngredient < availableStock {
+						availableStock = unitsFromIngredient
+					}
+				}
+			}
+		}
+
+		// If availableStock is still -1, set it to 0 (no ingredients defined)
+		if availableStock == -1 {
+			availableStock = 0
+		}
+
+		// Ensure stock is not negative
+		if availableStock < 0 {
+			availableStock = 0
+		}
+
+		// Floor to integer (no decimals)
+		availableStock = float64(int(availableStock))
+
+		variant.AvailableStock = availableStock
+	} else {
+		variant.AvailableStock = 0
 	}
 
 	return variant

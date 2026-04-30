@@ -480,18 +480,19 @@ type ComplexityRoot struct {
 	}
 
 	ProductVariant struct {
-		CreatedAt     func(childComplexity int) int
-		DeletedAt     func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Image         func(childComplexity int) int
-		Ingredients   func(childComplexity int) int
-		IsActive      func(childComplexity int) int
-		Name          func(childComplexity int) int
-		Price         func(childComplexity int) int
-		PriceOriginal func(childComplexity int) int
-		Product       func(childComplexity int) int
-		ProductID     func(childComplexity int) int
-		UpdatedAt     func(childComplexity int) int
+		AvailableStock func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		DeletedAt      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Image          func(childComplexity int) int
+		Ingredients    func(childComplexity int) int
+		IsActive       func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Price          func(childComplexity int) int
+		PriceOriginal  func(childComplexity int) int
+		Product        func(childComplexity int) int
+		ProductID      func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	ProductVariantResponse struct {
@@ -2702,6 +2703,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.ProductResponse.Success(childComplexity), true
 
+	case "ProductVariant.available_stock":
+		if e.ComplexityRoot.ProductVariant.AvailableStock == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductVariant.AvailableStock(childComplexity), true
 	case "ProductVariant.created_at":
 		if e.ComplexityRoot.ProductVariant.CreatedAt == nil {
 			break
@@ -5980,6 +5987,8 @@ func (ec *executionContext) fieldContext_CreateProductVariantResponse_data(_ con
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -7384,6 +7393,8 @@ func (ec *executionContext) fieldContext_DeleteProductVariantResponse_data(_ con
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -13616,6 +13627,8 @@ func (ec *executionContext) fieldContext_Product_variants(_ context.Context, fie
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -14386,6 +14399,8 @@ func (ec *executionContext) fieldContext_ProductIngredient_variant(_ context.Con
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -15336,6 +15351,35 @@ func (ec *executionContext) fieldContext_ProductVariant_ingredients(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _ProductVariant_available_stock(ctx context.Context, field graphql.CollectedField, obj *model.ProductVariant) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductVariant_available_stock,
+		func(ctx context.Context) (any, error) {
+			return obj.AvailableStock, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductVariant_available_stock(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductVariant",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProductVariant_is_active(ctx context.Context, field graphql.CollectedField, obj *model.ProductVariant) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -15579,6 +15623,8 @@ func (ec *executionContext) fieldContext_ProductVariantResponse_data(_ context.C
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -15721,6 +15767,8 @@ func (ec *executionContext) fieldContext_ProductVariantsResponse_data(_ context.
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -18350,6 +18398,8 @@ func (ec *executionContext) fieldContext_UpdateProductVariantResponse_data(_ con
 				return ec.fieldContext_ProductVariant_price_original(ctx, field)
 			case "ingredients":
 				return ec.fieldContext_ProductVariant_ingredients(ctx, field)
+			case "available_stock":
+				return ec.fieldContext_ProductVariant_available_stock(ctx, field)
 			case "is_active":
 				return ec.fieldContext_ProductVariant_is_active(ctx, field)
 			case "deleted_at":
@@ -25804,6 +25854,11 @@ func (ec *executionContext) _ProductVariant(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._ProductVariant_price_original(ctx, field, obj)
 		case "ingredients":
 			out.Values[i] = ec._ProductVariant_ingredients(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "available_stock":
+			out.Values[i] = ec._ProductVariant_available_stock(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

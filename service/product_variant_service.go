@@ -139,7 +139,7 @@ func (s *ProductVariantService) GetAll(ctx context.Context, pagination *model.Pa
 	var total int64
 
 	// Build query
-	query := s.DB.Where("deleted_at IS NULL")
+	query := s.DB.Model(&model.ProductVariantDB{}).Where("deleted_at IS NULL")
 
 	if productID != 0 {
 		query = query.Where("product_id = ?", productID)
@@ -150,15 +150,21 @@ func (s *ProductVariantService) GetAll(ctx context.Context, pagination *model.Pa
 	}
 
 	// Get total count
-	if err := query.Model(&model.ProductVariantDB{}).Count(&total).Error; err != nil {
+	if err := query.Count(&total).Error; err != nil {
 		return nil, nil, err
 	}
 
-	// Apply pagination
+	// Apply pagination with preload of Ingredients and their Stocks
 	limit := int(*pagination.Limit)
 	offset := (int(*pagination.Page) - 1) * limit
 
-	if err := query.Limit(limit).Offset(offset).Find(&variants).Error; err != nil {
+	if err := query.
+		Preload("Ingredients").
+		Preload("Ingredients.Ingredient").
+		Preload("Ingredients.Ingredient.Stocks", "deleted_at IS NULL").
+		Limit(limit).
+		Offset(offset).
+		Find(&variants).Error; err != nil {
 		return nil, nil, err
 	}
 
@@ -178,7 +184,12 @@ func (s *ProductVariantService) GetAll(ctx context.Context, pagination *model.Pa
 
 func (s *ProductVariantService) GetByID(ctx context.Context, id int64) (*model.ProductVariantDB, error) {
 	var variant model.ProductVariantDB
-	if err := s.DB.Where("id = ? AND deleted_at IS NULL", id).First(&variant).Error; err != nil {
+	if err := s.DB.
+		Where("id = ? AND deleted_at IS NULL", id).
+		Preload("Ingredients").
+		Preload("Ingredients.Ingredient").
+		Preload("Ingredients.Ingredient.Stocks", "deleted_at IS NULL").
+		First(&variant).Error; err != nil {
 		return nil, err
 	}
 

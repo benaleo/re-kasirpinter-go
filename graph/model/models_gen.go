@@ -496,18 +496,19 @@ type ProductResponse struct {
 }
 
 type ProductVariant struct {
-	ID            int64                `json:"id"`
-	Image         *string              `json:"image,omitempty"`
-	ProductID     int64                `json:"product_id"`
-	Product       *Product             `json:"product,omitempty"`
-	Name          string               `json:"name"`
-	Price         float64              `json:"price"`
-	PriceOriginal *float64             `json:"price_original,omitempty"`
-	Ingredients   []*ProductIngredient `json:"ingredients"`
-	IsActive      bool                 `json:"is_active"`
-	DeletedAt     *time.Time           `json:"deleted_at,omitempty"`
-	CreatedAt     time.Time            `json:"created_at"`
-	UpdatedAt     time.Time            `json:"updated_at"`
+	ID             int64                `json:"id"`
+	Image          *string              `json:"image,omitempty"`
+	ProductID      int64                `json:"product_id"`
+	Product        *Product             `json:"product,omitempty"`
+	Name           string               `json:"name"`
+	Price          float64              `json:"price"`
+	PriceOriginal  *float64             `json:"price_original,omitempty"`
+	Ingredients    []*ProductIngredient `json:"ingredients"`
+	AvailableStock float64              `json:"available_stock"`
+	IsActive       bool                 `json:"is_active"`
+	DeletedAt      *time.Time           `json:"deleted_at,omitempty"`
+	CreatedAt      time.Time            `json:"created_at"`
+	UpdatedAt      time.Time            `json:"updated_at"`
 }
 
 type ProductVariantResponse struct {
