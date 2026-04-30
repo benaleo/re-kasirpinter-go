@@ -673,7 +673,36 @@ func (r *queryResolver) CheckDiscount(ctx context.Context, code string) (*model.
 
 // ProductVariants is the resolver for the productVariants field.
 func (r *queryResolver) ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID *int64, isActive *bool) (*model.ProductVariantsResponse, error) {
-	panic(fmt.Errorf("not implemented: ProductVariants - productVariants"))
+	if r.ProductVariantService == nil {
+		return &model.ProductVariantsResponse{
+			Code:    500,
+			Success: false,
+			Message: "product variant service not initialized",
+		}, nil
+	}
+
+	variantsDB, pageInfo, err := r.ProductVariantService.GetAll(ctx, pagination, productID, isActive)
+	if err != nil {
+		return &model.ProductVariantsResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to retrieve product variants: %v", err),
+		}, nil
+	}
+
+	// Convert DB models to GraphQL models
+	variants := make([]*model.ProductVariant, len(variantsDB))
+	for i, variantDB := range variantsDB {
+		variants[i] = helper.ToGraphQLProductVariant(*variantDB)
+	}
+
+	return &model.ProductVariantsResponse{
+		Code:       200,
+		Success:    true,
+		Message:    "product variants retrieved successfully",
+		Data:       variants,
+		Pagination: pageInfo,
+	}, nil
 }
 
 // ProductIngredients is the resolver for the productIngredients field.
