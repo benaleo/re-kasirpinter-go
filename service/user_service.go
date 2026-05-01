@@ -65,17 +65,18 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 
 		// Handle avatar upload if provided
 		var avatarURL *string
-		if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
-			avatarURLStr, err := s.R2Service.UploadFromBase64(
-				context.Background(),
-				*input.Avatar,
-				"avatars",
-				secureID,
-			)
-			if err != nil {
-				return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+		if input.Avatar != nil && *input.Avatar != "" {
+			// If avatar is already a URL, use it directly
+			if helper.IsImageURL(*input.Avatar) {
+				avatarURL = input.Avatar
+			} else {
+				// Upload to R2 using helper with UUID filename
+				avatarURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Avatar, "avatars")
+				if err != nil {
+					return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+				}
+				avatarURL = &avatarURLStr
 			}
-			avatarURL = &avatarURLStr
 		}
 
 		// Create user DB model
@@ -149,17 +150,18 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 
 		// Handle avatar upload if provided
 		var avatarURL *string
-		if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
-			avatarURLStr, err := s.R2Service.UploadFromBase64(
-				context.Background(),
-				*input.Avatar,
-				"avatars",
-				secureID,
-			)
-			if err != nil {
-				return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+		if input.Avatar != nil && *input.Avatar != "" {
+			// If avatar is already a URL, use it directly
+			if helper.IsImageURL(*input.Avatar) {
+				avatarURL = input.Avatar
+			} else {
+				// Upload to R2 using helper with UUID filename
+				avatarURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Avatar, "avatars")
+				if err != nil {
+					return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+				}
+				avatarURL = &avatarURLStr
 			}
-			avatarURL = &avatarURLStr
 		}
 
 		// Create user DB model
@@ -212,21 +214,22 @@ func (s *UserService) UpdateUser(ctx context.Context, id string, input input.Upd
 
 	// Handle avatar upload if provided
 	var avatarURL *string
-	if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
-		avatarURLStr, err := s.R2Service.UploadFromBase64(
-			ctx,
-			*input.Avatar,
-			"avatars",
-			id,
-		)
-		if err != nil {
-			return &model.UpdateUserResponse{
-				Code:    500,
-				Success: false,
-				Message: fmt.Sprintf("failed to upload avatar: %v", err),
-			}, nil
+	if input.Avatar != nil && *input.Avatar != "" {
+		// If avatar is already a URL, use it directly
+		if helper.IsImageURL(*input.Avatar) {
+			avatarURL = input.Avatar
+		} else {
+			// Upload to R2 using helper with UUID filename
+			avatarURLStr, err := helper.UploadImageToR2(ctx, s.R2Service, *input.Avatar, "avatars")
+			if err != nil {
+				return &model.UpdateUserResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to upload avatar: %v", err),
+				}, nil
+			}
+			avatarURL = &avatarURLStr
 		}
-		avatarURL = &avatarURLStr
 	}
 
 	// Update fields if provided

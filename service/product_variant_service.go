@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"re-kasirpinter-go/graph/model"
+	"re-kasirpinter-go/helper"
 
 	"gorm.io/gorm"
 )
@@ -38,15 +39,11 @@ func (s *ProductVariantService) Create(ctx context.Context, input model.CreatePr
 	var imageURL *string
 	if input.Image != nil && *input.Image != "" {
 		// If image is already a URL, use it directly
-		if len(*input.Image) >= 4 && (*input.Image)[:4] == "http" {
+		if helper.IsImageURL(*input.Image) {
 			imageURL = input.Image
-		} else if s.R2Service != nil {
-			imageURLStr, err := s.R2Service.UploadFromBase64(
-				context.Background(),
-				*input.Image,
-				"product-variants",
-				fmt.Sprintf("%d", input.ProductID),
-			)
+		} else {
+			// Upload to R2 using helper with UUID filename
+			imageURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Image, "product-variants")
 			if err != nil {
 				return nil, fmt.Errorf("failed to upload image: %v", err)
 			}
@@ -82,15 +79,11 @@ func (s *ProductVariantService) Update(ctx context.Context, id int64, input mode
 		// Handle image upload if provided
 		if *input.Image != "" {
 			// If image is already a URL, use it directly
-			if len(*input.Image) >= 4 && (*input.Image)[:4] == "http" {
+			if helper.IsImageURL(*input.Image) {
 				variant.Image = input.Image
-			} else if s.R2Service != nil {
-				imageURLStr, err := s.R2Service.UploadFromBase64(
-					context.Background(),
-					*input.Image,
-					"product-variants",
-					fmt.Sprintf("%d", variant.ProductID),
-				)
+			} else {
+				// Upload to R2 using helper with UUID filename
+				imageURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Image, "product-variants")
 				if err != nil {
 					return nil, fmt.Errorf("failed to upload image: %v", err)
 				}

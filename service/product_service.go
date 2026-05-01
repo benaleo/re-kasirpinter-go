@@ -102,21 +102,22 @@ func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.C
 
 	// Handle image upload if provided
 	var imageURL *string
-	if input.Image != nil && *input.Image != "" && s.R2Service != nil {
-		imageURLStr, err := s.R2Service.UploadFromBase64(
-			context.Background(),
-			*input.Image,
-			"products",
-			secureID,
-		)
-		if err != nil {
-			return &model.CreateProductResponse{
-				Code:    500,
-				Success: false,
-				Message: fmt.Sprintf("failed to upload image: %v", err),
-			}, nil
+	if input.Image != nil && *input.Image != "" {
+		// If image is already a URL, use it directly
+		if helper.IsImageURL(*input.Image) {
+			imageURL = input.Image
+		} else {
+			// Upload to R2 using helper with UUID filename
+			imageURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Image, "products")
+			if err != nil {
+				return &model.CreateProductResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to upload image: %v", err),
+				}, nil
+			}
+			imageURL = &imageURLStr
 		}
-		imageURL = &imageURLStr
 	}
 
 	// Create product DB model
@@ -193,30 +194,22 @@ func (s *ProductService) UpdateProduct(ctx context.Context, id int64, input mode
 
 	// Handle image upload if provided
 	var imageURL *string
-	if input.Image != nil && *input.Image != "" && s.R2Service != nil {
-		// Use secure_id for upload folder naming
-		secureID := ""
-		if productDB.SecureID != nil {
-			secureID = *productDB.SecureID
+	if input.Image != nil && *input.Image != "" {
+		// If image is already a URL, use it directly
+		if helper.IsImageURL(*input.Image) {
+			imageURL = input.Image
+		} else {
+			// Upload to R2 using helper with UUID filename
+			imageURLStr, err := helper.UploadImageToR2(ctx, s.R2Service, *input.Image, "products")
+			if err != nil {
+				return &model.UpdateProductResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to upload image: %v", err),
+				}, nil
+			}
+			imageURL = &imageURLStr
 		}
-		if secureID == "" {
-			secureID = fmt.Sprintf("%d", id)
-		}
-
-		imageURLStr, err := s.R2Service.UploadFromBase64(
-			ctx,
-			*input.Image,
-			"products",
-			secureID,
-		)
-		if err != nil {
-			return &model.UpdateProductResponse{
-				Code:    500,
-				Success: false,
-				Message: fmt.Sprintf("failed to upload image: %v", err),
-			}, nil
-		}
-		imageURL = &imageURLStr
 	}
 
 	// Update fields if provided

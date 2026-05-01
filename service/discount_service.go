@@ -7,7 +7,6 @@ import (
 	"re-kasirpinter-go/helper"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -95,26 +94,24 @@ func (s *DiscountService) Discounts(pagination *model.PaginationInput, isActive 
 }
 
 func (s *DiscountService) CreateDiscount(input model.CreateDiscountInput) (*model.CreateDiscountResponse, error) {
-	// Generate UUID v4 for icon upload
-	secureID := uuid.New().String()
-
 	// Handle icon upload if provided
 	var iconURL *string
-	if input.Icon != nil && *input.Icon != "" && s.R2Service != nil {
-		iconURLStr, err := s.R2Service.UploadFromBase64(
-			context.Background(),
-			*input.Icon,
-			"discounts",
-			secureID,
-		)
-		if err != nil {
-			return &model.CreateDiscountResponse{
-				Code:    500,
-				Success: false,
-				Message: fmt.Sprintf("failed to upload icon: %v", err),
-			}, nil
+	if input.Icon != nil && *input.Icon != "" {
+		// If icon is already a URL, use it directly
+		if helper.IsImageURL(*input.Icon) {
+			iconURL = input.Icon
+		} else {
+			// Upload to R2 using helper with UUID filename
+			iconURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Icon, "discounts")
+			if err != nil {
+				return &model.CreateDiscountResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to upload icon: %v", err),
+				}, nil
+			}
+			iconURL = &iconURLStr
 		}
-		iconURL = &iconURLStr
 	}
 
 	// Create discount DB model
@@ -175,22 +172,22 @@ func (s *DiscountService) UpdateDiscount(ctx context.Context, id int64, input mo
 
 	// Handle icon upload if provided
 	var iconURL *string
-	if input.Icon != nil && *input.Icon != "" && s.R2Service != nil {
-		// Use ID for upload folder naming
-		iconURLStr, err := s.R2Service.UploadFromBase64(
-			ctx,
-			*input.Icon,
-			"discounts",
-			fmt.Sprintf("%d", id),
-		)
-		if err != nil {
-			return &model.UpdateDiscountResponse{
-				Code:    500,
-				Success: false,
-				Message: fmt.Sprintf("failed to upload icon: %v", err),
-			}, nil
+	if input.Icon != nil && *input.Icon != "" {
+		// If icon is already a URL, use it directly
+		if helper.IsImageURL(*input.Icon) {
+			iconURL = input.Icon
+		} else {
+			// Upload to R2 using helper with UUID filename
+			iconURLStr, err := helper.UploadImageToR2(ctx, s.R2Service, *input.Icon, "discounts")
+			if err != nil {
+				return &model.UpdateDiscountResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to upload icon: %v", err),
+				}, nil
+			}
+			iconURL = &iconURLStr
 		}
-		iconURL = &iconURLStr
 	}
 
 	// Update fields if provided
