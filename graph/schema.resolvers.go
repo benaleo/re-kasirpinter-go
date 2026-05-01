@@ -967,6 +967,39 @@ func (r *queryResolver) ProductExtras(ctx context.Context, pagination *model.Pag
 	return r.ProductExtraService.ProductExtras(pagination, isActive)
 }
 
+// ProductHasExtras is the resolver for the productHasExtras field.
+func (r *queryResolver) ProductHasExtras(ctx context.Context, productID int64) (*model.ProductHasExtrasResponse, error) {
+	if r.ProductHasExtraService == nil {
+		return &model.ProductHasExtrasResponse{
+			Code:    500,
+			Success: false,
+			Message: "product has extra service not initialized",
+		}, nil
+	}
+
+	productHasExtraDB, err := r.ProductHasExtraService.GetByProductID(ctx, productID)
+	if err != nil {
+		return &model.ProductHasExtrasResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to get product has extras: %v", err),
+		}, nil
+	}
+
+	// Convert all items to GraphQL format
+	var data []*model.ProductHasExtra
+	for _, item := range productHasExtraDB {
+		data = append(data, helper.ToGraphQLProductHasExtra(*item))
+	}
+
+	return &model.ProductHasExtrasResponse{
+		Code:    200,
+		Success: true,
+		Message: "product has extras retrieved successfully",
+		Data:    data,
+	}, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 

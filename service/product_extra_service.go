@@ -236,3 +236,20 @@ func (s *ProductHasExtraService) Delete(ctx context.Context, productID int64) ([
 
 	return productHasExtrasPtr, nil
 }
+
+func (s *ProductHasExtraService) GetByProductID(ctx context.Context, productID int64) ([]*model.ProductHasExtraDB, error) {
+	// Find all product has extras by product_id
+	var productHasExtrasDB []model.ProductHasExtraDB
+	result := s.DB.Where("product_id = ?", productID).Find(&productHasExtrasDB)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to find product has extras: %v", result.Error)
+	}
+
+	// Convert to pointer slice
+	var productHasExtrasPtr []*model.ProductHasExtraDB
+	for i := range productHasExtrasDB {
+		productHasExtrasPtr = append(productHasExtrasPtr, &productHasExtrasDB[i])
+	}
+
+	return productHasExtrasPtr, nil
+}

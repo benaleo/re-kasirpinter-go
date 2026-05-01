@@ -101,6 +101,8 @@ type Query {
     pagination: PaginationInput
     is_active: Boolean
   ): ProductExtrasResponse! @auth
+  #product has extras
+  productHasExtras(product_id: Int64!): ProductHasExtrasResponse! @auth
 }
 
 type Mutation {
