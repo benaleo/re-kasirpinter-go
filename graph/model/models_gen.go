@@ -528,7 +528,6 @@ type ProductExtrasResponse struct {
 }
 
 type ProductHasExtra struct {
-	ID             int64         `json:"id"`
 	ProductID      int64         `json:"product_id"`
 	Product        *Product      `json:"product,omitempty"`
 	ProductExtraID int64         `json:"product_extra_id"`

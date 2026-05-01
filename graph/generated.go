@@ -506,7 +506,6 @@ type ComplexityRoot struct {
 
 	ProductHasExtra struct {
 		CreatedAt      func(childComplexity int) int
-		ID             func(childComplexity int) int
 		Product        func(childComplexity int) int
 		ProductExtra   func(childComplexity int) int
 		ProductExtraID func(childComplexity int) int
@@ -2934,12 +2933,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.ProductHasExtra.CreatedAt(childComplexity), true
-	case "ProductHasExtra.id":
-		if e.ComplexityRoot.ProductHasExtra.ID == nil {
-			break
-		}
-
-		return e.ComplexityRoot.ProductHasExtra.ID(childComplexity), true
 	case "ProductHasExtra.product":
 		if e.ComplexityRoot.ProductHasExtra.Product == nil {
 			break
@@ -6433,8 +6426,6 @@ func (ec *executionContext) fieldContext_CreateProductHasExtraResponse_data(_ co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProductHasExtra_id(ctx, field)
 			case "product_id":
 				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
 			case "product":
@@ -8107,8 +8098,6 @@ func (ec *executionContext) fieldContext_DeleteProductHasExtraResponse_data(_ co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProductHasExtra_id(ctx, field)
 			case "product_id":
 				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
 			case "product":
@@ -16310,35 +16299,6 @@ func (ec *executionContext) fieldContext_ProductExtrasResponse_pagination(_ cont
 	return fc, nil
 }
 
-func (ec *executionContext) _ProductHasExtra_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_ProductHasExtra_id,
-		func(ctx context.Context) (any, error) {
-			return obj.ID, nil
-		},
-		nil,
-		ec.marshalNInt642int64,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_ProductHasExtra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProductHasExtra",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int64 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ProductHasExtra_product_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -16668,8 +16628,6 @@ func (ec *executionContext) fieldContext_ProductHasExtraResponse_data(_ context.
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProductHasExtra_id(ctx, field)
 			case "product_id":
 				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
 			case "product":
@@ -16800,8 +16758,6 @@ func (ec *executionContext) fieldContext_ProductHasExtrasResponse_data(_ context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_ProductHasExtra_id(ctx, field)
 			case "product_id":
 				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
 			case "product":
@@ -29027,11 +28983,6 @@ func (ec *executionContext) _ProductHasExtra(ctx context.Context, sel ast.Select
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProductHasExtra")
-		case "id":
-			out.Values[i] = ec._ProductHasExtra_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "product_id":
 			out.Values[i] = ec._ProductHasExtra_product_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

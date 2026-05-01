@@ -628,7 +628,6 @@ type ProductExtra {
 }
 
 type ProductHasExtra {
-  id: Int64!
   product_id: Int64!
   product: Product
   product_extra_id: Int64!

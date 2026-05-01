@@ -532,9 +532,8 @@ func (p *ProductExtraDB) BeforeUpdate(tx *gorm.DB) error {
 
 // ProductHasExtraDB represents the database model for ProductHasExtra
 type ProductHasExtraDB struct {
-	ID             int64     `gorm:"primaryKey;autoIncrement" json:"id"`
-	ProductID      int64     `gorm:"not null;index" json:"product_id"`
-	ProductExtraID int64     `gorm:"not null;index" json:"product_extra_id"`
+	ProductID      int64     `gorm:"primaryKey;not null" json:"product_id"`
+	ProductExtraID int64     `gorm:"primaryKey;not null" json:"product_extra_id"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 

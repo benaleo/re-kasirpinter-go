@@ -414,7 +414,6 @@ func ToGraphQLProductExtra(productExtraDB model.ProductExtraDB) *model.ProductEx
 // ToGraphQLProductHasExtra converts ProductHasExtraDB to GraphQL ProductHasExtra model
 func ToGraphQLProductHasExtra(productHasExtraDB model.ProductHasExtraDB) *model.ProductHasExtra {
 	hasExtra := &model.ProductHasExtra{
-		ID:             productHasExtraDB.ID,
 		ProductID:      productHasExtraDB.ProductID,
 		ProductExtraID: productHasExtraDB.ProductExtraID,
 		CreatedAt:      productHasExtraDB.CreatedAt,
