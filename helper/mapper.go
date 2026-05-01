@@ -246,6 +246,15 @@ func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 		product.IsAvailable = false
 	}
 
+	// Set product_extra_ids if ProductHasExtras relationship is loaded
+	if len(productDB.ProductHasExtras) > 0 {
+		productExtraIds := make([]int64, len(productDB.ProductHasExtras))
+		for i, hasExtra := range productDB.ProductHasExtras {
+			productExtraIds[i] = hasExtra.ProductExtraID
+		}
+		product.ProductExtraIds = productExtraIds
+	}
+
 	return product
 }
 

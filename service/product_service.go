@@ -30,12 +30,17 @@ func NewProductService(db *gorm.DB) (*ProductService, error) {
 	}, nil
 }
 
-func (s *ProductService) Products(pagination *model.PaginationInput, isActive *bool) (*model.ProductsResponse, error) {
+func (s *ProductService) Products(pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query with category preload
 	baseQuery := s.DB.Model(&model.ProductDB{}).Preload("Category").Where("deleted_at IS NULL")
+
+	// Preload ProductHasExtras if productExtraIds flag is true
+	if productExtraIds != nil && *productExtraIds {
+		baseQuery = baseQuery.Preload("ProductHasExtras")
+	}
 
 	// Filter by is_active if provided
 	if isActive != nil {

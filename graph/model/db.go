@@ -359,8 +359,9 @@ type ProductDB struct {
 	UpdatedAt   time.Time  `json:"updated_at"`
 
 	// Relations
-	Category *ProductCategoryDB `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
-	Variants []ProductVariantDB `gorm:"foreignKey:ProductID" json:"variants,omitempty"`
+	Category         *ProductCategoryDB  `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Variants         []ProductVariantDB  `gorm:"foreignKey:ProductID" json:"variants,omitempty"`
+	ProductHasExtras []ProductHasExtraDB `gorm:"foreignKey:ProductID" json:"product_has_extras,omitempty"`
 }
 
 // TableName specifies the table name for ProductDB

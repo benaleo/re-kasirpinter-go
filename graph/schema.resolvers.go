@@ -854,7 +854,7 @@ func (r *queryResolver) ProductCategories(ctx context.Context, pagination *model
 }
 
 // Products is the resolver for the products field.
-func (r *queryResolver) Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductsResponse, error) {
+func (r *queryResolver) Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error) {
 	if r.ProductService == nil {
 		return &model.ProductsResponse{
 			Code:    500,
@@ -862,7 +862,7 @@ func (r *queryResolver) Products(ctx context.Context, pagination *model.Paginati
 			Message: "product service not initialized",
 		}, nil
 	}
-	return r.ProductService.Products(pagination, isActive)
+	return r.ProductService.Products(pagination, isActive, productExtraIds)
 }
 
 // Discounts is the resolver for the discounts field.

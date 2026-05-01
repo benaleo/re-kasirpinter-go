@@ -436,19 +436,20 @@ type ComplexityRoot struct {
 	}
 
 	Product struct {
-		Category    func(childComplexity int) int
-		CategoryID  func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		DeletedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Image       func(childComplexity int) int
-		IsActive    func(childComplexity int) int
-		IsAvailable func(childComplexity int) int
-		Name        func(childComplexity int) int
-		SecureID    func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		Variants    func(childComplexity int) int
+		Category        func(childComplexity int) int
+		CategoryID      func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		DeletedAt       func(childComplexity int) int
+		Description     func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Image           func(childComplexity int) int
+		IsActive        func(childComplexity int) int
+		IsAvailable     func(childComplexity int) int
+		Name            func(childComplexity int) int
+		ProductExtraIds func(childComplexity int) int
+		SecureID        func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
+		Variants        func(childComplexity int) int
 	}
 
 	ProductCategoriesResponse struct {
@@ -614,7 +615,7 @@ type ComplexityRoot struct {
 		ProductHasExtras     func(childComplexity int, productID int64) int
 		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID int64) int
 		ProductVariants      func(childComplexity int, pagination *model.PaginationInput, productID int64, isActive *bool) int
-		Products             func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
+		Products             func(childComplexity int, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) int
 		Role                 func(childComplexity int, id int64) int
 		Roles                func(childComplexity int) int
 		User                 func(childComplexity int, id string) int
@@ -825,7 +826,7 @@ type QueryResolver interface {
 	Ingredients(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.IngredientsResponse, error)
 	IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error)
 	ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error)
-	Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductsResponse, error)
+	Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error)
 	Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error)
 	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
@@ -2692,6 +2693,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Product.Name(childComplexity), true
+	case "Product.product_extra_ids":
+		if e.ComplexityRoot.Product.ProductExtraIds == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Product.ProductExtraIds(childComplexity), true
 	case "Product.secure_id":
 		if e.ComplexityRoot.Product.SecureID == nil {
 			break
@@ -3455,7 +3462,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Products(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool)), true
+		return e.ComplexityRoot.Query.Products(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool), args["product_extra_ids"].(*bool)), true
 	case "Query.role":
 		if e.ComplexityRoot.Query.Role == nil {
 			break
@@ -4851,6 +4858,11 @@ func (ec *executionContext) field_Query_products_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["is_active"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "product_extra_ids", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["product_extra_ids"] = arg2
 	return args, nil
 }
 
@@ -6718,6 +6730,8 @@ func (ec *executionContext) fieldContext_CreateProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -8390,6 +8404,8 @@ func (ec *executionContext) fieldContext_DeleteProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -15128,6 +15144,35 @@ func (ec *executionContext) fieldContext_Product_variants(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Product_product_extra_ids(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Product_product_extra_ids,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductExtraIds, nil
+		},
+		nil,
+		ec.marshalOInt642ᚕint64ᚄ,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Product_product_extra_ids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProductCategoriesResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.ProductCategoriesResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -16378,6 +16423,8 @@ func (ec *executionContext) fieldContext_ProductHasExtra_product(_ context.Conte
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -17593,6 +17640,8 @@ func (ec *executionContext) fieldContext_ProductResponse_data(_ context.Context,
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -17737,6 +17786,8 @@ func (ec *executionContext) fieldContext_ProductVariant_product(_ context.Contex
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -18530,6 +18581,8 @@ func (ec *executionContext) fieldContext_ProductsResponse_data(_ context.Context
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -19162,7 +19215,7 @@ func (ec *executionContext) _Query_products(ctx context.Context, field graphql.C
 		ec.fieldContext_Query_products,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Products(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_active"].(*bool))
+			return ec.Resolvers.Query().Products(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_active"].(*bool), fc.Args["product_extra_ids"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -21094,6 +21147,8 @@ func (ec *executionContext) fieldContext_UpdateProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_updated_at(ctx, field)
 			case "variants":
 				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -28597,6 +28652,8 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "product_extra_ids":
+			out.Values[i] = ec._Product_product_extra_ids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -33136,6 +33193,42 @@ func (ec *executionContext) marshalOInt2ᚖint32(ctx context.Context, sel ast.Se
 	_ = ctx
 	res := graphql.MarshalInt32(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOInt642ᚕint64ᚄ(ctx context.Context, v any) ([]int64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]int64, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt642int64(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInt642ᚕint64ᚄ(ctx context.Context, sel ast.SelectionSet, v []int64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt642int64(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOInt642ᚕᚖint64(ctx context.Context, v any) ([]*int64, error) {

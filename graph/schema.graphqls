@@ -75,8 +75,11 @@ type Query {
   # products
   productCategories(pagination: PaginationInput): ProductCategoriesResponse!
     @auth
-  products(pagination: PaginationInput, is_active: Boolean): ProductsResponse!
-    @auth
+  products(
+    pagination: PaginationInput
+    is_active: Boolean
+    product_extra_ids: Boolean
+  ): ProductsResponse! @auth
   # discounts
   discounts(
     pagination: PaginationInput

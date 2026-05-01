@@ -459,19 +459,20 @@ type PermissionsResponse struct {
 }
 
 type Product struct {
-	ID          int64             `json:"id"`
-	SecureID    *string           `json:"secure_id,omitempty"`
-	Name        string            `json:"name"`
-	Image       *string           `json:"image,omitempty"`
-	CategoryID  *int64            `json:"category_id,omitempty"`
-	Category    *ProductCategory  `json:"category,omitempty"`
-	Description *string           `json:"description,omitempty"`
-	IsAvailable bool              `json:"is_available"`
-	IsActive    bool              `json:"is_active"`
-	DeletedAt   *time.Time        `json:"deleted_at,omitempty"`
-	CreatedAt   time.Time         `json:"created_at"`
-	UpdatedAt   time.Time         `json:"updated_at"`
-	Variants    []*ProductVariant `json:"variants"`
+	ID              int64             `json:"id"`
+	SecureID        *string           `json:"secure_id,omitempty"`
+	Name            string            `json:"name"`
+	Image           *string           `json:"image,omitempty"`
+	CategoryID      *int64            `json:"category_id,omitempty"`
+	Category        *ProductCategory  `json:"category,omitempty"`
+	Description     *string           `json:"description,omitempty"`
+	IsAvailable     bool              `json:"is_available"`
+	IsActive        bool              `json:"is_active"`
+	DeletedAt       *time.Time        `json:"deleted_at,omitempty"`
+	CreatedAt       time.Time         `json:"created_at"`
+	UpdatedAt       time.Time         `json:"updated_at"`
+	Variants        []*ProductVariant `json:"variants"`
+	ProductExtraIds []int64           `json:"product_extra_ids,omitempty"`
 }
 
 type ProductCategoriesResponse struct {

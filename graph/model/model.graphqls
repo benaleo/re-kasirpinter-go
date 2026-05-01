@@ -512,6 +512,7 @@ type Product {
   created_at: Time!
   updated_at: Time!
   variants: [ProductVariant!]!
+  product_extra_ids: [Int64!]
 }
 
 enum DiscountType {
