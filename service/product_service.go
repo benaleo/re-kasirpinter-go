@@ -30,12 +30,17 @@ func NewProductService(db *gorm.DB) (*ProductService, error) {
 	}, nil
 }
 
-func (s *ProductService) Products(pagination *model.PaginationInput) (*model.ProductsResponse, error) {
+func (s *ProductService) Products(pagination *model.PaginationInput, isActive *bool) (*model.ProductsResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query with category preload
 	baseQuery := s.DB.Model(&model.ProductDB{}).Preload("Category").Where("deleted_at IS NULL")
+
+	// Filter by is_active if provided
+	if isActive != nil {
+		baseQuery = baseQuery.Where("is_active = ?", *isActive)
+	}
 
 	// Get total count
 	var total int64
@@ -48,10 +53,18 @@ func (s *ProductService) Products(pagination *model.PaginationInput) (*model.Pro
 		}, nil
 	}
 
-	// Query products with pagination
+	// Query products with pagination and preload variants with ingredients and stocks
 	paginationResult := helper.BuildPaginationResult(params, total, 0)
 	var productsDB []model.ProductDB
-	result := baseQuery.Order(paginationResult.SortBy).Limit(int(paginationResult.Limit)).Offset(paginationResult.Offset).Find(&productsDB)
+	result := baseQuery.
+		Preload("Variants", "deleted_at IS NULL").
+		Preload("Variants.Ingredients").
+		Preload("Variants.Ingredients.Ingredient").
+		Preload("Variants.Ingredients.Ingredient.Stocks", "deleted_at IS NULL").
+		Order(paginationResult.SortBy).
+		Limit(int(paginationResult.Limit)).
+		Offset(paginationResult.Offset).
+		Find(&productsDB)
 	if result.Error != nil {
 		return &model.ProductsResponse{
 			Code:    500,

@@ -441,6 +441,7 @@ type Product {
   category_id: Int64
   category: ProductCategory
   description: String
+  is_available: Boolean!
   is_active: Boolean!
   deleted_at: Time
   created_at: Time!

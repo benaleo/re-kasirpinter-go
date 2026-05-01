@@ -427,6 +427,7 @@ type Product struct {
 	CategoryID  *int64            `json:"category_id,omitempty"`
 	Category    *ProductCategory  `json:"category,omitempty"`
 	Description *string           `json:"description,omitempty"`
+	IsAvailable bool              `json:"is_available"`
 	IsActive    bool              `json:"is_active"`
 	DeletedAt   *time.Time        `json:"deleted_at,omitempty"`
 	CreatedAt   time.Time         `json:"created_at"`

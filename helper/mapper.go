@@ -229,7 +229,21 @@ func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 				variants[i] = ToGraphQLProductVariant(variantDB)
 			}
 			product.Variants = variants
+
+			// Calculate is_available: true if any variant has available_stock > 0 or is_unlimited is true and is_active is true
+			isAvailable := false
+			for _, variant := range variants {
+				if variant.IsActive && (variant.IsUnlimited || variant.AvailableStock > 0) {
+					isAvailable = true
+					break
+				}
+			}
+			product.IsAvailable = isAvailable
+		} else {
+			product.IsAvailable = false
 		}
+	} else {
+		product.IsAvailable = false
 	}
 
 	return product

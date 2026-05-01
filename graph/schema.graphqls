@@ -64,7 +64,7 @@ type Query {
   ingredientStocks(pagination: PaginationInput, ingredient_id: Int64): IngredientStocksResponse! @auth
   # products
   productCategories(pagination: PaginationInput): ProductCategoriesResponse! @auth
-  products(pagination: PaginationInput): ProductsResponse! @auth
+  products(pagination: PaginationInput, is_active: Boolean): ProductsResponse! @auth
   # discounts
   discounts(pagination: PaginationInput, is_active: Boolean, is_period: Boolean, is_quota: Boolean): DiscountsResponse! @auth
   checkDiscount(code: String!): CheckDiscountResponse!

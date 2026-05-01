@@ -411,6 +411,7 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Image       func(childComplexity int) int
 		IsActive    func(childComplexity int) int
+		IsAvailable func(childComplexity int) int
 		Name        func(childComplexity int) int
 		SecureID    func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -529,7 +530,7 @@ type ComplexityRoot struct {
 		ProductCategories    func(childComplexity int, pagination *model.PaginationInput) int
 		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID int64) int
 		ProductVariants      func(childComplexity int, pagination *model.PaginationInput, productID int64, isActive *bool) int
-		Products             func(childComplexity int, pagination *model.PaginationInput) int
+		Products             func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
 		Role                 func(childComplexity int, id int64) int
 		Roles                func(childComplexity int) int
 		User                 func(childComplexity int, id string) int
@@ -728,7 +729,7 @@ type QueryResolver interface {
 	Ingredients(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.IngredientsResponse, error)
 	IngredientStocks(ctx context.Context, pagination *model.PaginationInput, ingredientID *int64) (*model.IngredientStocksResponse, error)
 	ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error)
-	Products(ctx context.Context, pagination *model.PaginationInput) (*model.ProductsResponse, error)
+	Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductsResponse, error)
 	Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error)
 	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
@@ -2426,6 +2427,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Product.IsActive(childComplexity), true
+	case "Product.is_available":
+		if e.ComplexityRoot.Product.IsAvailable == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Product.IsAvailable(childComplexity), true
 	case "Product.name":
 		if e.ComplexityRoot.Product.Name == nil {
 			break
@@ -2981,7 +2988,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Products(childComplexity, args["pagination"].(*model.PaginationInput)), true
+		return e.ComplexityRoot.Query.Products(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool)), true
 	case "Query.role":
 		if e.ComplexityRoot.Query.Role == nil {
 			break
@@ -4257,6 +4264,11 @@ func (ec *executionContext) field_Query_products_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_active", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_active"] = arg1
 	return args, nil
 }
 
@@ -5850,6 +5862,8 @@ func (ec *executionContext) fieldContext_CreateProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
 				return ec.fieldContext_Product_is_active(ctx, field)
 			case "deleted_at":
@@ -7258,6 +7272,8 @@ func (ec *executionContext) fieldContext_DeleteProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
 				return ec.fieldContext_Product_is_active(ctx, field)
 			case "deleted_at":
@@ -13482,6 +13498,35 @@ func (ec *executionContext) fieldContext_Product_description(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Product_is_available(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Product_is_available,
+		func(ctx context.Context) (any, error) {
+			return obj.IsAvailable, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Product_is_available(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Product_is_active(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -15071,6 +15116,8 @@ func (ec *executionContext) fieldContext_ProductResponse_data(_ context.Context,
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
 				return ec.fieldContext_Product_is_active(ctx, field)
 			case "deleted_at":
@@ -15213,6 +15260,8 @@ func (ec *executionContext) fieldContext_ProductVariant_product(_ context.Contex
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
 				return ec.fieldContext_Product_is_active(ctx, field)
 			case "deleted_at":
@@ -16004,6 +16053,8 @@ func (ec *executionContext) fieldContext_ProductsResponse_data(_ context.Context
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
 				return ec.fieldContext_Product_is_active(ctx, field)
 			case "deleted_at":
@@ -16646,7 +16697,7 @@ func (ec *executionContext) _Query_products(ctx context.Context, field graphql.C
 		ec.fieldContext_Query_products,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Products(ctx, fc.Args["pagination"].(*model.PaginationInput))
+			return ec.Resolvers.Query().Products(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_active"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
@@ -18302,6 +18353,8 @@ func (ec *executionContext) fieldContext_UpdateProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
 				return ec.fieldContext_Product_is_active(ctx, field)
 			case "deleted_at":
@@ -25424,6 +25477,11 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Product_category(ctx, field, obj)
 		case "description":
 			out.Values[i] = ec._Product_description(ctx, field, obj)
+		case "is_available":
+			out.Values[i] = ec._Product_is_available(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "is_active":
 			out.Values[i] = ec._Product_is_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
