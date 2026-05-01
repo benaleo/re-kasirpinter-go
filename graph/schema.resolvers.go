@@ -658,72 +658,6 @@ func (r *mutationResolver) DeleteProductExtra(ctx context.Context, id int64) (*m
 	return r.ProductExtraService.DeleteProductExtra(id)
 }
 
-// CreateProductHasExtra is the resolver for the createProductHasExtra field.
-func (r *mutationResolver) CreateProductHasExtra(ctx context.Context, input model.CreateProductHasExtraInput) (*model.CreateProductHasExtraResponse, error) {
-	if r.ProductHasExtraService == nil {
-		return &model.CreateProductHasExtraResponse{
-			Code:    500,
-			Success: false,
-			Message: "product has extra service not initialized",
-		}, nil
-	}
-
-	productHasExtraDB, err := r.ProductHasExtraService.Create(ctx, &input)
-	if err != nil {
-		return &model.CreateProductHasExtraResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to create product has extra: %v", err),
-		}, nil
-	}
-
-	// Convert all created items to GraphQL format
-	var data []*model.ProductHasExtra
-	for _, item := range productHasExtraDB {
-		data = append(data, helper.ToGraphQLProductHasExtra(*item))
-	}
-
-	return &model.CreateProductHasExtraResponse{
-		Code:    200,
-		Success: true,
-		Message: "product has extra saved successfully",
-		Data:    data,
-	}, nil
-}
-
-// DeleteProductHasExtra is the resolver for the deleteProductHasExtra field.
-func (r *mutationResolver) DeleteProductHasExtra(ctx context.Context, productID int64) (*model.DeleteProductHasExtraResponse, error) {
-	if r.ProductHasExtraService == nil {
-		return &model.DeleteProductHasExtraResponse{
-			Code:    500,
-			Success: false,
-			Message: "product has extra service not initialized",
-		}, nil
-	}
-
-	productHasExtraDB, err := r.ProductHasExtraService.Delete(ctx, productID)
-	if err != nil {
-		return &model.DeleteProductHasExtraResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to delete product has extra: %v", err),
-		}, nil
-	}
-
-	// Convert all deleted items to GraphQL format
-	var data []*model.ProductHasExtra
-	for _, item := range productHasExtraDB {
-		data = append(data, helper.ToGraphQLProductHasExtra(*item))
-	}
-
-	return &model.DeleteProductHasExtraResponse{
-		Code:    200,
-		Success: true,
-		Message: "product has extra deleted successfully",
-		Data:    data,
-	}, nil
-}
-
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
@@ -965,39 +899,6 @@ func (r *queryResolver) ProductExtras(ctx context.Context, pagination *model.Pag
 		}, nil
 	}
 	return r.ProductExtraService.ProductExtras(pagination, isActive)
-}
-
-// ProductHasExtras is the resolver for the productHasExtras field.
-func (r *queryResolver) ProductHasExtras(ctx context.Context, productID int64) (*model.ProductHasExtrasResponse, error) {
-	if r.ProductHasExtraService == nil {
-		return &model.ProductHasExtrasResponse{
-			Code:    500,
-			Success: false,
-			Message: "product has extra service not initialized",
-		}, nil
-	}
-
-	productHasExtraDB, err := r.ProductHasExtraService.GetByProductID(ctx, productID)
-	if err != nil {
-		return &model.ProductHasExtrasResponse{
-			Code:    500,
-			Success: false,
-			Message: fmt.Sprintf("failed to get product has extras: %v", err),
-		}, nil
-	}
-
-	// Convert all items to GraphQL format
-	var data []*model.ProductHasExtra
-	for _, item := range productHasExtraDB {
-		data = append(data, helper.ToGraphQLProductHasExtra(*item))
-	}
-
-	return &model.ProductHasExtrasResponse{
-		Code:    200,
-		Success: true,
-		Message: "product has extras retrieved successfully",
-		Data:    data,
-	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

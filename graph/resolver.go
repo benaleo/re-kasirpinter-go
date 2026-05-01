@@ -26,5 +26,4 @@ type Resolver struct {
 	ProductVariantService     *service.ProductVariantService
 	ProductIngredientService  *service.ProductIngredientService
 	ProductExtraService       *service.ProductExtraService
-	ProductHasExtraService    *service.ProductHasExtraService
 }

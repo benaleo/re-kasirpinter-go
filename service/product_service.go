@@ -139,8 +139,34 @@ func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.C
 		}, nil
 	}
 
-	// Reload with category
-	s.DB.Preload("Category").First(&productDB, productDB.ID)
+	// Handle product_extra_ids if provided
+	if input.ProductExtraIds != nil && len(input.ProductExtraIds) > 0 {
+		// Create ProductHasExtra relationships
+		var productHasExtras []model.ProductHasExtraDB
+		for _, extraID := range input.ProductExtraIds {
+			if extraID != nil {
+				productHasExtras = append(productHasExtras, model.ProductHasExtraDB{
+					ProductID:      productDB.ID,
+					ProductExtraID: *extraID,
+				})
+			}
+		}
+
+		// Save all ProductHasExtra relationships
+		if len(productHasExtras) > 0 {
+			result := s.DB.Create(&productHasExtras)
+			if result.Error != nil {
+				return &model.CreateProductResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to create product extras: %v", result.Error),
+				}, nil
+			}
+		}
+	}
+
+	// Reload with category and product extras
+	s.DB.Preload("Category").Preload("ProductHasExtras").First(&productDB, productDB.ID)
 
 	// Convert DB model to GraphQL model
 	product := helper.ToGraphQLProduct(productDB)
@@ -223,8 +249,39 @@ func (s *ProductService) UpdateProduct(ctx context.Context, id int64, input mode
 		}, nil
 	}
 
-	// Reload with category
-	s.DB.Preload("Category").First(&productDB, productDB.ID)
+	// Handle product_extra_ids if provided (replace all existing relationships)
+	if input.ProductExtraIds != nil {
+		// Delete existing ProductHasExtra relationships for this product
+		s.DB.Where("product_id = ?", productDB.ID).Delete(&model.ProductHasExtraDB{})
+
+		// Create new ProductHasExtra relationships if any are provided
+		if len(input.ProductExtraIds) > 0 {
+			var productHasExtras []model.ProductHasExtraDB
+			for _, extraID := range input.ProductExtraIds {
+				if extraID != nil {
+					productHasExtras = append(productHasExtras, model.ProductHasExtraDB{
+						ProductID:      productDB.ID,
+						ProductExtraID: *extraID,
+					})
+				}
+			}
+
+			// Save all new ProductHasExtra relationships
+			if len(productHasExtras) > 0 {
+				result := s.DB.Create(&productHasExtras)
+				if result.Error != nil {
+					return &model.UpdateProductResponse{
+						Code:    500,
+						Success: false,
+						Message: fmt.Sprintf("failed to update product extras: %v", result.Error),
+					}, nil
+				}
+			}
+		}
+	}
+
+	// Reload with category and product extras
+	s.DB.Preload("Category").Preload("ProductHasExtras").First(&productDB, productDB.ID)
 
 	// Convert DB model to GraphQL model
 	product := helper.ToGraphQLProduct(productDB)

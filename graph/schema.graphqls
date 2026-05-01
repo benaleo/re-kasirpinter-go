@@ -104,8 +104,6 @@ type Query {
     pagination: PaginationInput
     is_active: Boolean
   ): ProductExtrasResponse! @auth
-  #product has extras
-  productHasExtras(product_id: Int64!): ProductHasExtrasResponse! @auth
 }
 
 type Mutation {
@@ -206,11 +204,4 @@ type Mutation {
     input: UpdateProductExtraInput!
   ): UpdateProductExtraResponse! @auth
   deleteProductExtra(id: Int64!): DeleteProductExtraResponse! @auth
-
-  # product has extras
-  createProductHasExtra(
-    input: CreateProductHasExtraInput!
-  ): CreateProductHasExtraResponse! @auth
-  deleteProductHasExtra(product_id: Int64!): DeleteProductHasExtraResponse!
-    @auth
 }

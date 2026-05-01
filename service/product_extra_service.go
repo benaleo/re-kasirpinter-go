@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
@@ -181,75 +180,4 @@ func (s *ProductExtraService) ProductExtras(pagination *model.PaginationInput, i
 		Data:       productExtras,
 		Pagination: paginationResult.PageInfo,
 	}, nil
-}
-
-type ProductHasExtraService struct {
-	DB *gorm.DB
-}
-
-func NewProductHasExtraService(db *gorm.DB) (*ProductHasExtraService, error) {
-	return &ProductHasExtraService{
-		DB: db,
-	}, nil
-}
-
-func (s *ProductHasExtraService) Create(ctx context.Context, input *model.CreateProductHasExtraInput) ([]*model.ProductHasExtraDB, error) {
-	var productHasExtrasDB []*model.ProductHasExtraDB
-
-	for _, extraID := range input.ProductExtraIds {
-		productHasExtraDB := &model.ProductHasExtraDB{
-			ProductID:      input.ProductID,
-			ProductExtraID: extraID,
-		}
-
-		// Save to database
-		result := s.DB.Create(productHasExtraDB)
-		if result.Error != nil {
-			return nil, fmt.Errorf("failed to create product has extra: %v", result.Error)
-		}
-
-		productHasExtrasDB = append(productHasExtrasDB, productHasExtraDB)
-	}
-
-	return productHasExtrasDB, nil
-}
-
-func (s *ProductHasExtraService) Delete(ctx context.Context, productID int64) ([]*model.ProductHasExtraDB, error) {
-	// Find all product has extras by product_id
-	var productHasExtrasDB []model.ProductHasExtraDB
-	result := s.DB.Where("product_id = ?", productID).Find(&productHasExtrasDB)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to find product has extras: %v", result.Error)
-	}
-
-	// Delete all records
-	result = s.DB.Where("product_id = ?", productID).Delete(&model.ProductHasExtraDB{})
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to delete product has extras: %v", result.Error)
-	}
-
-	// Convert to pointer slice
-	var productHasExtrasPtr []*model.ProductHasExtraDB
-	for i := range productHasExtrasDB {
-		productHasExtrasPtr = append(productHasExtrasPtr, &productHasExtrasDB[i])
-	}
-
-	return productHasExtrasPtr, nil
-}
-
-func (s *ProductHasExtraService) GetByProductID(ctx context.Context, productID int64) ([]*model.ProductHasExtraDB, error) {
-	// Find all product has extras by product_id
-	var productHasExtrasDB []model.ProductHasExtraDB
-	result := s.DB.Where("product_id = ?", productID).Find(&productHasExtrasDB)
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to find product has extras: %v", result.Error)
-	}
-
-	// Convert to pointer slice
-	var productHasExtrasPtr []*model.ProductHasExtraDB
-	for i := range productHasExtrasDB {
-		productHasExtrasPtr = append(productHasExtrasPtr, &productHasExtrasDB[i])
-	}
-
-	return productHasExtrasPtr, nil
 }

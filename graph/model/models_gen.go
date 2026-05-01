@@ -157,11 +157,12 @@ type CreateProductIngredientResponse struct {
 }
 
 type CreateProductInput struct {
-	Name        string  `json:"name"`
-	Image       *string `json:"image,omitempty"`
-	CategoryID  *int64  `json:"category_id,omitempty"`
-	Description *string `json:"description,omitempty"`
-	IsActive    bool    `json:"is_active"`
+	Name            string   `json:"name"`
+	Image           *string  `json:"image,omitempty"`
+	CategoryID      *int64   `json:"category_id,omitempty"`
+	Description     *string  `json:"description,omitempty"`
+	IsActive        bool     `json:"is_active"`
+	ProductExtraIds []*int64 `json:"product_extra_ids,omitempty"`
 }
 
 type CreateProductResponse struct {
@@ -749,11 +750,12 @@ type UpdateProductIngredientResponse struct {
 }
 
 type UpdateProductInput struct {
-	Name        *string `json:"name,omitempty"`
-	Image       *string `json:"image,omitempty"`
-	CategoryID  *int64  `json:"category_id,omitempty"`
-	Description *string `json:"description,omitempty"`
-	IsActive    *bool   `json:"is_active,omitempty"`
+	Name            *string  `json:"name,omitempty"`
+	Image           *string  `json:"image,omitempty"`
+	CategoryID      *int64   `json:"category_id,omitempty"`
+	Description     *string  `json:"description,omitempty"`
+	IsActive        *bool    `json:"is_active,omitempty"`
+	ProductExtraIds []*int64 `json:"product_extra_ids,omitempty"`
 }
 
 type UpdateProductResponse struct {

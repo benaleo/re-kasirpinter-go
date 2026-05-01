@@ -377,7 +377,6 @@ type ComplexityRoot struct {
 		CreateProduct            func(childComplexity int, input model.CreateProductInput) int
 		CreateProductCategory    func(childComplexity int, input model.CreateProductCategoryInput) int
 		CreateProductExtra       func(childComplexity int, input model.CreateProductExtraInput) int
-		CreateProductHasExtra    func(childComplexity int, input model.CreateProductHasExtraInput) int
 		CreateProductIngredient  func(childComplexity int, input []*model.CreateProductIngredientInput) int
 		CreateProductVariant     func(childComplexity int, input model.CreateProductVariantInput) int
 		CreateRole               func(childComplexity int, input model.CreateRoleInput) int
@@ -389,7 +388,6 @@ type ComplexityRoot struct {
 		DeleteProduct            func(childComplexity int, id int64) int
 		DeleteProductCategory    func(childComplexity int, id int64) int
 		DeleteProductExtra       func(childComplexity int, id int64) int
-		DeleteProductHasExtra    func(childComplexity int, productID int64) int
 		DeleteProductIngredient  func(childComplexity int, variantID int64) int
 		DeleteProductVariant     func(childComplexity int, id int64) int
 		DeleteRole               func(childComplexity int, id int64) int
@@ -612,7 +610,6 @@ type ComplexityRoot struct {
 		Permissions          func(childComplexity int) int
 		ProductCategories    func(childComplexity int, pagination *model.PaginationInput) int
 		ProductExtras        func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
-		ProductHasExtras     func(childComplexity int, productID int64) int
 		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID int64) int
 		ProductVariants      func(childComplexity int, pagination *model.PaginationInput, productID int64, isActive *bool) int
 		Products             func(childComplexity int, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) int
@@ -813,8 +810,6 @@ type MutationResolver interface {
 	CreateProductExtra(ctx context.Context, input model.CreateProductExtraInput) (*model.CreateProductExtraResponse, error)
 	UpdateProductExtra(ctx context.Context, id int64, input model.UpdateProductExtraInput) (*model.UpdateProductExtraResponse, error)
 	DeleteProductExtra(ctx context.Context, id int64) (*model.DeleteProductExtraResponse, error)
-	CreateProductHasExtra(ctx context.Context, input model.CreateProductHasExtraInput) (*model.CreateProductHasExtraResponse, error)
-	DeleteProductHasExtra(ctx context.Context, productID int64) (*model.DeleteProductHasExtraResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
@@ -832,7 +827,6 @@ type QueryResolver interface {
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
 	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
 	ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error)
-	ProductHasExtras(ctx context.Context, productID int64) (*model.ProductHasExtrasResponse, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -2197,17 +2191,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateProductExtra(childComplexity, args["input"].(model.CreateProductExtraInput)), true
-	case "Mutation.createProductHasExtra":
-		if e.ComplexityRoot.Mutation.CreateProductHasExtra == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createProductHasExtra_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.CreateProductHasExtra(childComplexity, args["input"].(model.CreateProductHasExtraInput)), true
 	case "Mutation.createProductIngredient":
 		if e.ComplexityRoot.Mutation.CreateProductIngredient == nil {
 			break
@@ -2329,17 +2312,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.DeleteProductExtra(childComplexity, args["id"].(int64)), true
-	case "Mutation.deleteProductHasExtra":
-		if e.ComplexityRoot.Mutation.DeleteProductHasExtra == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteProductHasExtra_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Mutation.DeleteProductHasExtra(childComplexity, args["product_id"].(int64)), true
 	case "Mutation.deleteProductIngredient":
 		if e.ComplexityRoot.Mutation.DeleteProductIngredient == nil {
 			break
@@ -3419,17 +3391,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.ProductExtras(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool)), true
-	case "Query.productHasExtras":
-		if e.ComplexityRoot.Query.ProductHasExtras == nil {
-			break
-		}
-
-		args, err := ec.field_Query_productHasExtras_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.ComplexityRoot.Query.ProductHasExtras(childComplexity, args["product_id"].(int64)), true
 	case "Query.productIngredients":
 		if e.ComplexityRoot.Query.ProductIngredients == nil {
 			break
@@ -4278,17 +4239,6 @@ func (ec *executionContext) field_Mutation_createProductExtra_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createProductHasExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductHasExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraInput)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createProductIngredient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -4412,17 +4362,6 @@ func (ec *executionContext) field_Mutation_deleteProductExtra_args(ctx context.C
 		return nil, err
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteProductHasExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "product_id", ec.unmarshalNInt642int64)
-	if err != nil {
-		return nil, err
-	}
-	args["product_id"] = arg0
 	return args, nil
 }
 
@@ -4794,17 +4733,6 @@ func (ec *executionContext) field_Query_productExtras_args(ctx context.Context, 
 		return nil, err
 	}
 	args["is_active"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_productHasExtras_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "product_id", ec.unmarshalNInt642int64)
-	if err != nil {
-		return nil, err
-	}
-	args["product_id"] = arg0
 	return args, nil
 }
 
@@ -14146,134 +14074,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteProductExtra(ctx context
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createProductHasExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_createProductHasExtra,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().CreateProductHasExtra(ctx, fc.Args["input"].(model.CreateProductHasExtraInput))
-		},
-		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
-			directive0 := next
-
-			directive1 := func(ctx context.Context) (any, error) {
-				if ec.Directives.Auth == nil {
-					var zeroVal *model.CreateProductHasExtraResponse
-					return zeroVal, errors.New("directive auth is not implemented")
-				}
-				return ec.Directives.Auth(ctx, nil, directive0)
-			}
-
-			next = directive1
-			return next
-		},
-		ec.marshalNCreateProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraResponse,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createProductHasExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "code":
-				return ec.fieldContext_CreateProductHasExtraResponse_code(ctx, field)
-			case "success":
-				return ec.fieldContext_CreateProductHasExtraResponse_success(ctx, field)
-			case "message":
-				return ec.fieldContext_CreateProductHasExtraResponse_message(ctx, field)
-			case "data":
-				return ec.fieldContext_CreateProductHasExtraResponse_data(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type CreateProductHasExtraResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createProductHasExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteProductHasExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_deleteProductHasExtra,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().DeleteProductHasExtra(ctx, fc.Args["product_id"].(int64))
-		},
-		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
-			directive0 := next
-
-			directive1 := func(ctx context.Context) (any, error) {
-				if ec.Directives.Auth == nil {
-					var zeroVal *model.DeleteProductHasExtraResponse
-					return zeroVal, errors.New("directive auth is not implemented")
-				}
-				return ec.Directives.Auth(ctx, nil, directive0)
-			}
-
-			next = directive1
-			return next
-		},
-		ec.marshalNDeleteProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductHasExtraResponse,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteProductHasExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "code":
-				return ec.fieldContext_DeleteProductHasExtraResponse_code(ctx, field)
-			case "success":
-				return ec.fieldContext_DeleteProductHasExtraResponse_success(ctx, field)
-			case "message":
-				return ec.fieldContext_DeleteProductHasExtraResponse_message(ctx, field)
-			case "data":
-				return ec.fieldContext_DeleteProductHasExtraResponse_data(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteProductHasExtraResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteProductHasExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _NewPasswordResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -19588,72 +19388,6 @@ func (ec *executionContext) fieldContext_Query_productExtras(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_productHasExtras(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Query_productHasExtras,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().ProductHasExtras(ctx, fc.Args["product_id"].(int64))
-		},
-		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
-			directive0 := next
-
-			directive1 := func(ctx context.Context) (any, error) {
-				if ec.Directives.Auth == nil {
-					var zeroVal *model.ProductHasExtrasResponse
-					return zeroVal, errors.New("directive auth is not implemented")
-				}
-				return ec.Directives.Auth(ctx, nil, directive0)
-			}
-
-			next = directive1
-			return next
-		},
-		ec.marshalNProductHasExtrasResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtrasResponse,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Query_productHasExtras(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "code":
-				return ec.fieldContext_ProductHasExtrasResponse_code(ctx, field)
-			case "success":
-				return ec.fieldContext_ProductHasExtrasResponse_success(ctx, field)
-			case "message":
-				return ec.fieldContext_ProductHasExtrasResponse_message(ctx, field)
-			case "data":
-				return ec.fieldContext_ProductHasExtrasResponse_data(ctx, field)
-			case "pagination":
-				return ec.fieldContext_ProductHasExtrasResponse_pagination(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProductHasExtrasResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_productHasExtras_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -24769,7 +24503,7 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "is_active"}
+	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "is_active", "product_extra_ids"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -24811,6 +24545,13 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 				return it, err
 			}
 			it.IsActive = data
+		case "product_extra_ids":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_extra_ids"))
+			data, err := ec.unmarshalOInt642ᚕᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductExtraIds = data
 		}
 	}
 	return it, nil
@@ -25542,7 +25283,7 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "is_active"}
+	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "is_active", "product_extra_ids"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25584,6 +25325,13 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 				return it, err
 			}
 			it.IsActive = data
+		case "product_extra_ids":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_extra_ids"))
+			data, err := ec.unmarshalOInt642ᚕᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductExtraIds = data
 		}
 	}
 	return it, nil
@@ -28386,20 +28134,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createProductHasExtra":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createProductHasExtra(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteProductHasExtra":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteProductHasExtra(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -30029,28 +29763,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "productHasExtras":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_productHasExtras(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -31663,25 +31375,6 @@ func (ec *executionContext) marshalNCreateProductExtraResponse2ᚖreᚑkasirpint
 	return ec._CreateProductExtraResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateProductHasExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraInput(ctx context.Context, v any) (model.CreateProductHasExtraInput, error) {
-	res, err := ec.unmarshalInputCreateProductHasExtraInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNCreateProductHasExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateProductHasExtraResponse) graphql.Marshaler {
-	return ec._CreateProductHasExtraResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCreateProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.CreateProductHasExtraResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CreateProductHasExtraResponse(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNCreateProductIngredientInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInputᚄ(ctx context.Context, v any) ([]*model.CreateProductIngredientInput, error) {
 	var vSlice []any
 	vSlice = graphql.CoerceList(v)
@@ -31874,20 +31567,6 @@ func (ec *executionContext) marshalNDeleteProductExtraResponse2ᚖreᚑkasirpint
 		return graphql.Null
 	}
 	return ec._DeleteProductExtraResponse(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNDeleteProductHasExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteProductHasExtraResponse) graphql.Marshaler {
-	return ec._DeleteProductHasExtraResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeleteProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProductHasExtraResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteProductHasExtraResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeleteProductIngredientResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductIngredientResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteProductIngredientResponse) graphql.Marshaler {
@@ -32424,20 +32103,6 @@ func (ec *executionContext) marshalNProductHasExtra2ᚖreᚑkasirpinterᚑgoᚋg
 		return graphql.Null
 	}
 	return ec._ProductHasExtra(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProductHasExtrasResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtrasResponse(ctx context.Context, sel ast.SelectionSet, v model.ProductHasExtrasResponse) graphql.Marshaler {
-	return ec._ProductHasExtrasResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNProductHasExtrasResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtrasResponse(ctx context.Context, sel ast.SelectionSet, v *model.ProductHasExtrasResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProductHasExtrasResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProductIngredient2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProductIngredient) graphql.Marshaler {

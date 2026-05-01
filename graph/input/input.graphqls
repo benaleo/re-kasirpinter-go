@@ -125,6 +125,7 @@ input CreateProductInput {
   category_id: Int64
   description: String
   is_active: Boolean!
+  product_extra_ids: [Int64]
 }
 
 input UpdateProductInput {
@@ -133,6 +134,7 @@ input UpdateProductInput {
   category_id: Int64
   description: String
   is_active: Boolean
+  product_extra_ids: [Int64]
 }
 
 input CreateDiscountInput {
