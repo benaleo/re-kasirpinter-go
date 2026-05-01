@@ -117,6 +117,31 @@ type CreateProductCategoryResponse struct {
 	Data    *ProductCategory `json:"data,omitempty"`
 }
 
+type CreateProductExtraInput struct {
+	Name     string  `json:"name"`
+	Price    float64 `json:"price"`
+	IsActive bool    `json:"is_active"`
+}
+
+type CreateProductExtraResponse struct {
+	Code    int32         `json:"code"`
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Data    *ProductExtra `json:"data,omitempty"`
+}
+
+type CreateProductHasExtraInput struct {
+	ProductID       int64   `json:"product_id"`
+	ProductExtraIds []int64 `json:"product_extra_ids"`
+}
+
+type CreateProductHasExtraResponse struct {
+	Code    int32              `json:"code"`
+	Success bool               `json:"success"`
+	Message string             `json:"message"`
+	Data    []*ProductHasExtra `json:"data,omitempty"`
+}
+
 type CreateProductIngredientInput struct {
 	VariantID       int64   `json:"variant_id"`
 	IngredientID    int64   `json:"ingredient_id"`
@@ -216,6 +241,20 @@ type DeleteProductCategoryResponse struct {
 	Success bool             `json:"success"`
 	Message string           `json:"message"`
 	Data    *ProductCategory `json:"data,omitempty"`
+}
+
+type DeleteProductExtraResponse struct {
+	Code    int32         `json:"code"`
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Data    *ProductExtra `json:"data,omitempty"`
+}
+
+type DeleteProductHasExtraResponse struct {
+	Code    int32              `json:"code"`
+	Success bool               `json:"success"`
+	Message string             `json:"message"`
+	Data    []*ProductHasExtra `json:"data,omitempty"`
 }
 
 type DeleteProductIngredientResponse struct {
@@ -463,6 +502,56 @@ type ProductCategoryResponse struct {
 	Data    *ProductCategory `json:"data,omitempty"`
 }
 
+type ProductExtra struct {
+	ID        int64      `json:"id"`
+	Name      string     `json:"name"`
+	Price     float64    `json:"price"`
+	IsActive  bool       `json:"is_active"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+}
+
+type ProductExtraResponse struct {
+	Code    int32         `json:"code"`
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Data    *ProductExtra `json:"data,omitempty"`
+}
+
+type ProductExtrasResponse struct {
+	Code       int32           `json:"code"`
+	Success    bool            `json:"success"`
+	Message    string          `json:"message"`
+	Data       []*ProductExtra `json:"data"`
+	Pagination *PageInfo       `json:"pagination,omitempty"`
+}
+
+type ProductHasExtra struct {
+	ID             int64         `json:"id"`
+	ProductID      int64         `json:"product_id"`
+	Product        *Product      `json:"product,omitempty"`
+	ProductExtraID int64         `json:"product_extra_id"`
+	ProductExtra   *ProductExtra `json:"product_extra,omitempty"`
+	CreatedAt      time.Time     `json:"created_at"`
+	UpdatedAt      time.Time     `json:"updated_at"`
+}
+
+type ProductHasExtraResponse struct {
+	Code    int32              `json:"code"`
+	Success bool               `json:"success"`
+	Message string             `json:"message"`
+	Data    []*ProductHasExtra `json:"data,omitempty"`
+}
+
+type ProductHasExtrasResponse struct {
+	Code       int32              `json:"code"`
+	Success    bool               `json:"success"`
+	Message    string             `json:"message"`
+	Data       []*ProductHasExtra `json:"data"`
+	Pagination *PageInfo          `json:"pagination,omitempty"`
+}
+
 type ProductIngredient struct {
 	ID              int64           `json:"id"`
 	VariantID       int64           `json:"variant_id"`
@@ -632,6 +721,19 @@ type UpdateProductCategoryResponse struct {
 	Success bool             `json:"success"`
 	Message string           `json:"message"`
 	Data    *ProductCategory `json:"data,omitempty"`
+}
+
+type UpdateProductExtraInput struct {
+	Name     *string  `json:"name,omitempty"`
+	Price    *float64 `json:"price,omitempty"`
+	IsActive *bool    `json:"is_active,omitempty"`
+}
+
+type UpdateProductExtraResponse struct {
+	Code    int32         `json:"code"`
+	Success bool          `json:"success"`
+	Message string        `json:"message"`
+	Data    *ProductExtra `json:"data,omitempty"`
 }
 
 type UpdateProductIngredientInput struct {

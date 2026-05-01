@@ -375,6 +375,71 @@ type DeleteProductIngredientResponse {
   data: [ProductIngredient]
 }
 
+type ProductExtrasResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductExtra!]!
+  pagination: PageInfo
+}
+
+type ProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type CreateProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type UpdateProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type DeleteProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type ProductHasExtrasResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra!]!
+  pagination: PageInfo
+}
+
+type ProductHasExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra]
+}
+
+type CreateProductHasExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra]
+}
+
+type DeleteProductHasExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra]
+}
+
 type IngredientCategory {
   id: Int64!
   name: String!
@@ -548,6 +613,26 @@ type ProductIngredient {
   ingredient: Ingredient
   ingredient_value: Float!
   unit: String!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type ProductExtra {
+  id: Int64!
+  name: String!
+  price: Float!
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type ProductHasExtra {
+  id: Int64!
+  product_id: Int64!
+  product: Product
+  product_extra_id: Int64!
+  product_extra: ProductExtra
   created_at: Time!
   updated_at: Time!
 }

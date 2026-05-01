@@ -622,6 +622,108 @@ func (r *mutationResolver) DeleteProductIngredient(ctx context.Context, variantI
 	}, nil
 }
 
+// CreateProductExtra is the resolver for the createProductExtra field.
+func (r *mutationResolver) CreateProductExtra(ctx context.Context, input model.CreateProductExtraInput) (*model.CreateProductExtraResponse, error) {
+	if r.ProductExtraService == nil {
+		return &model.CreateProductExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: "product extra service not initialized",
+		}, nil
+	}
+	return r.ProductExtraService.CreateProductExtra(input)
+}
+
+// UpdateProductExtra is the resolver for the updateProductExtra field.
+func (r *mutationResolver) UpdateProductExtra(ctx context.Context, id int64, input model.UpdateProductExtraInput) (*model.UpdateProductExtraResponse, error) {
+	if r.ProductExtraService == nil {
+		return &model.UpdateProductExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: "product extra service not initialized",
+		}, nil
+	}
+	return r.ProductExtraService.UpdateProductExtra(id, input)
+}
+
+// DeleteProductExtra is the resolver for the deleteProductExtra field.
+func (r *mutationResolver) DeleteProductExtra(ctx context.Context, id int64) (*model.DeleteProductExtraResponse, error) {
+	if r.ProductExtraService == nil {
+		return &model.DeleteProductExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: "product extra service not initialized",
+		}, nil
+	}
+	return r.ProductExtraService.DeleteProductExtra(id)
+}
+
+// CreateProductHasExtra is the resolver for the createProductHasExtra field.
+func (r *mutationResolver) CreateProductHasExtra(ctx context.Context, input model.CreateProductHasExtraInput) (*model.CreateProductHasExtraResponse, error) {
+	if r.ProductHasExtraService == nil {
+		return &model.CreateProductHasExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: "product has extra service not initialized",
+		}, nil
+	}
+
+	productHasExtraDB, err := r.ProductHasExtraService.Create(ctx, &input)
+	if err != nil {
+		return &model.CreateProductHasExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to create product has extra: %v", err),
+		}, nil
+	}
+
+	// Convert all created items to GraphQL format
+	var data []*model.ProductHasExtra
+	for _, item := range productHasExtraDB {
+		data = append(data, helper.ToGraphQLProductHasExtra(*item))
+	}
+
+	return &model.CreateProductHasExtraResponse{
+		Code:    200,
+		Success: true,
+		Message: "product has extra saved successfully",
+		Data:    data,
+	}, nil
+}
+
+// DeleteProductHasExtra is the resolver for the deleteProductHasExtra field.
+func (r *mutationResolver) DeleteProductHasExtra(ctx context.Context, productID int64) (*model.DeleteProductHasExtraResponse, error) {
+	if r.ProductHasExtraService == nil {
+		return &model.DeleteProductHasExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: "product has extra service not initialized",
+		}, nil
+	}
+
+	productHasExtraDB, err := r.ProductHasExtraService.Delete(ctx, productID)
+	if err != nil {
+		return &model.DeleteProductHasExtraResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to delete product has extra: %v", err),
+		}, nil
+	}
+
+	// Convert all deleted items to GraphQL format
+	var data []*model.ProductHasExtra
+	for _, item := range productHasExtraDB {
+		data = append(data, helper.ToGraphQLProductHasExtra(*item))
+	}
+
+	return &model.DeleteProductHasExtraResponse{
+		Code:    200,
+		Success: true,
+		Message: "product has extra deleted successfully",
+		Data:    data,
+	}, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
@@ -851,6 +953,18 @@ func (r *queryResolver) ProductIngredients(ctx context.Context, pagination *mode
 		Data:       productIngredients,
 		Pagination: pageInfo,
 	}, nil
+}
+
+// ProductExtras is the resolver for the productExtras field.
+func (r *queryResolver) ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error) {
+	if r.ProductExtraService == nil {
+		return &model.ProductExtrasResponse{
+			Code:    500,
+			Success: false,
+			Message: "product extra service not initialized",
+		}, nil
+	}
+	return r.ProductExtraService.ProductExtras(pagination, isActive)
 }
 
 // Mutation returns MutationResolver implementation.

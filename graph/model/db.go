@@ -499,3 +499,64 @@ func (p *ProductIngredientDB) BeforeCreate(tx *gorm.DB) error {
 	p.UpdatedAt = now
 	return nil
 }
+
+// ProductExtraDB represents the database model for ProductExtra
+type ProductExtraDB struct {
+	ID        int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name      string     `gorm:"not null" json:"name"`
+	Price     float64    `gorm:"not null" json:"price"`
+	IsActive  bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+}
+
+// TableName specifies the table name for ProductExtraDB
+func (ProductExtraDB) TableName() string {
+	return "product_extras"
+}
+
+// BeforeCreate hook for ProductExtraDB
+func (p *ProductExtraDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ProductExtraDB
+func (p *ProductExtraDB) BeforeUpdate(tx *gorm.DB) error {
+	p.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductHasExtraDB represents the database model for ProductHasExtra
+type ProductHasExtraDB struct {
+	ID             int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	ProductID      int64     `gorm:"not null;index" json:"product_id"`
+	ProductExtraID int64     `gorm:"not null;index" json:"product_extra_id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+
+	// Relations
+	Product      *ProductDB      `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	ProductExtra *ProductExtraDB `gorm:"foreignKey:ProductExtraID" json:"product_extra,omitempty"`
+}
+
+// TableName specifies the table name for ProductHasExtraDB
+func (ProductHasExtraDB) TableName() string {
+	return "product_has_extras"
+}
+
+// AddUniqueIndexes adds the unique constraint for product_id and product_extra_id
+func (ProductHasExtraDB) AddUniqueIndexes(db *gorm.DB) error {
+	return db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_product_extra ON product_has_extras(product_id, product_extra_id)").Error
+}
+
+// BeforeCreate hook for ProductHasExtraDB
+func (p *ProductHasExtraDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}

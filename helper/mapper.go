@@ -397,3 +397,48 @@ func ToGraphQLProductIngredientSlice(productIngredientsDB []*model.ProductIngred
 	}
 	return ingredients
 }
+
+// ToGraphQLProductExtra converts ProductExtraDB to GraphQL ProductExtra model
+func ToGraphQLProductExtra(productExtraDB model.ProductExtraDB) *model.ProductExtra {
+	return &model.ProductExtra{
+		ID:        productExtraDB.ID,
+		Name:      productExtraDB.Name,
+		Price:     productExtraDB.Price,
+		IsActive:  productExtraDB.IsActive,
+		DeletedAt: productExtraDB.DeletedAt,
+		CreatedAt: productExtraDB.CreatedAt,
+		UpdatedAt: productExtraDB.UpdatedAt,
+	}
+}
+
+// ToGraphQLProductHasExtra converts ProductHasExtraDB to GraphQL ProductHasExtra model
+func ToGraphQLProductHasExtra(productHasExtraDB model.ProductHasExtraDB) *model.ProductHasExtra {
+	hasExtra := &model.ProductHasExtra{
+		ID:             productHasExtraDB.ID,
+		ProductID:      productHasExtraDB.ProductID,
+		ProductExtraID: productHasExtraDB.ProductExtraID,
+		CreatedAt:      productHasExtraDB.CreatedAt,
+		UpdatedAt:      productHasExtraDB.UpdatedAt,
+	}
+
+	// Set product if available
+	if productHasExtraDB.Product != nil {
+		hasExtra.Product = ToGraphQLProduct(*productHasExtraDB.Product)
+	}
+
+	// Set product extra if available
+	if productHasExtraDB.ProductExtra != nil {
+		hasExtra.ProductExtra = ToGraphQLProductExtra(*productHasExtraDB.ProductExtra)
+	}
+
+	return hasExtra
+}
+
+// ToGraphQLProductHasExtraSlice converts []*ProductHasExtraDB to []*model.ProductHasExtra
+func ToGraphQLProductHasExtraSlice(productHasExtrasDB []*model.ProductHasExtraDB) []*model.ProductHasExtra {
+	hasExtras := make([]*model.ProductHasExtra, len(productHasExtrasDB))
+	for i, hasExtraDB := range productHasExtrasDB {
+		hasExtras[i] = ToGraphQLProductHasExtra(*hasExtraDB)
+	}
+	return hasExtras
+}

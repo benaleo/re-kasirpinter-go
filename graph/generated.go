@@ -106,6 +106,20 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	CreateProductExtraResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	CreateProductHasExtraResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
 	CreateProductIngredientResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
@@ -170,6 +184,20 @@ type ComplexityRoot struct {
 	}
 
 	DeleteProductCategoryResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	DeleteProductExtraResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	DeleteProductHasExtraResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -348,6 +376,8 @@ type ComplexityRoot struct {
 		CreateOtp                func(childComplexity int, input model.CreateOtpInput) int
 		CreateProduct            func(childComplexity int, input model.CreateProductInput) int
 		CreateProductCategory    func(childComplexity int, input model.CreateProductCategoryInput) int
+		CreateProductExtra       func(childComplexity int, input model.CreateProductExtraInput) int
+		CreateProductHasExtra    func(childComplexity int, input model.CreateProductHasExtraInput) int
 		CreateProductIngredient  func(childComplexity int, input []*model.CreateProductIngredientInput) int
 		CreateProductVariant     func(childComplexity int, input model.CreateProductVariantInput) int
 		CreateRole               func(childComplexity int, input model.CreateRoleInput) int
@@ -358,6 +388,8 @@ type ComplexityRoot struct {
 		DeleteIngredientStock    func(childComplexity int, id int64) int
 		DeleteProduct            func(childComplexity int, id int64) int
 		DeleteProductCategory    func(childComplexity int, id int64) int
+		DeleteProductExtra       func(childComplexity int, id int64) int
+		DeleteProductHasExtra    func(childComplexity int, productID int64) int
 		DeleteProductIngredient  func(childComplexity int, variantID int64) int
 		DeleteProductVariant     func(childComplexity int, id int64) int
 		DeleteRole               func(childComplexity int, id int64) int
@@ -372,6 +404,7 @@ type ComplexityRoot struct {
 		UpdateIngredientStock    func(childComplexity int, id int64, input model.UpdateIngredientStockInput) int
 		UpdateProduct            func(childComplexity int, id int64, input model.UpdateProductInput) int
 		UpdateProductCategory    func(childComplexity int, id int64, input model.UpdateProductCategoryInput) int
+		UpdateProductExtra       func(childComplexity int, id int64, input model.UpdateProductExtraInput) int
 		UpdateProductVariant     func(childComplexity int, id int64, input model.UpdateProductVariantInput) int
 		UpdateRole               func(childComplexity int, id int64, input model.UpdateRoleInput) int
 		UpdateUser               func(childComplexity int, id string, input input.UpdateUserInput) int
@@ -444,6 +477,56 @@ type ComplexityRoot struct {
 		Data    func(childComplexity int) int
 		Message func(childComplexity int) int
 		Success func(childComplexity int) int
+	}
+
+	ProductExtra struct {
+		CreatedAt func(childComplexity int) int
+		DeletedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		IsActive  func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Price     func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	ProductExtraResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	ProductExtrasResponse struct {
+		Code       func(childComplexity int) int
+		Data       func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Pagination func(childComplexity int) int
+		Success    func(childComplexity int) int
+	}
+
+	ProductHasExtra struct {
+		CreatedAt      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Product        func(childComplexity int) int
+		ProductExtra   func(childComplexity int) int
+		ProductExtraID func(childComplexity int) int
+		ProductID      func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
+	}
+
+	ProductHasExtraResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	ProductHasExtrasResponse struct {
+		Code       func(childComplexity int) int
+		Data       func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Pagination func(childComplexity int) int
+		Success    func(childComplexity int) int
 	}
 
 	ProductIngredient struct {
@@ -528,6 +611,7 @@ type ComplexityRoot struct {
 		Ingredients          func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
 		Permissions          func(childComplexity int) int
 		ProductCategories    func(childComplexity int, pagination *model.PaginationInput) int
+		ProductExtras        func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
 		ProductIngredients   func(childComplexity int, pagination *model.PaginationInput, variantID int64) int
 		ProductVariants      func(childComplexity int, pagination *model.PaginationInput, productID int64, isActive *bool) int
 		Products             func(childComplexity int, pagination *model.PaginationInput, isActive *bool) int
@@ -580,6 +664,13 @@ type ComplexityRoot struct {
 	}
 
 	UpdateProductCategoryResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	UpdateProductExtraResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -718,6 +809,11 @@ type MutationResolver interface {
 	DeleteProductVariant(ctx context.Context, id int64) (*model.DeleteProductVariantResponse, error)
 	CreateProductIngredient(ctx context.Context, input []*model.CreateProductIngredientInput) (*model.CreateProductIngredientResponse, error)
 	DeleteProductIngredient(ctx context.Context, variantID int64) (*model.DeleteProductIngredientResponse, error)
+	CreateProductExtra(ctx context.Context, input model.CreateProductExtraInput) (*model.CreateProductExtraResponse, error)
+	UpdateProductExtra(ctx context.Context, id int64, input model.UpdateProductExtraInput) (*model.UpdateProductExtraResponse, error)
+	DeleteProductExtra(ctx context.Context, id int64) (*model.DeleteProductExtraResponse, error)
+	CreateProductHasExtra(ctx context.Context, input model.CreateProductHasExtraInput) (*model.CreateProductHasExtraResponse, error)
+	DeleteProductHasExtra(ctx context.Context, productID int64) (*model.DeleteProductHasExtraResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
@@ -734,6 +830,7 @@ type QueryResolver interface {
 	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
 	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
+	ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -981,6 +1078,56 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.CreateProductCategoryResponse.Success(childComplexity), true
+
+	case "CreateProductExtraResponse.code":
+		if e.ComplexityRoot.CreateProductExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductExtraResponse.Code(childComplexity), true
+	case "CreateProductExtraResponse.data":
+		if e.ComplexityRoot.CreateProductExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductExtraResponse.Data(childComplexity), true
+	case "CreateProductExtraResponse.message":
+		if e.ComplexityRoot.CreateProductExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductExtraResponse.Message(childComplexity), true
+	case "CreateProductExtraResponse.success":
+		if e.ComplexityRoot.CreateProductExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductExtraResponse.Success(childComplexity), true
+
+	case "CreateProductHasExtraResponse.code":
+		if e.ComplexityRoot.CreateProductHasExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductHasExtraResponse.Code(childComplexity), true
+	case "CreateProductHasExtraResponse.data":
+		if e.ComplexityRoot.CreateProductHasExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductHasExtraResponse.Data(childComplexity), true
+	case "CreateProductHasExtraResponse.message":
+		if e.ComplexityRoot.CreateProductHasExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductHasExtraResponse.Message(childComplexity), true
+	case "CreateProductHasExtraResponse.success":
+		if e.ComplexityRoot.CreateProductHasExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateProductHasExtraResponse.Success(childComplexity), true
 
 	case "CreateProductIngredientResponse.code":
 		if e.ComplexityRoot.CreateProductIngredientResponse.Code == nil {
@@ -1231,6 +1378,56 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.DeleteProductCategoryResponse.Success(childComplexity), true
+
+	case "DeleteProductExtraResponse.code":
+		if e.ComplexityRoot.DeleteProductExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductExtraResponse.Code(childComplexity), true
+	case "DeleteProductExtraResponse.data":
+		if e.ComplexityRoot.DeleteProductExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductExtraResponse.Data(childComplexity), true
+	case "DeleteProductExtraResponse.message":
+		if e.ComplexityRoot.DeleteProductExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductExtraResponse.Message(childComplexity), true
+	case "DeleteProductExtraResponse.success":
+		if e.ComplexityRoot.DeleteProductExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductExtraResponse.Success(childComplexity), true
+
+	case "DeleteProductHasExtraResponse.code":
+		if e.ComplexityRoot.DeleteProductHasExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductHasExtraResponse.Code(childComplexity), true
+	case "DeleteProductHasExtraResponse.data":
+		if e.ComplexityRoot.DeleteProductHasExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductHasExtraResponse.Data(childComplexity), true
+	case "DeleteProductHasExtraResponse.message":
+		if e.ComplexityRoot.DeleteProductHasExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductHasExtraResponse.Message(childComplexity), true
+	case "DeleteProductHasExtraResponse.success":
+		if e.ComplexityRoot.DeleteProductHasExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteProductHasExtraResponse.Success(childComplexity), true
 
 	case "DeleteProductIngredientResponse.code":
 		if e.ComplexityRoot.DeleteProductIngredientResponse.Code == nil {
@@ -1987,6 +2184,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateProductCategory(childComplexity, args["input"].(model.CreateProductCategoryInput)), true
+	case "Mutation.createProductExtra":
+		if e.ComplexityRoot.Mutation.CreateProductExtra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProductExtra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateProductExtra(childComplexity, args["input"].(model.CreateProductExtraInput)), true
+	case "Mutation.createProductHasExtra":
+		if e.ComplexityRoot.Mutation.CreateProductHasExtra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProductHasExtra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateProductHasExtra(childComplexity, args["input"].(model.CreateProductHasExtraInput)), true
 	case "Mutation.createProductIngredient":
 		if e.ComplexityRoot.Mutation.CreateProductIngredient == nil {
 			break
@@ -2097,6 +2316,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.DeleteProductCategory(childComplexity, args["id"].(int64)), true
+	case "Mutation.deleteProductExtra":
+		if e.ComplexityRoot.Mutation.DeleteProductExtra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteProductExtra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.DeleteProductExtra(childComplexity, args["id"].(int64)), true
+	case "Mutation.deleteProductHasExtra":
+		if e.ComplexityRoot.Mutation.DeleteProductHasExtra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteProductHasExtra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.DeleteProductHasExtra(childComplexity, args["product_id"].(int64)), true
 	case "Mutation.deleteProductIngredient":
 		if e.ComplexityRoot.Mutation.DeleteProductIngredient == nil {
 			break
@@ -2241,6 +2482,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdateProductCategory(childComplexity, args["id"].(int64), args["input"].(model.UpdateProductCategoryInput)), true
+	case "Mutation.updateProductExtra":
+		if e.ComplexityRoot.Mutation.UpdateProductExtra == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProductExtra_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateProductExtra(childComplexity, args["id"].(int64), args["input"].(model.UpdateProductExtraInput)), true
 	case "Mutation.updateProductVariant":
 		if e.ComplexityRoot.Mutation.UpdateProductVariant == nil {
 			break
@@ -2574,6 +2826,204 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.ProductCategoryResponse.Success(childComplexity), true
+
+	case "ProductExtra.created_at":
+		if e.ComplexityRoot.ProductExtra.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.CreatedAt(childComplexity), true
+	case "ProductExtra.deleted_at":
+		if e.ComplexityRoot.ProductExtra.DeletedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.DeletedAt(childComplexity), true
+	case "ProductExtra.id":
+		if e.ComplexityRoot.ProductExtra.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.ID(childComplexity), true
+	case "ProductExtra.is_active":
+		if e.ComplexityRoot.ProductExtra.IsActive == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.IsActive(childComplexity), true
+	case "ProductExtra.name":
+		if e.ComplexityRoot.ProductExtra.Name == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.Name(childComplexity), true
+	case "ProductExtra.price":
+		if e.ComplexityRoot.ProductExtra.Price == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.Price(childComplexity), true
+	case "ProductExtra.updated_at":
+		if e.ComplexityRoot.ProductExtra.UpdatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtra.UpdatedAt(childComplexity), true
+
+	case "ProductExtraResponse.code":
+		if e.ComplexityRoot.ProductExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtraResponse.Code(childComplexity), true
+	case "ProductExtraResponse.data":
+		if e.ComplexityRoot.ProductExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtraResponse.Data(childComplexity), true
+	case "ProductExtraResponse.message":
+		if e.ComplexityRoot.ProductExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtraResponse.Message(childComplexity), true
+	case "ProductExtraResponse.success":
+		if e.ComplexityRoot.ProductExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtraResponse.Success(childComplexity), true
+
+	case "ProductExtrasResponse.code":
+		if e.ComplexityRoot.ProductExtrasResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtrasResponse.Code(childComplexity), true
+	case "ProductExtrasResponse.data":
+		if e.ComplexityRoot.ProductExtrasResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtrasResponse.Data(childComplexity), true
+	case "ProductExtrasResponse.message":
+		if e.ComplexityRoot.ProductExtrasResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtrasResponse.Message(childComplexity), true
+	case "ProductExtrasResponse.pagination":
+		if e.ComplexityRoot.ProductExtrasResponse.Pagination == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtrasResponse.Pagination(childComplexity), true
+	case "ProductExtrasResponse.success":
+		if e.ComplexityRoot.ProductExtrasResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductExtrasResponse.Success(childComplexity), true
+
+	case "ProductHasExtra.created_at":
+		if e.ComplexityRoot.ProductHasExtra.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.CreatedAt(childComplexity), true
+	case "ProductHasExtra.id":
+		if e.ComplexityRoot.ProductHasExtra.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.ID(childComplexity), true
+	case "ProductHasExtra.product":
+		if e.ComplexityRoot.ProductHasExtra.Product == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.Product(childComplexity), true
+	case "ProductHasExtra.product_extra":
+		if e.ComplexityRoot.ProductHasExtra.ProductExtra == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.ProductExtra(childComplexity), true
+	case "ProductHasExtra.product_extra_id":
+		if e.ComplexityRoot.ProductHasExtra.ProductExtraID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.ProductExtraID(childComplexity), true
+	case "ProductHasExtra.product_id":
+		if e.ComplexityRoot.ProductHasExtra.ProductID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.ProductID(childComplexity), true
+	case "ProductHasExtra.updated_at":
+		if e.ComplexityRoot.ProductHasExtra.UpdatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtra.UpdatedAt(childComplexity), true
+
+	case "ProductHasExtraResponse.code":
+		if e.ComplexityRoot.ProductHasExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtraResponse.Code(childComplexity), true
+	case "ProductHasExtraResponse.data":
+		if e.ComplexityRoot.ProductHasExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtraResponse.Data(childComplexity), true
+	case "ProductHasExtraResponse.message":
+		if e.ComplexityRoot.ProductHasExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtraResponse.Message(childComplexity), true
+	case "ProductHasExtraResponse.success":
+		if e.ComplexityRoot.ProductHasExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtraResponse.Success(childComplexity), true
+
+	case "ProductHasExtrasResponse.code":
+		if e.ComplexityRoot.ProductHasExtrasResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtrasResponse.Code(childComplexity), true
+	case "ProductHasExtrasResponse.data":
+		if e.ComplexityRoot.ProductHasExtrasResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtrasResponse.Data(childComplexity), true
+	case "ProductHasExtrasResponse.message":
+		if e.ComplexityRoot.ProductHasExtrasResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtrasResponse.Message(childComplexity), true
+	case "ProductHasExtrasResponse.pagination":
+		if e.ComplexityRoot.ProductHasExtrasResponse.Pagination == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtrasResponse.Pagination(childComplexity), true
+	case "ProductHasExtrasResponse.success":
+		if e.ComplexityRoot.ProductHasExtrasResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ProductHasExtrasResponse.Success(childComplexity), true
 
 	case "ProductIngredient.created_at":
 		if e.ComplexityRoot.ProductIngredient.CreatedAt == nil {
@@ -2956,6 +3406,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.ProductCategories(childComplexity, args["pagination"].(*model.PaginationInput)), true
+	case "Query.productExtras":
+		if e.ComplexityRoot.Query.ProductExtras == nil {
+			break
+		}
+
+		args, err := ec.field_Query_productExtras_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.ProductExtras(childComplexity, args["pagination"].(*model.PaginationInput), args["is_active"].(*bool)), true
 	case "Query.productIngredients":
 		if e.ComplexityRoot.Query.ProductIngredients == nil {
 			break
@@ -3203,6 +3664,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.UpdateProductCategoryResponse.Success(childComplexity), true
+
+	case "UpdateProductExtraResponse.code":
+		if e.ComplexityRoot.UpdateProductExtraResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateProductExtraResponse.Code(childComplexity), true
+	case "UpdateProductExtraResponse.data":
+		if e.ComplexityRoot.UpdateProductExtraResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateProductExtraResponse.Data(childComplexity), true
+	case "UpdateProductExtraResponse.message":
+		if e.ComplexityRoot.UpdateProductExtraResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateProductExtraResponse.Message(childComplexity), true
+	case "UpdateProductExtraResponse.success":
+		if e.ComplexityRoot.UpdateProductExtraResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateProductExtraResponse.Success(childComplexity), true
 
 	case "UpdateProductIngredientResponse.code":
 		if e.ComplexityRoot.UpdateProductIngredientResponse.Code == nil {
@@ -3584,6 +4070,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateIngredientStockInput,
 		ec.unmarshalInputCreateOtpInput,
 		ec.unmarshalInputCreateProductCategoryInput,
+		ec.unmarshalInputCreateProductExtraInput,
+		ec.unmarshalInputCreateProductHasExtraInput,
 		ec.unmarshalInputCreateProductIngredientInput,
 		ec.unmarshalInputCreateProductInput,
 		ec.unmarshalInputCreateProductVariantInput,
@@ -3597,6 +4085,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateIngredientInput,
 		ec.unmarshalInputUpdateIngredientStockInput,
 		ec.unmarshalInputUpdateProductCategoryInput,
+		ec.unmarshalInputUpdateProductExtraInput,
 		ec.unmarshalInputUpdateProductIngredientInput,
 		ec.unmarshalInputUpdateProductInput,
 		ec.unmarshalInputUpdateProductVariantInput,
@@ -3765,6 +4254,28 @@ func (ec *executionContext) field_Mutation_createProductCategory_args(ctx contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createProductExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductExtraInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createProductHasExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateProductHasExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createProductIngredient_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3877,6 +4388,28 @@ func (ec *executionContext) field_Mutation_deleteProductCategory_args(ctx contex
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteProductExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNInt642int64)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteProductHasExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "product_id", ec.unmarshalNInt642int64)
+	if err != nil {
+		return nil, err
+	}
+	args["product_id"] = arg0
 	return args, nil
 }
 
@@ -4030,6 +4563,22 @@ func (ec *executionContext) field_Mutation_updateProductCategory_args(ctx contex
 	}
 	args["id"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductCategoryInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductCategoryInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProductExtra_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNInt642int64)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateProductExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductExtraInput)
 	if err != nil {
 		return nil, err
 	}
@@ -4216,6 +4765,22 @@ func (ec *executionContext) field_Query_productCategories_args(ctx context.Conte
 		return nil, err
 	}
 	args["pagination"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_productExtras_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "pagination", ec.unmarshalOPaginationInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐPaginationInput)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "is_active", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["is_active"] = arg1
 	return args, nil
 }
 
@@ -5596,6 +6161,270 @@ func (ec *executionContext) fieldContext_CreateProductCategoryResponse_data(_ co
 				return ec.fieldContext_ProductCategory_updated_at(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProductCategory", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductExtra_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProductExtra_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ProductExtra_price(ctx, field)
+			case "is_active":
+				return ec.fieldContext_ProductExtra_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_ProductExtra_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductHasExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductHasExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductHasExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductHasExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductHasExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductHasExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductHasExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductHasExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductHasExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProductHasExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.CreateProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateProductHasExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductHasExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateProductHasExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductHasExtra_id(ctx, field)
+			case "product_id":
+				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
+			case "product":
+				return ec.fieldContext_ProductHasExtra_product(ctx, field)
+			case "product_extra_id":
+				return ec.fieldContext_ProductHasExtra_product_extra_id(ctx, field)
+			case "product_extra":
+				return ec.fieldContext_ProductHasExtra_product_extra(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductHasExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductHasExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductHasExtra", field.Name)
 		},
 	}
 	return fc, nil
@@ -7006,6 +7835,270 @@ func (ec *executionContext) fieldContext_DeleteProductCategoryResponse_data(_ co
 				return ec.fieldContext_ProductCategory_updated_at(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProductCategory", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductExtra_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProductExtra_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ProductExtra_price(ctx, field)
+			case "is_active":
+				return ec.fieldContext_ProductExtra_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_ProductExtra_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductHasExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductHasExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductHasExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductHasExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductHasExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductHasExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductHasExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductHasExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductHasExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteProductHasExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.DeleteProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteProductHasExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductHasExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteProductHasExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductHasExtra_id(ctx, field)
+			case "product_id":
+				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
+			case "product":
+				return ec.fieldContext_ProductHasExtra_product(ctx, field)
+			case "product_extra_id":
+				return ec.fieldContext_ProductHasExtra_product_extra_id(ctx, field)
+			case "product_extra":
+				return ec.fieldContext_ProductHasExtra_product_extra(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductHasExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductHasExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductHasExtra", field.Name)
 		},
 	}
 	return fc, nil
@@ -12832,6 +13925,326 @@ func (ec *executionContext) fieldContext_Mutation_deleteProductIngredient(ctx co
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createProductExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createProductExtra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CreateProductExtra(ctx, fc.Args["input"].(model.CreateProductExtraInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.CreateProductExtraResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNCreateProductExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductExtraResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createProductExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_CreateProductExtraResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_CreateProductExtraResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_CreateProductExtraResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_CreateProductExtraResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateProductExtraResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createProductExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateProductExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateProductExtra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UpdateProductExtra(ctx, fc.Args["id"].(int64), fc.Args["input"].(model.UpdateProductExtraInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.UpdateProductExtraResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNUpdateProductExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductExtraResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateProductExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_UpdateProductExtraResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_UpdateProductExtraResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_UpdateProductExtraResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_UpdateProductExtraResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateProductExtraResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateProductExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteProductExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteProductExtra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().DeleteProductExtra(ctx, fc.Args["id"].(int64))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.DeleteProductExtraResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNDeleteProductExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductExtraResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteProductExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_DeleteProductExtraResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_DeleteProductExtraResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_DeleteProductExtraResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_DeleteProductExtraResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteProductExtraResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteProductExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createProductHasExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createProductHasExtra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CreateProductHasExtra(ctx, fc.Args["input"].(model.CreateProductHasExtraInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.CreateProductHasExtraResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNCreateProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createProductHasExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_CreateProductHasExtraResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_CreateProductHasExtraResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_CreateProductHasExtraResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_CreateProductHasExtraResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateProductHasExtraResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createProductHasExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteProductHasExtra(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteProductHasExtra,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().DeleteProductHasExtra(ctx, fc.Args["product_id"].(int64))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.DeleteProductHasExtraResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNDeleteProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductHasExtraResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteProductHasExtra(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_DeleteProductHasExtraResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_DeleteProductHasExtraResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_DeleteProductHasExtraResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_DeleteProductHasExtraResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteProductHasExtraResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteProductHasExtra_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _NewPasswordResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -14354,6 +15767,1078 @@ func (ec *executionContext) fieldContext_ProductCategoryResponse_data(_ context.
 				return ec.fieldContext_ProductCategory_updated_at(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProductCategory", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_name(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_price(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_price,
+		func(ctx context.Context) (any, error) {
+			return obj.Price, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_price(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_is_active(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_is_active,
+		func(ctx context.Context) (any, error) {
+			return obj.IsActive, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_is_active(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_deleted_at(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_deleted_at,
+		func(ctx context.Context) (any, error) {
+			return obj.DeletedAt, nil
+		},
+		nil,
+		ec.marshalOTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_deleted_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_created_at(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtra_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtra_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtra_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductExtra_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProductExtra_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ProductExtra_price(ctx, field)
+			case "is_active":
+				return ec.fieldContext_ProductExtra_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_ProductExtra_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtrasResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtrasResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtrasResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtrasResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtrasResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtrasResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtrasResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtrasResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtrasResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtrasResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtrasResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalNProductExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtraᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtrasResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductExtra_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProductExtra_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ProductExtra_price(ctx, field)
+			case "is_active":
+				return ec.fieldContext_ProductExtra_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_ProductExtra_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductExtrasResponse_pagination(ctx context.Context, field graphql.CollectedField, obj *model.ProductExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductExtrasResponse_pagination,
+		func(ctx context.Context) (any, error) {
+			return obj.Pagination, nil
+		},
+		nil,
+		ec.marshalOPageInfo2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐPageInfo,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductExtrasResponse_pagination(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "current_page":
+				return ec.fieldContext_PageInfo_current_page(ctx, field)
+			case "per_page":
+				return ec.fieldContext_PageInfo_per_page(ctx, field)
+			case "total_items":
+				return ec.fieldContext_PageInfo_total_items(ctx, field)
+			case "total_pages":
+				return ec.fieldContext_PageInfo_total_pages(ctx, field)
+			case "has_next_page":
+				return ec.fieldContext_PageInfo_has_next_page(ctx, field)
+			case "has_previous_page":
+				return ec.fieldContext_PageInfo_has_previous_page(ctx, field)
+			case "start_item":
+				return ec.fieldContext_PageInfo_start_item(ctx, field)
+			case "end_item":
+				return ec.fieldContext_PageInfo_end_item(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_product_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_product_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_product_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_product(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_product,
+		func(ctx context.Context) (any, error) {
+			return obj.Product, nil
+		},
+		nil,
+		ec.marshalOProduct2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProduct,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_product(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Product_id(ctx, field)
+			case "secure_id":
+				return ec.fieldContext_Product_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Product_image(ctx, field)
+			case "category_id":
+				return ec.fieldContext_Product_category_id(ctx, field)
+			case "category":
+				return ec.fieldContext_Product_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Product_description(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
+			case "is_active":
+				return ec.fieldContext_Product_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Product_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Product_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Product_updated_at(ctx, field)
+			case "variants":
+				return ec.fieldContext_Product_variants(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_product_extra_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_product_extra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductExtraID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_product_extra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_product_extra(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_product_extra,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductExtra, nil
+		},
+		nil,
+		ec.marshalOProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_product_extra(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductExtra_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProductExtra_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ProductExtra_price(ctx, field)
+			case "is_active":
+				return ec.fieldContext_ProductExtra_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_ProductExtra_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_created_at(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtra_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtra_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtra_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductHasExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductHasExtra_id(ctx, field)
+			case "product_id":
+				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
+			case "product":
+				return ec.fieldContext_ProductHasExtra_product(ctx, field)
+			case "product_extra_id":
+				return ec.fieldContext_ProductHasExtra_product_extra_id(ctx, field)
+			case "product_extra":
+				return ec.fieldContext_ProductHasExtra_product_extra(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductHasExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductHasExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductHasExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtrasResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtrasResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtrasResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtrasResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtrasResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtrasResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtrasResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtrasResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtrasResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtrasResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtrasResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalNProductHasExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtraᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtrasResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductHasExtra_id(ctx, field)
+			case "product_id":
+				return ec.fieldContext_ProductHasExtra_product_id(ctx, field)
+			case "product":
+				return ec.fieldContext_ProductHasExtra_product(ctx, field)
+			case "product_extra_id":
+				return ec.fieldContext_ProductHasExtra_product_extra_id(ctx, field)
+			case "product_extra":
+				return ec.fieldContext_ProductHasExtra_product_extra(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductHasExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductHasExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductHasExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProductHasExtrasResponse_pagination(ctx context.Context, field graphql.CollectedField, obj *model.ProductHasExtrasResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ProductHasExtrasResponse_pagination,
+		func(ctx context.Context) (any, error) {
+			return obj.Pagination, nil
+		},
+		nil,
+		ec.marshalOPageInfo2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐPageInfo,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ProductHasExtrasResponse_pagination(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProductHasExtrasResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "current_page":
+				return ec.fieldContext_PageInfo_current_page(ctx, field)
+			case "per_page":
+				return ec.fieldContext_PageInfo_per_page(ctx, field)
+			case "total_items":
+				return ec.fieldContext_PageInfo_total_items(ctx, field)
+			case "total_pages":
+				return ec.fieldContext_PageInfo_total_pages(ctx, field)
+			case "has_next_page":
+				return ec.fieldContext_PageInfo_has_next_page(ctx, field)
+			case "has_previous_page":
+				return ec.fieldContext_PageInfo_has_previous_page(ctx, field)
+			case "start_item":
+				return ec.fieldContext_PageInfo_start_item(ctx, field)
+			case "end_item":
+				return ec.fieldContext_PageInfo_end_item(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
 		},
 	}
 	return fc, nil
@@ -17004,6 +19489,72 @@ func (ec *executionContext) fieldContext_Query_productIngredients(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_productExtras(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_productExtras,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().ProductExtras(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["is_active"].(*bool))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.ProductExtrasResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNProductExtrasResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtrasResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_productExtras(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_ProductExtrasResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_ProductExtrasResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_ProductExtrasResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_ProductExtrasResponse_data(ctx, field)
+			case "pagination":
+				return ec.fieldContext_ProductExtrasResponse_pagination(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtrasResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_productExtras_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -18087,6 +20638,138 @@ func (ec *executionContext) fieldContext_UpdateProductCategoryResponse_data(_ co
 				return ec.fieldContext_ProductCategory_updated_at(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProductCategory", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProductExtraResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateProductExtraResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateProductExtraResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProductExtraResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateProductExtraResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateProductExtraResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProductExtraResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateProductExtraResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateProductExtraResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateProductExtraResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.UpdateProductExtraResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateProductExtraResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateProductExtraResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateProductExtraResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProductExtra_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProductExtra_name(ctx, field)
+			case "price":
+				return ec.fieldContext_ProductExtra_price(ctx, field)
+			case "is_active":
+				return ec.fieldContext_ProductExtra_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_ProductExtra_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_ProductExtra_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_ProductExtra_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProductExtra", field.Name)
 		},
 	}
 	return fc, nil
@@ -21842,6 +24525,87 @@ func (ec *executionContext) unmarshalInputCreateProductCategoryInput(ctx context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateProductExtraInput(ctx context.Context, obj any) (model.CreateProductExtraInput, error) {
+	var it model.CreateProductExtraInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "price", "is_active"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Price = data
+		case "is_active":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsActive = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateProductHasExtraInput(ctx context.Context, obj any) (model.CreateProductHasExtraInput, error) {
+	var it model.CreateProductHasExtraInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"product_id", "product_extra_ids"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "product_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_id"))
+			data, err := ec.unmarshalNInt642int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductID = data
+		case "product_extra_ids":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_extra_ids"))
+			data, err := ec.unmarshalNInt642ᚕint64ᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductExtraIds = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateProductIngredientInput(ctx context.Context, obj any) (model.CreateProductIngredientInput, error) {
 	var it model.CreateProductIngredientInput
 	if obj == nil {
@@ -22573,6 +25337,50 @@ func (ec *executionContext) unmarshalInputUpdateProductCategoryInput(ctx context
 				return it, err
 			}
 			it.ParentID = data
+		case "is_active":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsActive = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateProductExtraInput(ctx context.Context, obj any) (model.UpdateProductExtraInput, error) {
+	var it model.UpdateProductExtraInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "price", "is_active"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Price = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -23424,6 +26232,108 @@ func (ec *executionContext) _CreateProductCategoryResponse(ctx context.Context, 
 	return out
 }
 
+var createProductExtraResponseImplementors = []string{"CreateProductExtraResponse"}
+
+func (ec *executionContext) _CreateProductExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateProductExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createProductExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateProductExtraResponse")
+		case "code":
+			out.Values[i] = ec._CreateProductExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._CreateProductExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._CreateProductExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._CreateProductExtraResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createProductHasExtraResponseImplementors = []string{"CreateProductHasExtraResponse"}
+
+func (ec *executionContext) _CreateProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateProductHasExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createProductHasExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateProductHasExtraResponse")
+		case "code":
+			out.Values[i] = ec._CreateProductHasExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._CreateProductHasExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._CreateProductHasExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._CreateProductHasExtraResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createProductIngredientResponseImplementors = []string{"CreateProductIngredientResponse"}
 
 func (ec *executionContext) _CreateProductIngredientResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateProductIngredientResponse) graphql.Marshaler {
@@ -23911,6 +26821,108 @@ func (ec *executionContext) _DeleteProductCategoryResponse(ctx context.Context, 
 			}
 		case "data":
 			out.Values[i] = ec._DeleteProductCategoryResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteProductExtraResponseImplementors = []string{"DeleteProductExtraResponse"}
+
+func (ec *executionContext) _DeleteProductExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProductExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProductExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteProductExtraResponse")
+		case "code":
+			out.Values[i] = ec._DeleteProductExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._DeleteProductExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._DeleteProductExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._DeleteProductExtraResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteProductHasExtraResponseImplementors = []string{"DeleteProductHasExtraResponse"}
+
+func (ec *executionContext) _DeleteProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProductHasExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProductHasExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteProductHasExtraResponse")
+		case "code":
+			out.Values[i] = ec._DeleteProductHasExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._DeleteProductHasExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._DeleteProductHasExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._DeleteProductHasExtraResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -25252,6 +28264,41 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createProductExtra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createProductExtra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateProductExtra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateProductExtra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteProductExtra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteProductExtra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createProductHasExtra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createProductHasExtra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteProductHasExtra":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteProductHasExtra(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -25683,6 +28730,349 @@ func (ec *executionContext) _ProductCategoryResponse(ctx context.Context, sel as
 			}
 		case "data":
 			out.Values[i] = ec._ProductCategoryResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productExtraImplementors = []string{"ProductExtra"}
+
+func (ec *executionContext) _ProductExtra(ctx context.Context, sel ast.SelectionSet, obj *model.ProductExtra) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productExtraImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductExtra")
+		case "id":
+			out.Values[i] = ec._ProductExtra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._ProductExtra_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "price":
+			out.Values[i] = ec._ProductExtra_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "is_active":
+			out.Values[i] = ec._ProductExtra_is_active(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleted_at":
+			out.Values[i] = ec._ProductExtra_deleted_at(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._ProductExtra_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updated_at":
+			out.Values[i] = ec._ProductExtra_updated_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productExtraResponseImplementors = []string{"ProductExtraResponse"}
+
+func (ec *executionContext) _ProductExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ProductExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductExtraResponse")
+		case "code":
+			out.Values[i] = ec._ProductExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._ProductExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._ProductExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._ProductExtraResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productExtrasResponseImplementors = []string{"ProductExtrasResponse"}
+
+func (ec *executionContext) _ProductExtrasResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ProductExtrasResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productExtrasResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductExtrasResponse")
+		case "code":
+			out.Values[i] = ec._ProductExtrasResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._ProductExtrasResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._ProductExtrasResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._ProductExtrasResponse_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pagination":
+			out.Values[i] = ec._ProductExtrasResponse_pagination(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productHasExtraImplementors = []string{"ProductHasExtra"}
+
+func (ec *executionContext) _ProductHasExtra(ctx context.Context, sel ast.SelectionSet, obj *model.ProductHasExtra) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productHasExtraImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductHasExtra")
+		case "id":
+			out.Values[i] = ec._ProductHasExtra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "product_id":
+			out.Values[i] = ec._ProductHasExtra_product_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "product":
+			out.Values[i] = ec._ProductHasExtra_product(ctx, field, obj)
+		case "product_extra_id":
+			out.Values[i] = ec._ProductHasExtra_product_extra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "product_extra":
+			out.Values[i] = ec._ProductHasExtra_product_extra(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._ProductHasExtra_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updated_at":
+			out.Values[i] = ec._ProductHasExtra_updated_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productHasExtraResponseImplementors = []string{"ProductHasExtraResponse"}
+
+func (ec *executionContext) _ProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ProductHasExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productHasExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductHasExtraResponse")
+		case "code":
+			out.Values[i] = ec._ProductHasExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._ProductHasExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._ProductHasExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._ProductHasExtraResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var productHasExtrasResponseImplementors = []string{"ProductHasExtrasResponse"}
+
+func (ec *executionContext) _ProductHasExtrasResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ProductHasExtrasResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productHasExtrasResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductHasExtrasResponse")
+		case "code":
+			out.Values[i] = ec._ProductHasExtrasResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._ProductHasExtrasResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._ProductHasExtrasResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._ProductHasExtrasResponse_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pagination":
+			out.Values[i] = ec._ProductHasExtrasResponse_pagination(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -26519,6 +29909,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "productExtras":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_productExtras(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -26887,6 +30299,57 @@ func (ec *executionContext) _UpdateProductCategoryResponse(ctx context.Context, 
 			}
 		case "data":
 			out.Values[i] = ec._UpdateProductCategoryResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateProductExtraResponseImplementors = []string{"UpdateProductExtraResponse"}
+
+func (ec *executionContext) _UpdateProductExtraResponse(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProductExtraResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateProductExtraResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateProductExtraResponse")
+		case "code":
+			out.Values[i] = ec._UpdateProductExtraResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._UpdateProductExtraResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._UpdateProductExtraResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._UpdateProductExtraResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28061,6 +31524,44 @@ func (ec *executionContext) marshalNCreateProductCategoryResponse2ᚖreᚑkasirp
 	return ec._CreateProductCategoryResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateProductExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductExtraInput(ctx context.Context, v any) (model.CreateProductExtraInput, error) {
+	res, err := ec.unmarshalInputCreateProductExtraInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateProductExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateProductExtraResponse) graphql.Marshaler {
+	return ec._CreateProductExtraResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateProductExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.CreateProductExtraResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateProductExtraResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateProductHasExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraInput(ctx context.Context, v any) (model.CreateProductHasExtraInput, error) {
+	res, err := ec.unmarshalInputCreateProductHasExtraInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateProductHasExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateProductHasExtraResponse) graphql.Marshaler {
+	return ec._CreateProductHasExtraResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.CreateProductHasExtraResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateProductHasExtraResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateProductIngredientInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateProductIngredientInputᚄ(ctx context.Context, v any) ([]*model.CreateProductIngredientInput, error) {
 	var vSlice []any
 	vSlice = graphql.CoerceList(v)
@@ -28239,6 +31740,34 @@ func (ec *executionContext) marshalNDeleteProductCategoryResponse2ᚖreᚑkasirp
 		return graphql.Null
 	}
 	return ec._DeleteProductCategoryResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteProductExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteProductExtraResponse) graphql.Marshaler {
+	return ec._DeleteProductExtraResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteProductExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProductExtraResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteProductExtraResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteProductHasExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteProductHasExtraResponse) graphql.Marshaler {
+	return ec._DeleteProductHasExtraResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteProductHasExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductHasExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.DeleteProductHasExtraResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteProductHasExtraResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeleteProductIngredientResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteProductIngredientResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteProductIngredientResponse) graphql.Marshaler {
@@ -28553,6 +32082,36 @@ func (ec *executionContext) marshalNInt642int64(ctx context.Context, sel ast.Sel
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt642ᚕint64ᚄ(ctx context.Context, v any) ([]int64, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]int64, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt642int64(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNInt642ᚕint64ᚄ(ctx context.Context, sel ast.SelectionSet, v []int64) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt642int64(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNLoginInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐLoginInput(ctx context.Context, v any) (input.LoginInput, error) {
 	res, err := ec.unmarshalInputLoginInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -28679,6 +32238,72 @@ func (ec *executionContext) marshalNProductCategory2ᚖreᚑkasirpinterᚑgoᚋg
 		return graphql.Null
 	}
 	return ec._ProductCategory(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtraᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProductExtra) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra(ctx context.Context, sel ast.SelectionSet, v *model.ProductExtra) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProductExtra(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductExtrasResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtrasResponse(ctx context.Context, sel ast.SelectionSet, v model.ProductExtrasResponse) graphql.Marshaler {
+	return ec._ProductExtrasResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProductExtrasResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtrasResponse(ctx context.Context, sel ast.SelectionSet, v *model.ProductExtrasResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProductExtrasResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductHasExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtraᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProductHasExtra) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNProductHasExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNProductHasExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra(ctx context.Context, sel ast.SelectionSet, v *model.ProductHasExtra) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProductHasExtra(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProductIngredient2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProductIngredient) graphql.Marshaler {
@@ -28928,6 +32553,25 @@ func (ec *executionContext) marshalNUpdateProductCategoryResponse2ᚖreᚑkasirp
 		return graphql.Null
 	}
 	return ec._UpdateProductCategoryResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateProductExtraInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductExtraInput(ctx context.Context, v any) (model.UpdateProductExtraInput, error) {
+	res, err := ec.unmarshalInputUpdateProductExtraInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateProductExtraResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductExtraResponse(ctx context.Context, sel ast.SelectionSet, v model.UpdateProductExtraResponse) graphql.Marshaler {
+	return ec._UpdateProductExtraResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateProductExtraResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductExtraResponse(ctx context.Context, sel ast.SelectionSet, v *model.UpdateProductExtraResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateProductExtraResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateProductInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateProductInput(ctx context.Context, v any) (model.UpdateProductInput, error) {
@@ -29492,6 +33136,33 @@ func (ec *executionContext) marshalOProductCategory2ᚖreᚑkasirpinterᚑgoᚋg
 		return graphql.Null
 	}
 	return ec._ProductCategory(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProductExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductExtra(ctx context.Context, sel ast.SelectionSet, v *model.ProductExtra) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProductExtra(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProductHasExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra(ctx context.Context, sel ast.SelectionSet, v []*model.ProductHasExtra) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalOProductHasExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra(ctx, sel, v[i])
+	})
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProductHasExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductHasExtra(ctx context.Context, sel ast.SelectionSet, v *model.ProductHasExtra) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProductHasExtra(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOProductIngredient2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProductIngredient(ctx context.Context, sel ast.SelectionSet, v []*model.ProductIngredient) graphql.Marshaler {
