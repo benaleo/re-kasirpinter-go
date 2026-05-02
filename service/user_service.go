@@ -475,9 +475,10 @@ func (s *UserService) User(id string) (*model.UserResponse, error) {
 }
 
 func (s *UserService) CustomerSearch(keyword string) (*model.CustomerSearchResponse, error) {
-	// Search for users by name or phone (case-insensitive)
+	// Search for users by name or phone (case-insensitive) with role_id = 2
 	var usersDB []model.UserDB
 	result := s.DB.Where("deleted_at IS NULL").
+		Where("role_id = ?", 2).
 		Where("LOWER(name) LIKE LOWER(?) OR phone LIKE ?", "%"+keyword+"%", "%"+keyword+"%").
 		Find(&usersDB)
 
