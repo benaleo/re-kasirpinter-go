@@ -434,6 +434,7 @@ type ComplexityRoot struct {
 	}
 
 	Product struct {
+		AvailableType   func(childComplexity int) int
 		Category        func(childComplexity int) int
 		CategoryID      func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
@@ -447,6 +448,7 @@ type ComplexityRoot struct {
 		ProductExtraIds func(childComplexity int) int
 		SecureID        func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
+		VariantType     func(childComplexity int) int
 		Variants        func(childComplexity int) int
 	}
 
@@ -2605,6 +2607,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.PermissionsResponse.Success(childComplexity), true
 
+	case "Product.available_type":
+		if e.ComplexityRoot.Product.AvailableType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Product.AvailableType(childComplexity), true
 	case "Product.category":
 		if e.ComplexityRoot.Product.Category == nil {
 			break
@@ -2683,6 +2691,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Product.UpdatedAt(childComplexity), true
+	case "Product.variant_type":
+		if e.ComplexityRoot.Product.VariantType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Product.VariantType(childComplexity), true
 	case "Product.variants":
 		if e.ComplexityRoot.Product.Variants == nil {
 			break
@@ -6646,6 +6660,10 @@ func (ec *executionContext) fieldContext_CreateProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -8320,6 +8338,10 @@ func (ec *executionContext) fieldContext_DeleteProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -14740,6 +14762,64 @@ func (ec *executionContext) fieldContext_Product_description(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Product_available_type(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Product_available_type,
+		func(ctx context.Context) (any, error) {
+			return obj.AvailableType, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Product_available_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Product_variant_type(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Product_variant_type,
+		func(ctx context.Context) (any, error) {
+			return obj.VariantType, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Product_variant_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Product_is_available(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -16211,6 +16291,10 @@ func (ec *executionContext) fieldContext_ProductHasExtra_product(_ context.Conte
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -17428,6 +17512,10 @@ func (ec *executionContext) fieldContext_ProductResponse_data(_ context.Context,
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -17574,6 +17662,10 @@ func (ec *executionContext) fieldContext_ProductVariant_product(_ context.Contex
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -18369,6 +18461,10 @@ func (ec *executionContext) fieldContext_ProductsResponse_data(_ context.Context
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -20869,6 +20965,10 @@ func (ec *executionContext) fieldContext_UpdateProductResponse_data(_ context.Co
 				return ec.fieldContext_Product_category(ctx, field)
 			case "description":
 				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
 			case "is_available":
 				return ec.fieldContext_Product_is_available(ctx, field)
 			case "is_active":
@@ -24503,7 +24603,7 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "is_active", "product_extra_ids"}
+	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "available_type", "variant_type", "is_active", "product_extra_ids"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -24538,6 +24638,20 @@ func (ec *executionContext) unmarshalInputCreateProductInput(ctx context.Context
 				return it, err
 			}
 			it.Description = data
+		case "available_type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("available_type"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AvailableType = data
+		case "variant_type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variant_type"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VariantType = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
@@ -25283,7 +25397,7 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "is_active", "product_extra_ids"}
+	fieldsInOrder := [...]string{"name", "image", "category_id", "description", "available_type", "variant_type", "is_active", "product_extra_ids"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25318,6 +25432,20 @@ func (ec *executionContext) unmarshalInputUpdateProductInput(ctx context.Context
 				return it, err
 			}
 			it.Description = data
+		case "available_type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("available_type"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AvailableType = data
+		case "variant_type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variant_type"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VariantType = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -28359,6 +28487,10 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Product_category(ctx, field, obj)
 		case "description":
 			out.Values[i] = ec._Product_description(ctx, field, obj)
+		case "available_type":
+			out.Values[i] = ec._Product_available_type(ctx, field, obj)
+		case "variant_type":
+			out.Values[i] = ec._Product_variant_type(ctx, field, obj)
 		case "is_available":
 			out.Values[i] = ec._Product_is_available(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

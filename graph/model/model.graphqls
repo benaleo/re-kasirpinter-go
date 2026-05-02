@@ -506,6 +506,8 @@ type Product {
   category_id: Int64
   category: ProductCategory
   description: String
+  available_type: String
+  variant_type: String
   is_available: Boolean!
   is_active: Boolean!
   deleted_at: Time

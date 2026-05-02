@@ -122,12 +122,14 @@ func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.C
 
 	// Create product DB model
 	productDB := model.ProductDB{
-		SecureID:    &secureID,
-		Name:        input.Name,
-		Image:       imageURL,
-		CategoryID:  input.CategoryID,
-		Description: input.Description,
-		IsActive:    input.IsActive,
+		SecureID:      &secureID,
+		Name:          input.Name,
+		Image:         imageURL,
+		CategoryID:    input.CategoryID,
+		Description:   input.Description,
+		AvailableType: input.AvailableType,
+		VariantType:   input.VariantType,
+		IsActive:      input.IsActive,
 	}
 
 	// Save to database
@@ -228,6 +230,8 @@ func (s *ProductService) UpdateProduct(ctx context.Context, id int64, input mode
 	if input.Description != nil {
 		productDB.Description = input.Description
 	}
+	productDB.AvailableType = input.AvailableType
+	productDB.VariantType = input.VariantType
 	if input.IsActive != nil {
 		productDB.IsActive = *input.IsActive
 	}

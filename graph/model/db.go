@@ -347,16 +347,18 @@ func (p *ProductCategoryDB) BeforeUpdate(tx *gorm.DB) error {
 
 // ProductDB represents the database model for Product
 type ProductDB struct {
-	ID          int64      `gorm:"primaryKey;autoIncrement" json:"id"`
-	SecureID    *string    `gorm:"uniqueIndex" json:"secure_id,omitempty"`
-	Name        string     `gorm:"not null" json:"name"`
-	Image       *string    `json:"image,omitempty"`
-	CategoryID  *int64     `json:"category_id,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	IsActive    bool       `gorm:"default:true" json:"is_active"`
-	DeletedAt   *time.Time `gorm:"index" json:"deleted_at,omitempty"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ID            int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	SecureID      *string    `gorm:"uniqueIndex" json:"secure_id,omitempty"`
+	Name          string     `gorm:"not null" json:"name"`
+	Image         *string    `json:"image,omitempty"`
+	CategoryID    *int64     `json:"category_id,omitempty"`
+	Description   *string    `json:"description,omitempty"`
+	AvailableType *string    `json:"available_type,omitempty"`
+	VariantType   *string    `json:"variant_type,omitempty"`
+	IsActive      bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt     *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
 
 	// Relations
 	Category         *ProductCategoryDB  `gorm:"foreignKey:CategoryID" json:"category,omitempty"`

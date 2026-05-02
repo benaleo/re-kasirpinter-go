@@ -124,6 +124,8 @@ input CreateProductInput {
   image: String
   category_id: Int64
   description: String
+  available_type: String
+  variant_type: String
   is_active: Boolean!
   product_extra_ids: [Int64]
 }
@@ -133,6 +135,8 @@ input UpdateProductInput {
   image: String
   category_id: Int64
   description: String
+  available_type: String
+  variant_type: String
   is_active: Boolean
   product_extra_ids: [Int64]
 }

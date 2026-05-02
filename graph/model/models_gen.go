@@ -161,6 +161,8 @@ type CreateProductInput struct {
 	Image           *string  `json:"image,omitempty"`
 	CategoryID      *int64   `json:"category_id,omitempty"`
 	Description     *string  `json:"description,omitempty"`
+	AvailableType   *string  `json:"available_type,omitempty"`
+	VariantType     *string  `json:"variant_type,omitempty"`
 	IsActive        bool     `json:"is_active"`
 	ProductExtraIds []*int64 `json:"product_extra_ids,omitempty"`
 }
@@ -467,6 +469,8 @@ type Product struct {
 	CategoryID      *int64            `json:"category_id,omitempty"`
 	Category        *ProductCategory  `json:"category,omitempty"`
 	Description     *string           `json:"description,omitempty"`
+	AvailableType   *string           `json:"available_type,omitempty"`
+	VariantType     *string           `json:"variant_type,omitempty"`
 	IsAvailable     bool              `json:"is_available"`
 	IsActive        bool              `json:"is_active"`
 	DeletedAt       *time.Time        `json:"deleted_at,omitempty"`
@@ -754,6 +758,8 @@ type UpdateProductInput struct {
 	Image           *string  `json:"image,omitempty"`
 	CategoryID      *int64   `json:"category_id,omitempty"`
 	Description     *string  `json:"description,omitempty"`
+	AvailableType   *string  `json:"available_type,omitempty"`
+	VariantType     *string  `json:"variant_type,omitempty"`
 	IsActive        *bool    `json:"is_active,omitempty"`
 	ProductExtraIds []*int64 `json:"product_extra_ids,omitempty"`
 }

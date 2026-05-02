@@ -198,16 +198,18 @@ func ToGraphQLProductCategory(productCategoryDB model.ProductCategoryDB) *model.
 // ToGraphQLProduct converts ProductDB to GraphQL Product model
 func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 	product := &model.Product{
-		ID:          productDB.ID,
-		SecureID:    productDB.SecureID,
-		Name:        productDB.Name,
-		Image:       productDB.Image,
-		CategoryID:  productDB.CategoryID,
-		Description: productDB.Description,
-		IsActive:    productDB.IsActive,
-		DeletedAt:   productDB.DeletedAt,
-		CreatedAt:   productDB.CreatedAt,
-		UpdatedAt:   productDB.UpdatedAt,
+		ID:            productDB.ID,
+		SecureID:      productDB.SecureID,
+		Name:          productDB.Name,
+		Image:         productDB.Image,
+		CategoryID:    productDB.CategoryID,
+		Description:   productDB.Description,
+		AvailableType: productDB.AvailableType,
+		VariantType:   productDB.VariantType,
+		IsActive:      productDB.IsActive,
+		DeletedAt:     productDB.DeletedAt,
+		CreatedAt:     productDB.CreatedAt,
+		UpdatedAt:     productDB.UpdatedAt,
 	}
 
 	// Set category if provided
