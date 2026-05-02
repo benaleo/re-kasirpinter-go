@@ -452,3 +452,37 @@ func (s *UserService) User(id string) (*model.UserResponse, error) {
 		Data:    user,
 	}, nil
 }
+
+func (s *UserService) CustomerSearch(keyword string) (*model.CustomerSearchResponse, error) {
+	// Search for users by name or phone (case-insensitive)
+	var usersDB []model.UserDB
+	result := s.DB.Where("deleted_at IS NULL").
+		Where("LOWER(name) LIKE LOWER(?) OR phone LIKE ?", "%"+keyword+"%", "%"+keyword+"%").
+		Find(&usersDB)
+
+	if result.Error != nil {
+		return &model.CustomerSearchResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("database error: %v", result.Error),
+		}, nil
+	}
+
+	// Create slice of CustomerSearchData with only the required fields
+	var customersData []*model.CustomerSearchData
+	for _, userDB := range usersDB {
+		customerData := &model.CustomerSearchData{
+			SecureID: userDB.SecureID,
+			Name:     userDB.Name,
+			Phone:    userDB.Phone,
+		}
+		customersData = append(customersData, customerData)
+	}
+
+	return &model.CustomerSearchResponse{
+		Code:    200,
+		Success: true,
+		Message: "customers retrieved successfully",
+		Data:    customersData,
+	}, nil
+}

@@ -211,6 +211,19 @@ type CreateUserResponse struct {
 	Data    *User  `json:"data,omitempty"`
 }
 
+type CustomerSearchData struct {
+	SecureID *string `json:"secure_id,omitempty"`
+	Name     string  `json:"name"`
+	Phone    string  `json:"phone"`
+}
+
+type CustomerSearchResponse struct {
+	Code    int32                 `json:"code"`
+	Success bool                  `json:"success"`
+	Message string                `json:"message"`
+	Data    []*CustomerSearchData `json:"data"`
+}
+
 type DeleteDiscountResponse struct {
 	Code    int32     `json:"code"`
 	Success bool      `json:"success"`

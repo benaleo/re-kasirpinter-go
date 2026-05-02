@@ -155,6 +155,19 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	CustomerSearchData struct {
+		Name     func(childComplexity int) int
+		Phone    func(childComplexity int) int
+		SecureID func(childComplexity int) int
+	}
+
+	CustomerSearchResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
 	DeleteDiscountResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
@@ -605,6 +618,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		CheckDiscount        func(childComplexity int, code string) int
+		CustomerSearch       func(childComplexity int, keyword string) int
 		Discounts            func(childComplexity int, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) int
 		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
 		IngredientStocks     func(childComplexity int, pagination *model.PaginationInput, ingredientID *int64) int
@@ -816,6 +830,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
 	User(ctx context.Context, id string) (*model.UserResponse, error)
+	CustomerSearch(ctx context.Context, keyword string) (*model.CustomerSearchResponse, error)
 	Roles(ctx context.Context) (*model.RolesResponse, error)
 	Role(ctx context.Context, id int64) (*model.RoleResponse, error)
 	Permissions(ctx context.Context) (*model.PermissionsResponse, error)
@@ -1251,6 +1266,50 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.CreateUserResponse.Success(childComplexity), true
+
+	case "CustomerSearchData.name":
+		if e.ComplexityRoot.CustomerSearchData.Name == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchData.Name(childComplexity), true
+	case "CustomerSearchData.phone":
+		if e.ComplexityRoot.CustomerSearchData.Phone == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchData.Phone(childComplexity), true
+	case "CustomerSearchData.secure_id":
+		if e.ComplexityRoot.CustomerSearchData.SecureID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchData.SecureID(childComplexity), true
+
+	case "CustomerSearchResponse.code":
+		if e.ComplexityRoot.CustomerSearchResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchResponse.Code(childComplexity), true
+	case "CustomerSearchResponse.data":
+		if e.ComplexityRoot.CustomerSearchResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchResponse.Data(childComplexity), true
+	case "CustomerSearchResponse.message":
+		if e.ComplexityRoot.CustomerSearchResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchResponse.Message(childComplexity), true
+	case "CustomerSearchResponse.success":
+		if e.ComplexityRoot.CustomerSearchResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchResponse.Success(childComplexity), true
 
 	case "DeleteDiscountResponse.code":
 		if e.ComplexityRoot.DeleteDiscountResponse.Code == nil {
@@ -3332,6 +3391,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.CheckDiscount(childComplexity, args["code"].(string)), true
+	case "Query.customerSearch":
+		if e.ComplexityRoot.Query.CustomerSearch == nil {
+			break
+		}
+
+		args, err := ec.field_Query_customerSearch_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.CustomerSearch(childComplexity, args["keyword"].(string)), true
 	case "Query.discounts":
 		if e.ComplexityRoot.Query.Discounts == nil {
 			break
@@ -4646,6 +4716,17 @@ func (ec *executionContext) field_Query_checkDiscount_args(ctx context.Context, 
 		return nil, err
 	}
 	args["code"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_customerSearch_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "keyword", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["keyword"] = arg0
 	return args, nil
 }
 
@@ -7106,6 +7187,217 @@ func (ec *executionContext) fieldContext_CreateUserResponse_data(_ context.Conte
 				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchData_secure_id(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchData_secure_id,
+		func(ctx context.Context) (any, error) {
+			return obj.SecureID, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchData_secure_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchData_name(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchData_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchData_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchData_phone(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchData_phone,
+		func(ctx context.Context) (any, error) {
+			return obj.Phone, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchData_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomerSearchResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalNCustomerSearchData2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchDataᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "secure_id":
+				return ec.fieldContext_CustomerSearchData_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomerSearchData_name(ctx, field)
+			case "phone":
+				return ec.fieldContext_CustomerSearchData_phone(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CustomerSearchData", field.Name)
 		},
 	}
 	return fc, nil
@@ -18663,6 +18955,70 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_customerSearch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_customerSearch,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().CustomerSearch(ctx, fc.Args["keyword"].(string))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.CustomerSearchResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNCustomerSearchResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_customerSearch(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_CustomerSearchResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_CustomerSearchResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_CustomerSearchResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_CustomerSearchResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CustomerSearchResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_customerSearch_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -26566,6 +26922,106 @@ func (ec *executionContext) _CreateUserResponse(ctx context.Context, sel ast.Sel
 	return out
 }
 
+var customerSearchDataImplementors = []string{"CustomerSearchData"}
+
+func (ec *executionContext) _CustomerSearchData(ctx context.Context, sel ast.SelectionSet, obj *model.CustomerSearchData) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, customerSearchDataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CustomerSearchData")
+		case "secure_id":
+			out.Values[i] = ec._CustomerSearchData_secure_id(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._CustomerSearchData_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "phone":
+			out.Values[i] = ec._CustomerSearchData_phone(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var customerSearchResponseImplementors = []string{"CustomerSearchResponse"}
+
+func (ec *executionContext) _CustomerSearchResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CustomerSearchResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, customerSearchResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CustomerSearchResponse")
+		case "code":
+			out.Values[i] = ec._CustomerSearchResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._CustomerSearchResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._CustomerSearchResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._CustomerSearchResponse_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteDiscountResponseImplementors = []string{"DeleteDiscountResponse"}
 
 func (ec *executionContext) _DeleteDiscountResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteDiscountResponse) graphql.Marshaler {
@@ -29609,6 +30065,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "customerSearch":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_customerSearch(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "roles":
 			field := field
 
@@ -31615,6 +32093,46 @@ func (ec *executionContext) marshalNCreateUserResponse2ᚖreᚑkasirpinterᚑgo�
 		return graphql.Null
 	}
 	return ec._CreateUserResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCustomerSearchData2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchDataᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CustomerSearchData) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNCustomerSearchData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchData(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCustomerSearchData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchData(ctx context.Context, sel ast.SelectionSet, v *model.CustomerSearchData) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CustomerSearchData(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCustomerSearchResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchResponse(ctx context.Context, sel ast.SelectionSet, v model.CustomerSearchResponse) graphql.Marshaler {
+	return ec._CustomerSearchResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCustomerSearchResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchResponse(ctx context.Context, sel ast.SelectionSet, v *model.CustomerSearchResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CustomerSearchResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeleteDiscountResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDeleteDiscountResponse(ctx context.Context, sel ast.SelectionSet, v model.DeleteDiscountResponse) graphql.Marshaler {

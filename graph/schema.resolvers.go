@@ -684,6 +684,19 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.UserRespons
 	return userService.User(id)
 }
 
+// CustomerSearch is the resolver for the customerSearch field.
+func (r *queryResolver) CustomerSearch(ctx context.Context, keyword string) (*model.CustomerSearchResponse, error) {
+	userService, err := service.NewUserService(r.DB)
+	if err != nil {
+		return &model.CustomerSearchResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to initialize user service: %v", err),
+		}, nil
+	}
+	return userService.CustomerSearch(keyword)
+}
+
 // Roles is the resolver for the roles field.
 func (r *queryResolver) Roles(ctx context.Context) (*model.RolesResponse, error) {
 	if r.RoleService == nil {

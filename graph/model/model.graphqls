@@ -58,6 +58,19 @@ type UsersResponse {
   pagination: PageInfo!
 }
 
+type CustomerSearchData {
+  secure_id: String
+  name: String!
+  phone: String!
+}
+
+type CustomerSearchResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [CustomerSearchData!]!
+}
+
 type CreateOtpResponse {
   code: Int!
   success: Boolean!
