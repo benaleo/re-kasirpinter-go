@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"re-kasirpinter-go/email"
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
@@ -109,6 +110,14 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 		}
 		user := helper.ToGraphQLUser(userDB, userRoleDB)
 
+		// Send welcome email with password
+		loginURL := "https://app.kasirpinter.com/login" // Update with actual login URL
+		go func() {
+			if err := email.SendUserWelcomeEmail(input.Email, input.Name, autoPassword, loginURL); err != nil {
+				fmt.Printf("Failed to send welcome email to %s: %v\n", input.Email, err)
+			}
+		}()
+
 		return helper.SuccessResponse(201, "user created successfully with auto-generated password", user), nil
 	} else {
 		// For is_user false: mandatory fields are name, email, address, phone, password, role_id
@@ -195,6 +204,18 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 			userRoleDB = &userRole
 		}
 		user := helper.ToGraphQLUser(userDB, userRoleDB)
+
+		// Send activation email
+		loginURL := "https://app.kasirpinter.com/login" // Update with actual login URL
+		roleName := "User"                              // Default role name
+		if userRole.ID > 0 {
+			roleName = userRole.Name
+		}
+		go func() {
+			if err := email.SendUserActivationEmail(input.Email, input.Name, input.Phone, roleName, loginURL); err != nil {
+				fmt.Printf("Failed to send activation email to %s: %v\n", input.Email, err)
+			}
+		}()
 
 		return helper.SuccessResponse(201, "user created successfully", user), nil
 	}
