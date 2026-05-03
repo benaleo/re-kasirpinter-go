@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"re-kasirpinter-go/graph/model"
 	"strings"
 	"time"
 
@@ -37,52 +38,62 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 			ctx := context.WithValue(r.Context(), clientInfoCtxKey, clientInfo)
 			r = r.WithContext(ctx)
 
-			// Skip auth for login and register mutations
-			if r.URL.Path == "/query" {
-				// This is a GraphQL request, check the operation name
-				if r.Method == "POST" {
-					// In a real app, you'd parse the request body to check the operation name
-					// For simplicity, we'll just check the auth header for now
-					authHeader := r.Header.Get("Authorization")
-					if authHeader == "" {
-						// No auth header, let the resolver handle it
-						next.ServeHTTP(w, r)
-						return
-					}
+			// Handle GraphQL requests
+			if r.URL.Path == "/query" && r.Method == "POST" {
+				// Check if there's an Authorization header
+				authHeader := r.Header.Get("Authorization")
+				if authHeader == "" {
+					// No auth header, let the resolver handle it (login, createOtp, etc.)
+					next.ServeHTTP(w, r)
+					return
+				}
 
-					// Extract the token from the Authorization header
-					// Support both "Bearer <token>" and just "<token>" formats
-					tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-					tokenString = strings.TrimSpace(tokenString)
+				// Extract the token from the Authorization header
+				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+				tokenString = strings.TrimSpace(tokenString)
 
-					if tokenString == "" {
-						// No token found
-						next.ServeHTTP(w, r)
-						return
-					}
+				if tokenString == "" {
+					// No token found, let the resolver handle it
+					next.ServeHTTP(w, r)
+					return
+				}
 
-					// Check if token is blacklisted
-					if isTokenBlacklisted(db, tokenString) {
-						// Token is blacklisted, reject the request with GraphQL error format
+				// Validate the JWT token
+				claims, err := validateJWT(tokenString)
+				if err != nil {
+					// Invalid JWT, let the resolver handle it
+					next.ServeHTTP(w, r)
+					return
+				}
+
+				// Check if token is blacklisted
+				if isTokenBlacklisted(db, tokenString) {
+					// Token is blacklisted, reject the request
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusUnauthorized)
+					w.Write([]byte(`{"errors":[{"message":"Access denied. Token has been revoked.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
+					return
+				}
+
+				// For login tokens, check ActiveTokenDB for expiry
+				if claims.Purpose == "login" {
+					var activeToken model.ActiveTokenDB
+					result := db.Where("token = ? AND expires_at > ?", tokenString, time.Now()).First(&activeToken)
+					if result.Error != nil {
+						// Token not found or expired, reject the request
 						w.Header().Set("Content-Type", "application/json")
 						w.WriteHeader(http.StatusUnauthorized)
-						w.Write([]byte(`{"errors":[{"message":"Access denied. You must be logged in.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
+						w.Write([]byte(`{"errors":[{"message":"Access denied. Token expired or invalid.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
 						return
 					}
-
-					// Validate the token
-					claims, err := validateJWT(tokenString)
-					if err != nil {
-						// Invalid token, let the resolver handle it
-						next.ServeHTTP(w, r)
-						return
-					}
-
-					// Add user info and token to context
-					ctx = context.WithValue(ctx, userCtxKey, claims)
-					ctx = context.WithValue(ctx, tokenCtxKey, tokenString)
-					r = r.WithContext(ctx)
 				}
+
+				// Add user info, token, DB, and client info to context for @auth directive
+				ctx = context.WithValue(ctx, userCtxKey, claims)
+				ctx = context.WithValue(ctx, tokenCtxKey, tokenString)
+				ctx = context.WithValue(ctx, "db", db)
+				ctx = context.WithValue(ctx, clientInfoCtxKey, clientInfo)
+				r = r.WithContext(ctx)
 			}
 
 			next.ServeHTTP(w, r)
@@ -178,6 +189,7 @@ func parseOS(userAgent string) string {
 // AuthDirective adds authentication to a field.
 // Only accepts full login tokens (purpose == "login").
 // Password-reset tokens are restricted to newPassword mutation only.
+// Extends token expiry for sliding session (1 hour from now).
 func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
 	user := ForContext(ctx)
 	if user == nil {
@@ -221,10 +233,46 @@ func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) 
 		}
 	}
 
+	// Implement sliding session for login tokens
+	// Extend token expiry to 1 hour from now if token is older than 30 minutes
+	if user.Purpose == "login" {
+		// Get the current token
+		currentToken := GetToken(ctx)
+		if currentToken != "" {
+			// Check if token should be extended (older than 30 minutes)
+			if time.Since(user.IssuedAt.Time) > 30*time.Minute {
+				// Get client info for logging
+				clientInfo := GetClientInfo(ctx)
+
+				operationContext := graphql.GetOperationContext(ctx)
+				if operationContext != nil {
+					// Try to get DB from context
+					if dbInterface, ok := ctx.Value("db").(*gorm.DB); ok {
+						// Update the token expiry in database
+						newExpiry := time.Now().Add(1 * time.Hour)
+						result := dbInterface.Model(&model.ActiveTokenDB{}).Where("token = ?", currentToken).Update("expires_at", newExpiry)
+						if result.Error == nil {
+							// Log the extension with device info
+							if clientInfo != nil {
+								log.Printf("Token extended for user %d from IP %s (%s/%s)", user.UserID, clientInfo.IP, clientInfo.Browser, clientInfo.OS)
+							}
+							ctx = context.WithValue(ctx, "tokenExtended", true)
+							ctx = context.WithValue(ctx, "tokenExtendedMessage", "Token expiry extended to 1 hour from now")
+						}
+					} else {
+						// Fallback: just indicate extension should happen
+						ctx = context.WithValue(ctx, "tokenExtended", true)
+						ctx = context.WithValue(ctx, "extendToken", currentToken)
+					}
+				}
+			}
+		}
+	}
+
 	return next(ctx)
 }
 
-// LoggingInterceptor logs GraphQL request details
+// LoggingInterceptor logs GraphQL request details and handles token extension
 type LoggingInterceptor struct{}
 
 func (li *LoggingInterceptor) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
@@ -243,6 +291,43 @@ func (li *LoggingInterceptor) InterceptResponse(ctx context.Context, next graphq
 
 	// Execute the response handler
 	resp := next(ctx)
+
+	// Check for token extension (sliding session extension)
+	if tokenExtended, ok := ctx.Value("tokenExtended").(bool); ok && tokenExtended {
+		// Check if extension was already handled in AuthDirective
+		if message, ok := ctx.Value("tokenExtendedMessage").(string); ok {
+			// Extension was handled in AuthDirective
+			if resp != nil && resp.Extensions == nil {
+				resp.Extensions = make(map[string]interface{})
+			}
+			if resp != nil {
+				resp.Extensions["token_extended"] = true
+				resp.Extensions["message"] = message
+			}
+		} else if tokenToExtend, ok := ctx.Value("extendToken").(string); ok && tokenToExtend != "" {
+			// Fallback: handle extension here (for cases where DB wasn't available in AuthDirective)
+			if dbInterface, ok := ctx.Value("db").(*gorm.DB); ok {
+				go func(db *gorm.DB, token string) {
+					newExpiry := time.Now().Add(1 * time.Hour)
+					result := db.Model(&model.ActiveTokenDB{}).Where("token = ?", token).Update("expires_at", newExpiry)
+					if result.Error == nil {
+						log.Printf("Token extended: %s (expiry reset to 1 hour from now)", token)
+					} else {
+						log.Printf("Failed to extend token: %v", result.Error)
+					}
+				}(dbInterface, tokenToExtend)
+
+				// Add extension notification to response
+				if resp != nil && resp.Extensions == nil {
+					resp.Extensions = make(map[string]interface{})
+				}
+				if resp != nil {
+					resp.Extensions["token_extended"] = true
+					resp.Extensions["message"] = "Token expiry extended to 1 hour from now"
+				}
+			}
+		}
+	}
 
 	// Calculate duration
 	duration := time.Since(startTime)

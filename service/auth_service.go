@@ -163,6 +163,24 @@ func (s *AuthService) Login(ctx context.Context, input input.LoginInput, clientI
 		}, nil
 	}
 
+	// Store token in ActiveTokenDB with 1 hour expiry and device info
+	expiryTime := time.Now().Add(1 * time.Hour)
+	activeToken := model.ActiveTokenDB{
+		Token:     token,
+		UserID:    userDB.ID,
+		IP:        ip,
+		Browser:   browser,
+		OS:        os,
+		ExpiresAt: expiryTime,
+	}
+	if err := s.DB.Create(&activeToken).Error; err != nil {
+		return &model.AuthResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to store token: %v", err),
+		}, nil
+	}
+
 	// Record successful login attempt
 	loginAudit := model.LoginAuditDB{
 		Email:   input.Email,
@@ -500,7 +518,7 @@ func (s *AuthService) generateOTPCode() string {
 
 func (s *AuthService) generateJWT(userID int32, email string, role string, secureID string, purpose string) (string, error) {
 	jwtSecret := s.getJWTSecret()
-	expiry := 1 * time.Hour // 1 hour for login tokens
+	expiry := 30 * 24 * time.Hour // 30 days for login tokens (actual expiry controlled by database)
 	if purpose == "password_reset" {
 		expiry = 15 * time.Minute
 	}

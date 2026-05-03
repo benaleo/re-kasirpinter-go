@@ -52,6 +52,7 @@ func InitDb() (*gorm.DB, error) {
 		&model.OtpDB{},
 		&model.LogEmailDB{},
 		&model.LoginAuditDB{},
+		&model.ActiveTokenDB{},
 		&model.BlacklistedTokenDB{},
 		&model.IngredientCategoryDB{},
 		&model.IngredientDB{},
@@ -67,6 +68,24 @@ func InitDb() (*gorm.DB, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	// Manual migration for ActiveTokenDB device info columns
+	// Check if columns exist and add them if they don't
+	if !db.Migrator().HasColumn(&model.ActiveTokenDB{}, "ip") {
+		if err := db.Migrator().AddColumn(&model.ActiveTokenDB{}, "ip"); err != nil {
+			fmt.Printf("Warning: Failed to add ip column: %v\n", err)
+		}
+	}
+	if !db.Migrator().HasColumn(&model.ActiveTokenDB{}, "browser") {
+		if err := db.Migrator().AddColumn(&model.ActiveTokenDB{}, "browser"); err != nil {
+			fmt.Printf("Warning: Failed to add browser column: %v\n", err)
+		}
+	}
+	if !db.Migrator().HasColumn(&model.ActiveTokenDB{}, "os") {
+		if err := db.Migrator().AddColumn(&model.ActiveTokenDB{}, "os"); err != nil {
+			fmt.Printf("Warning: Failed to add os column: %v\n", err)
+		}
 	}
 
 	// Add unique constraints

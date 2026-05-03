@@ -177,12 +177,44 @@ func (l *LoginAuditDB) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// ActiveTokenDB represents the database model for active tokens with managed expiry
+type ActiveTokenDB struct {
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Token     string    `gorm:"uniqueIndex;not null;size:500" json:"token"`
+	UserID    int32     `gorm:"not null;index" json:"user_id"`
+	IP        *string   `json:"ip,omitempty"`
+	Browser   *string   `json:"browser,omitempty"`
+	OS        *string   `json:"os,omitempty"`
+	ExpiresAt time.Time `gorm:"not null;index" json:"expires_at"`
+	CreatedAt time.Time `gorm:"not null;index" json:"created_at"`
+	UpdatedAt time.Time `gorm:"not null" json:"updated_at"`
+}
+
+// TableName specifies the table name for ActiveTokenDB
+func (ActiveTokenDB) TableName() string {
+	return "active_tokens"
+}
+
+// BeforeCreate hook for ActiveTokenDB
+func (a *ActiveTokenDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	a.CreatedAt = now
+	a.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ActiveTokenDB
+func (a *ActiveTokenDB) BeforeUpdate(tx *gorm.DB) error {
+	a.UpdatedAt = time.Now()
+	return nil
+}
+
 // BlacklistedTokenDB represents the database model for blacklisted tokens
 type BlacklistedTokenDB struct {
 	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
 	Token     string    `gorm:"uniqueIndex;not null;size:500" json:"token"`
 	UserID    int32     `gorm:"not null;index" json:"user_id"`
-	ExpiresAt time.Time `gorm:"not null;index" json:"expired_at"`
+	ExpiresAt time.Time `gorm:"not null;index" json:"expires_at"`
 	CreatedAt time.Time `gorm:"not null;index" json:"created_at"`
 }
 

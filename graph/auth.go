@@ -111,6 +111,11 @@ func cleanupExpiredBlacklistedTokens(db *gorm.DB) error {
 	return db.Where("expires_at <= ?", time.Now()).Delete(&model.BlacklistedTokenDB{}).Error
 }
 
+// generateExtendedToken creates a new token with extended expiry for sliding session
+func generateExtendedToken(userID int32, email string, role string, secureID string) (string, error) {
+	return generateJWT(userID, email, role, secureID, "login")
+}
+
 // RequireSuperAdmin checks if the user from context has superadmin role
 func RequireSuperAdmin(ctx context.Context) error {
 	userClaims := ForContext(ctx)
