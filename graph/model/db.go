@@ -598,6 +598,7 @@ func (p *ProductHasExtraDB) BeforeCreate(tx *gorm.DB) error {
 // TransactionDB represents the database model for Transaction
 type TransactionDB struct {
 	ID            int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	SecureID      *string   `gorm:"uniqueIndex;index" json:"secure_id,omitempty"`
 	Date          time.Time `gorm:"not null;index" json:"date"`
 	Sequence      int32     `gorm:"not null" json:"sequence"`
 	Invoice       string    `gorm:"uniqueIndex;not null" json:"invoice"`

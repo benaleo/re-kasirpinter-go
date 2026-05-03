@@ -107,6 +107,10 @@ type Query {
     pagination: PaginationInput
     is_active: Boolean
   ): ProductExtrasResponse! @auth
+
+  # transactions
+  transactions(pagination: PaginationInput): TransactionsResponse! @auth
+  transaction(id: String!): TransactionResponse! @auth
 }
 
 type Mutation {
@@ -208,4 +212,13 @@ type Mutation {
     input: UpdateProductExtraInput!
   ): UpdateProductExtraResponse! @auth
   deleteProductExtra(id: Int64!): DeleteProductExtraResponse! @auth
+
+  # transactions
+  createTransaction(input: CreateTransactionInput!): CreateTransactionResponse!
+    @auth
+  updateTransaction(
+    id: String!
+    input: UpdateTransactionInput!
+  ): UpdateTransactionResponse! @auth
+  cancelTransaction(id: String!): UpdateTransactionResponse! @auth
 }

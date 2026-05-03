@@ -396,6 +396,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CancelTransaction        func(childComplexity int, id string) int
 		CreateDiscount           func(childComplexity int, input model.CreateDiscountInput) int
 		CreateIngredient         func(childComplexity int, input model.CreateIngredientInput) int
 		CreateIngredientCategory func(childComplexity int, input model.CreateIngredientCategoryInput) int
@@ -407,6 +408,7 @@ type ComplexityRoot struct {
 		CreateProductIngredient  func(childComplexity int, input []*model.CreateProductIngredientInput) int
 		CreateProductVariant     func(childComplexity int, input model.CreateProductVariantInput) int
 		CreateRole               func(childComplexity int, input model.CreateRoleInput) int
+		CreateTransaction        func(childComplexity int, input model.CreateTransactionInput) int
 		CreateUser               func(childComplexity int, input input.CreateUserInput, isUser *bool) int
 		DeleteDiscount           func(childComplexity int, id int64) int
 		DeleteIngredient         func(childComplexity int, id int64) int
@@ -433,6 +435,7 @@ type ComplexityRoot struct {
 		UpdateProductExtra       func(childComplexity int, id int64, input model.UpdateProductExtraInput) int
 		UpdateProductVariant     func(childComplexity int, id int64, input model.UpdateProductVariantInput) int
 		UpdateRole               func(childComplexity int, id int64, input model.UpdateRoleInput) int
+		UpdateTransaction        func(childComplexity int, id string, input model.UpdateTransactionInput) int
 		UpdateUser               func(childComplexity int, id string, input input.UpdateUserInput) int
 		VerifyOtp                func(childComplexity int, input model.VerifyOtpInput) int
 	}
@@ -646,6 +649,8 @@ type ComplexityRoot struct {
 		Products             func(childComplexity int, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) int
 		Role                 func(childComplexity int, id int64) int
 		Roles                func(childComplexity int) int
+		Transaction          func(childComplexity int, id string) int
+		Transactions         func(childComplexity int, pagination *model.PaginationInput) int
 		User                 func(childComplexity int, id string) int
 		Users                func(childComplexity int, pagination *model.PaginationInput, isUser *bool) int
 	}
@@ -922,6 +927,9 @@ type MutationResolver interface {
 	CreateProductExtra(ctx context.Context, input model.CreateProductExtraInput) (*model.CreateProductExtraResponse, error)
 	UpdateProductExtra(ctx context.Context, id int64, input model.UpdateProductExtraInput) (*model.UpdateProductExtraResponse, error)
 	DeleteProductExtra(ctx context.Context, id int64) (*model.DeleteProductExtraResponse, error)
+	CreateTransaction(ctx context.Context, input model.CreateTransactionInput) (*model.CreateTransactionResponse, error)
+	UpdateTransaction(ctx context.Context, id string, input model.UpdateTransactionInput) (*model.UpdateTransactionResponse, error)
+	CancelTransaction(ctx context.Context, id string) (*model.UpdateTransactionResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
@@ -940,6 +948,8 @@ type QueryResolver interface {
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
 	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
 	ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error)
+	Transactions(ctx context.Context, pagination *model.PaginationInput) (*model.TransactionsResponse, error)
+	Transaction(ctx context.Context, id string) (*model.TransactionResponse, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -2310,6 +2320,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.LogoutResponse.Success(childComplexity), true
 
+	case "Mutation.cancelTransaction":
+		if e.ComplexityRoot.Mutation.CancelTransaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_cancelTransaction_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CancelTransaction(childComplexity, args["id"].(string)), true
 	case "Mutation.createDiscount":
 		if e.ComplexityRoot.Mutation.CreateDiscount == nil {
 			break
@@ -2431,6 +2452,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateRole(childComplexity, args["input"].(model.CreateRoleInput)), true
+	case "Mutation.createTransaction":
+		if e.ComplexityRoot.Mutation.CreateTransaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTransaction_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateTransaction(childComplexity, args["input"].(model.CreateTransactionInput)), true
 	case "Mutation.createUser":
 		if e.ComplexityRoot.Mutation.CreateUser == nil {
 			break
@@ -2707,6 +2739,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdateRole(childComplexity, args["id"].(int64), args["input"].(model.UpdateRoleInput)), true
+	case "Mutation.updateTransaction":
+		if e.ComplexityRoot.Mutation.UpdateTransaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTransaction_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateTransaction(childComplexity, args["id"].(string), args["input"].(model.UpdateTransactionInput)), true
 	case "Mutation.updateUser":
 		if e.ComplexityRoot.Mutation.UpdateUser == nil {
 			break
@@ -3682,6 +3725,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Roles(childComplexity), true
+	case "Query.transaction":
+		if e.ComplexityRoot.Query.Transaction == nil {
+			break
+		}
+
+		args, err := ec.field_Query_transaction_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.Transaction(childComplexity, args["id"].(string)), true
+	case "Query.transactions":
+		if e.ComplexityRoot.Query.Transactions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_transactions_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.Transactions(childComplexity, args["pagination"].(*model.PaginationInput)), true
 	case "Query.user":
 		if e.ComplexityRoot.Query.User == nil {
 			break
@@ -4769,6 +4834,17 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_cancelTransaction_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createDiscount_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -4883,6 +4959,17 @@ func (ec *executionContext) field_Mutation_createRole_args(ctx context.Context, 
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateRoleInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateRoleInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTransaction_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateTransactionInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionInput)
 	if err != nil {
 		return nil, err
 	}
@@ -5204,6 +5291,22 @@ func (ec *executionContext) field_Mutation_updateRole_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateTransaction_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateTransactionInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateTransactionInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -5431,6 +5534,28 @@ func (ec *executionContext) field_Query_role_args(ctx context.Context, rawArgs m
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_transaction_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_transactions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "pagination", ec.unmarshalOPaginationInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐPaginationInput)
+	if err != nil {
+		return nil, err
+	}
+	args["pagination"] = arg0
 	return args, nil
 }
 
@@ -15285,6 +15410,198 @@ func (ec *executionContext) fieldContext_Mutation_deleteProductExtra(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createTransaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createTransaction,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CreateTransaction(ctx, fc.Args["input"].(model.CreateTransactionInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.CreateTransactionResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNCreateTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTransaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_CreateTransactionResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_CreateTransactionResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_CreateTransactionResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_CreateTransactionResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateTransactionResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTransaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateTransaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateTransaction,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UpdateTransaction(ctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateTransactionInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.UpdateTransactionResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNUpdateTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateTransactionResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTransaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_UpdateTransactionResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_UpdateTransactionResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_UpdateTransactionResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_UpdateTransactionResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateTransactionResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTransaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_cancelTransaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_cancelTransaction,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CancelTransaction(ctx, fc.Args["id"].(string))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.UpdateTransactionResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNUpdateTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateTransactionResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_cancelTransaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_UpdateTransactionResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_UpdateTransactionResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_UpdateTransactionResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_UpdateTransactionResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateTransactionResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_cancelTransaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _NewPasswordResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -20731,6 +21048,136 @@ func (ec *executionContext) fieldContext_Query_productExtras(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_productExtras_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_transactions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_transactions,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().Transactions(ctx, fc.Args["pagination"].(*model.PaginationInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.TransactionsResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNTransactionsResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionsResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_transactions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_TransactionsResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_TransactionsResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_TransactionsResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_TransactionsResponse_data(ctx, field)
+			case "pagination":
+				return ec.fieldContext_TransactionsResponse_pagination(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TransactionsResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_transactions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_transaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_transaction,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().Transaction(ctx, fc.Args["id"].(string))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.TransactionResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_transaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_TransactionResponse_code(ctx, field)
+			case "success":
+				return ec.fieldContext_TransactionResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_TransactionResponse_message(ctx, field)
+			case "data":
+				return ec.fieldContext_TransactionResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TransactionResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_transaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -32098,6 +32545,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createTransaction":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTransaction(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateTransaction":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTransaction(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "cancelTransaction":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_cancelTransaction(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -33741,6 +34209,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_productExtras(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "transactions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_transactions(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "transaction":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_transaction(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -35970,6 +36482,11 @@ func (ec *executionContext) unmarshalNCreateTransactionExtraInput2ᚖreᚑkasirp
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateTransactionInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionInput(ctx context.Context, v any) (model.CreateTransactionInput, error) {
+	res, err := ec.unmarshalInputCreateTransactionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx context.Context, v any) ([]*model.CreateTransactionProductInput, error) {
 	var vSlice []any
 	vSlice = graphql.CoerceList(v)
@@ -35988,6 +36505,20 @@ func (ec *executionContext) unmarshalNCreateTransactionProductInput2ᚕᚖreᚑk
 func (ec *executionContext) unmarshalNCreateTransactionProductInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInput(ctx context.Context, v any) (*model.CreateTransactionProductInput, error) {
 	res, err := ec.unmarshalInputCreateTransactionProductInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateTransactionResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionResponse(ctx context.Context, sel ast.SelectionSet, v model.CreateTransactionResponse) graphql.Marshaler {
+	return ec._CreateTransactionResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionResponse(ctx context.Context, sel ast.SelectionSet, v *model.CreateTransactionResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateTransactionResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCreateUserInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐCreateUserInput(ctx context.Context, v any) (input.CreateUserInput, error) {
@@ -36936,6 +37467,34 @@ func (ec *executionContext) marshalNTransactionProduct2ᚖreᚑkasirpinterᚑgo�
 	return ec._TransactionProduct(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTransactionResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionResponse(ctx context.Context, sel ast.SelectionSet, v model.TransactionResponse) graphql.Marshaler {
+	return ec._TransactionResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionResponse(ctx context.Context, sel ast.SelectionSet, v *model.TransactionResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TransactionResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTransactionsResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionsResponse(ctx context.Context, sel ast.SelectionSet, v model.TransactionsResponse) graphql.Marshaler {
+	return ec._TransactionsResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTransactionsResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionsResponse(ctx context.Context, sel ast.SelectionSet, v *model.TransactionsResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TransactionsResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUpdateDiscountInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateDiscountInput(ctx context.Context, v any) (model.UpdateDiscountInput, error) {
 	res, err := ec.unmarshalInputUpdateDiscountInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -37105,6 +37664,25 @@ func (ec *executionContext) marshalNUpdateRoleResponse2ᚖreᚑkasirpinterᚑgo�
 		return graphql.Null
 	}
 	return ec._UpdateRoleResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateTransactionInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateTransactionInput(ctx context.Context, v any) (model.UpdateTransactionInput, error) {
+	res, err := ec.unmarshalInputUpdateTransactionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateTransactionResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateTransactionResponse(ctx context.Context, sel ast.SelectionSet, v model.UpdateTransactionResponse) graphql.Marshaler {
+	return ec._UpdateTransactionResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateTransactionResponse(ctx context.Context, sel ast.SelectionSet, v *model.UpdateTransactionResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateTransactionResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateUserInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐUpdateUserInput(ctx context.Context, v any) (input.UpdateUserInput, error) {

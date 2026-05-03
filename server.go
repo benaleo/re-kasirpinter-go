@@ -141,13 +141,16 @@ func main() {
 		log.Printf("Warning: Failed to initialize product extra service: %v", err)
 	}
 
+	// Initialize transaction service
+	transactionService := service.NewTransactionService(db)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService, DiscountService: discountService, ProductVariantService: productVariantService, ProductIngredientService: productIngredientService, ProductExtraService: productExtraService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService, DiscountService: discountService, ProductVariantService: productVariantService, ProductIngredientService: productIngredientService, ProductExtraService: productExtraService, TransactionService: transactionService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 

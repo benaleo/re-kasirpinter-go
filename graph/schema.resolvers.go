@@ -678,6 +678,57 @@ func (r *mutationResolver) DeleteProductExtra(ctx context.Context, id int64) (*m
 	return r.ProductExtraService.DeleteProductExtra(id)
 }
 
+// CreateTransaction is the resolver for the createTransaction field.
+func (r *mutationResolver) CreateTransaction(ctx context.Context, input model.CreateTransactionInput) (*model.CreateTransactionResponse, error) {
+	if r.TransactionService == nil {
+		return &model.CreateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "transaction service not initialized",
+		}, nil
+	}
+
+	// Get user info from context for audit trail
+	userClaims := ForContext(ctx)
+	if userClaims != nil {
+		input.CreatedBy = &userClaims.SecureID
+	}
+
+	return r.TransactionService.CreateTransaction(ctx, input)
+}
+
+// UpdateTransaction is the resolver for the updateTransaction field.
+func (r *mutationResolver) UpdateTransaction(ctx context.Context, id string, input model.UpdateTransactionInput) (*model.UpdateTransactionResponse, error) {
+	if r.TransactionService == nil {
+		return &model.UpdateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "transaction service not initialized",
+		}, nil
+	}
+
+	// Get user info from context for audit trail
+	userClaims := ForContext(ctx)
+	if userClaims != nil {
+		input.UpdatedBy = &userClaims.SecureID
+	}
+
+	return r.TransactionService.UpdateTransaction(ctx, id, input)
+}
+
+// CancelTransaction is the resolver for the cancelTransaction field.
+func (r *mutationResolver) CancelTransaction(ctx context.Context, id string) (*model.UpdateTransactionResponse, error) {
+	if r.TransactionService == nil {
+		return &model.UpdateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "transaction service not initialized",
+		}, nil
+	}
+
+	return r.TransactionService.CancelTransaction(ctx, id)
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
@@ -932,6 +983,32 @@ func (r *queryResolver) ProductExtras(ctx context.Context, pagination *model.Pag
 		}, nil
 	}
 	return r.ProductExtraService.ProductExtras(pagination, isActive)
+}
+
+// Transactions is the resolver for the transactions field.
+func (r *queryResolver) Transactions(ctx context.Context, pagination *model.PaginationInput) (*model.TransactionsResponse, error) {
+	if r.TransactionService == nil {
+		return &model.TransactionsResponse{
+			Code:    500,
+			Success: false,
+			Message: "transaction service not initialized",
+		}, nil
+	}
+
+	return r.TransactionService.GetTransactions(ctx, *pagination)
+}
+
+// Transaction is the resolver for the transaction field.
+func (r *queryResolver) Transaction(ctx context.Context, id string) (*model.TransactionResponse, error) {
+	if r.TransactionService == nil {
+		return &model.TransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "transaction service not initialized",
+		}, nil
+	}
+
+	return r.TransactionService.GetTransactionByID(ctx, id)
 }
 
 // Mutation returns MutationResolver implementation.

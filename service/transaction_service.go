@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"re-kasirpinter-go/graph/model"
+	"re-kasirpinter-go/helper"
 	"time"
 
 	"gorm.io/gorm"
@@ -52,23 +53,33 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 		}
 	}()
 
+	// Generate secure_id
+	secureID, err := helper.GenerateRandomString(32)
+	if err != nil {
+		return &model.CreateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to generate secure ID: " + err.Error(),
+		}, err
+	}
+
 	// Get current date and sequence
 	now := time.Now()
 	sequence, err := s.getNextSequence(now)
 	if err != nil {
-		tx.Rollback()
 		return &model.CreateTransactionResponse{
 			Code:    500,
 			Success: false,
-			Message: "Failed to generate sequence number: " + err.Error(),
+			Message: "Failed to get next sequence: " + err.Error(),
 		}, err
 	}
 
-	// Generate invoice number
+	// Generate invoice
 	invoice := s.generateInvoice(now, sequence)
 
 	// Create transaction
 	transaction := model.TransactionDB{
+		SecureID:      &secureID,
 		Date:          now,
 		Sequence:      sequence,
 		Invoice:       invoice,
@@ -236,14 +247,15 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 	}, nil
 }
 
-// GetTransactionByID retrieves a single transaction by ID
-func (s *TransactionService) GetTransactionByID(ctx context.Context, id int64) (*model.TransactionResponse, error) {
+// GetTransactionByID retrieves a single transaction by secure_id
+func (s *TransactionService) GetTransactionByID(ctx context.Context, secureID string) (*model.TransactionResponse, error) {
 	var transaction model.TransactionDB
 
 	if err := s.DB.Preload("Customer").
 		Preload("Products.Product").
 		Preload("Products.Extras").
-		First(&transaction, id).Error; err != nil {
+		Where("secure_id = ?", secureID).
+		First(&transaction).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return &model.TransactionResponse{
 				Code:    404,
@@ -267,11 +279,11 @@ func (s *TransactionService) GetTransactionByID(ctx context.Context, id int64) (
 }
 
 // UpdateTransaction updates an existing transaction
-func (s *TransactionService) UpdateTransaction(ctx context.Context, id int64, input model.UpdateTransactionInput) (*model.UpdateTransactionResponse, error) {
+func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID string, input model.UpdateTransactionInput) (*model.UpdateTransactionResponse, error) {
 	var transaction model.TransactionDB
 
 	// Check if transaction exists
-	if err := s.DB.First(&transaction, id).Error; err != nil {
+	if err := s.DB.Where("secure_id = ?", secureID).First(&transaction).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return &model.UpdateTransactionResponse{
 				Code:    404,
@@ -328,7 +340,7 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, id int64, in
 
 	// Get updated transaction with relations
 	var result model.TransactionDB
-	if err := s.DB.Preload("Customer").Preload("Products.Product").Preload("Products.Extras").First(&result, id).Error; err != nil {
+	if err := s.DB.Preload("Customer").Preload("Products.Product").Preload("Products.Extras").Where("secure_id = ?", secureID).First(&result).Error; err != nil {
 		return &model.UpdateTransactionResponse{
 			Code:    500,
 			Success: false,
@@ -344,40 +356,69 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, id int64, in
 	}, nil
 }
 
-// DeleteTransaction soft deletes a transaction
-func (s *TransactionService) DeleteTransaction(ctx context.Context, id int64) (*model.DeleteTransactionResponse, error) {
+// CancelTransaction cancels a transaction by setting is_canceled to true
+func (s *TransactionService) CancelTransaction(ctx context.Context, secureID string) (*model.UpdateTransactionResponse, error) {
 	var transaction model.TransactionDB
 
 	// Check if transaction exists
-	if err := s.DB.First(&transaction, id).Error; err != nil {
+	if err := s.DB.Where("secure_id = ?", secureID).First(&transaction).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return &model.DeleteTransactionResponse{
+			return &model.UpdateTransactionResponse{
 				Code:    404,
 				Success: false,
 				Message: "Transaction not found",
 			}, nil
 		}
-		return &model.DeleteTransactionResponse{
+		return &model.UpdateTransactionResponse{
 			Code:    500,
 			Success: false,
 			Message: "Failed to retrieve transaction: " + err.Error(),
 		}, err
 	}
 
-	// Soft delete transaction (this will cascade delete related products and extras)
-	if err := s.DB.Delete(&transaction).Error; err != nil {
-		return &model.DeleteTransactionResponse{
+	// Check if transaction is already completed
+	if transaction.IsCompleted {
+		return &model.UpdateTransactionResponse{
+			Code:    400,
+			Success: false,
+			Message: "Cannot cancel completed transaction",
+		}, nil
+	}
+
+	// Check if transaction is already canceled
+	if transaction.IsCanceled {
+		return &model.UpdateTransactionResponse{
+			Code:    400,
+			Success: false,
+			Message: "Transaction is already canceled",
+		}, nil
+	}
+
+	// Cancel transaction
+	transaction.IsCanceled = true
+	if err := s.DB.Save(&transaction).Error; err != nil {
+		return &model.UpdateTransactionResponse{
 			Code:    500,
 			Success: false,
-			Message: "Failed to delete transaction: " + err.Error(),
+			Message: "Failed to cancel transaction: " + err.Error(),
 		}, err
 	}
 
-	return &model.DeleteTransactionResponse{
+	// Get updated transaction with relations
+	var result model.TransactionDB
+	if err := s.DB.Preload("Customer").Preload("Products.Product").Preload("Products.Extras").Where("secure_id = ?", secureID).First(&result).Error; err != nil {
+		return &model.UpdateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to retrieve updated transaction: " + err.Error(),
+		}, err
+	}
+
+	return &model.UpdateTransactionResponse{
 		Code:    200,
 		Success: true,
-		Message: "Transaction deleted successfully",
-		Data:    s.convertTransactionDBToGraphQL(&transaction),
+		Message: "Transaction canceled successfully",
+		Data:    s.convertTransactionDBToGraphQL(&result),
 	}, nil
 }
 
