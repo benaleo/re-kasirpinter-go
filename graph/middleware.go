@@ -2,12 +2,14 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"re-kasirpinter-go/graph/model"
 	"strings"
 	"time"
+
+	"re-kasirpinter-go/graph/model"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -24,9 +26,46 @@ type ClientInfo struct {
 	OS      string
 }
 
+type AuthStatusResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func NewAuthStatusResponseWriter(w http.ResponseWriter) *AuthStatusResponseWriter {
+	return &AuthStatusResponseWriter{w, http.StatusOK}
+}
+
+func (asrw *AuthStatusResponseWriter) WriteHeader(code int) {
+	asrw.statusCode = code
+	asrw.ResponseWriter.WriteHeader(code)
+}
+
+func (asrw *AuthStatusResponseWriter) Write(b []byte) (int, error) {
+	// Check if this is a GraphQL response with auth errors
+	var response map[string]interface{}
+	if err := json.Unmarshal(b, &response); err == nil {
+		if errors, ok := response["errors"].([]interface{}); ok {
+			for _, err := range errors {
+				if errMap, ok := err.(map[string]interface{}); ok {
+					if extensions, ok := errMap["extensions"].(map[string]interface{}); ok {
+						if code, ok := extensions["code"].(string); ok && code == "UNAUTHENTICATED" {
+							asrw.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+	return asrw.ResponseWriter.Write(b)
+}
+
 func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Wrap the response writer to capture auth errors
+			authWriter := NewAuthStatusResponseWriter(w)
+
 			// Extract client information
 			clientInfo := &ClientInfo{
 				IP:      getClientIP(r),
@@ -44,7 +83,7 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 				authHeader := r.Header.Get("Authorization")
 				if authHeader == "" {
 					// No auth header, let the resolver handle it (login, createOtp, etc.)
-					next.ServeHTTP(w, r)
+					next.ServeHTTP(authWriter, r)
 					return
 				}
 
@@ -54,7 +93,7 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 
 				if tokenString == "" {
 					// No token found, let the resolver handle it
-					next.ServeHTTP(w, r)
+					next.ServeHTTP(authWriter, r)
 					return
 				}
 
@@ -62,16 +101,16 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 				claims, err := validateJWT(tokenString)
 				if err != nil {
 					// Invalid JWT, let the resolver handle it
-					next.ServeHTTP(w, r)
+					next.ServeHTTP(authWriter, r)
 					return
 				}
 
 				// Check if token is blacklisted
 				if isTokenBlacklisted(db, tokenString) {
 					// Token is blacklisted, reject the request
-					w.Header().Set("Content-Type", "application/json")
-					w.WriteHeader(http.StatusUnauthorized)
-					w.Write([]byte(`{"errors":[{"message":"Access denied. Token has been revoked.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
+					authWriter.Header().Set("Content-Type", "application/json")
+					authWriter.WriteHeader(http.StatusUnauthorized)
+					authWriter.Write([]byte(`{"errors":[{"message":"Access denied. Token has been revoked.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
 					return
 				}
 
@@ -88,15 +127,16 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 					}
 				}
 
-				// Add user info, token, DB, and client info to context for @auth directive
+				// Add user info, token, DB, client info, and HTTP writer to context for @auth directive
 				ctx = context.WithValue(ctx, userCtxKey, claims)
 				ctx = context.WithValue(ctx, tokenCtxKey, tokenString)
 				ctx = context.WithValue(ctx, "db", db)
 				ctx = context.WithValue(ctx, clientInfoCtxKey, clientInfo)
+				ctx = context.WithValue(ctx, "httpWriter", authWriter)
 				r = r.WithContext(ctx)
 			}
 
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(authWriter, r)
 		})
 	}
 }
@@ -301,13 +341,45 @@ func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) 
 	return next(ctx)
 }
 
+// AuthStatusInterceptor sets HTTP status codes based on GraphQL errors
+type AuthStatusInterceptor struct{}
+
+func (asi *AuthStatusInterceptor) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+	resp := next(ctx)
+
+	// Check if response contains authentication errors
+	if resp != nil && len(resp.Errors) > 0 {
+		for _, err := range resp.Errors {
+			if err != nil && err.Extensions != nil {
+				if code, ok := err.Extensions["code"].(string); ok && code == "UNAUTHENTICATED" {
+					// Set HTTP status code to 401 for authentication errors
+					if httpWriter, ok := ctx.Value("httpWriter").(http.ResponseWriter); ok {
+						httpWriter.WriteHeader(http.StatusUnauthorized)
+					}
+					break
+				}
+			}
+		}
+	}
+
+	return resp
+}
+
+func (asi *AuthStatusInterceptor) ExtensionName() string {
+	return "AuthStatusInterceptor"
+}
+
+func (asi *AuthStatusInterceptor) Validate(schema graphql.ExecutableSchema) error {
+	return nil
+}
+
 // LoggingInterceptor logs GraphQL request details and handles token extension
 type LoggingInterceptor struct{}
 
 func (li *LoggingInterceptor) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 	startTime := time.Now()
 
-	// Get request context info
+	// Get client info and user claims from context
 	clientInfo := GetClientInfo(ctx)
 	userClaims := ForContext(ctx)
 
