@@ -80,11 +80,11 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 					var activeToken model.ActiveTokenDB
 					result := db.Where("token = ? AND expires_at > ?", tokenString, time.Now()).First(&activeToken)
 					if result.Error != nil {
-						// Token not found or expired, reject the request
-						w.Header().Set("Content-Type", "application/json")
-						w.WriteHeader(http.StatusUnauthorized)
-						w.Write([]byte(`{"errors":[{"message":"Access denied. Token expired or invalid.","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}`))
-						return
+						// Token not found or expired, check if this is a logout request
+						// For logout, we allow expired tokens to be processed for blacklisting
+						// We'll pass a flag to the resolver to handle this case
+						ctx = context.WithValue(ctx, "tokenExpired", true)
+						ctx = context.WithValue(ctx, "expiredToken", tokenString)
 					}
 				}
 
@@ -190,16 +190,13 @@ func parseOS(userAgent string) string {
 // Only accepts full login tokens (purpose == "login").
 // Password-reset tokens are restricted to newPassword mutation only.
 // Extends token expiry for sliding session (1 hour from now).
+// Allows expired tokens for logout mutation.
 func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
 	user := ForContext(ctx)
-	if user == nil {
-		return nil, &gqlerror.Error{
-			Message: "Access denied. You must be logged in.",
-			Extensions: map[string]interface{}{
-				"code": "UNAUTHENTICATED",
-			},
-		}
-	}
+
+	// Check if this is an expired token case (for logout)
+	tokenExpired, _ := ctx.Value("tokenExpired").(bool)
+	expiredToken, _ := ctx.Value("expiredToken").(string)
 
 	// Get the field name from the graphql context
 	field := graphql.GetFieldContext(ctx)
@@ -208,6 +205,38 @@ func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) 
 			Message: "Access denied. Unable to verify field.",
 			Extensions: map[string]interface{}{
 				"code": "FORBIDDEN",
+			},
+		}
+	}
+
+	// Handle expired tokens - only allow logout
+	if tokenExpired {
+		if field.Field.Name == "logout" {
+			// Allow logout to proceed with expired token
+			// Create a minimal user context for logout processing
+			expiredUser := &Claims{
+				Purpose: "login",
+			}
+			ctx = context.WithValue(ctx, userCtxKey, expiredUser)
+			ctx = context.WithValue(ctx, "expiredTokenForLogout", expiredToken)
+			return next(ctx)
+		} else {
+			// Reject expired tokens for all other methods
+			return nil, &gqlerror.Error{
+				Message: "Access denied. Token expired or invalid.",
+				Extensions: map[string]interface{}{
+					"code": "UNAUTHENTICATED",
+				},
+			}
+		}
+	}
+
+	// Normal authentication flow for valid tokens
+	if user == nil {
+		return nil, &gqlerror.Error{
+			Message: "Access denied. You must be logged in.",
+			Extensions: map[string]interface{}{
+				"code": "UNAUTHENTICATED",
 			},
 		}
 	}

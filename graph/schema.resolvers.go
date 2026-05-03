@@ -50,6 +50,13 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 		}, nil
 	}
 
+	// Check if this is an expired token logout
+	expiredToken, _ := ctx.Value("expiredTokenForLogout").(string)
+	if expiredToken != "" {
+		// Handle logout with expired token
+		return r.AuthService.LogoutExpiredToken(ctx, expiredToken)
+	}
+
 	// Get user claims from context (already authenticated by @auth directive)
 	userClaims := ForContext(ctx)
 	if userClaims == nil {

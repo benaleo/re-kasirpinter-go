@@ -661,6 +661,49 @@ func (s *AuthService) RefreshToken(ctx context.Context, input input.RefreshToken
 	}, nil
 }
 
+// LogoutExpiredToken handles logout for expired tokens by blacklisting them
+func (s *AuthService) LogoutExpiredToken(ctx context.Context, token string) (*model.LogoutResponse, error) {
+	// Check if token is already blacklisted
+	if s.isTokenBlacklisted(token) {
+		return &model.LogoutResponse{
+			Code:    200,
+			Success: true,
+			Message: "Token already blacklisted",
+		}, nil
+	}
+
+	// Try to extract user info from the expired token for logging
+	claims, err := s.validateJWT(token)
+	var userID int32
+	if err == nil {
+		userID = claims.UserID
+	} else {
+		// Token is invalid/expired, but we'll still blacklist it
+		userID = 0
+	}
+
+	// Blacklist the expired token
+	// Set expiry to far future to ensure it stays blacklisted
+	farFuture := time.Now().Add(365 * 24 * time.Hour) // 1 year
+	err = s.blacklistToken(token, userID, farFuture)
+	if err != nil {
+		return &model.LogoutResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to blacklist token: %v", err),
+		}, nil
+	}
+
+	// Also remove from active_tokens if it exists
+	s.DB.Where("token = ?", token).Delete(&model.ActiveTokenDB{})
+
+	return &model.LogoutResponse{
+		Code:    200,
+		Success: true,
+		Message: "Expired token blacklisted successfully",
+	}, nil
+}
+
 // isTokenBlacklisted checks if a token is in the blacklist
 func (s *AuthService) isTokenBlacklisted(tokenString string) bool {
 	var count int64
