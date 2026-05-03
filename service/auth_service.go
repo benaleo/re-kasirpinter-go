@@ -500,7 +500,7 @@ func (s *AuthService) generateOTPCode() string {
 
 func (s *AuthService) generateJWT(userID int32, email string, role string, secureID string, purpose string) (string, error) {
 	jwtSecret := s.getJWTSecret()
-	expiry := 24 * time.Hour
+	expiry := 1 * time.Hour // 1 hour for login tokens
 	if purpose == "password_reset" {
 		expiry = 15 * time.Minute
 	}
@@ -559,4 +559,93 @@ func (s *AuthService) blacklistToken(tokenString string, userID int32, expiresAt
 
 func (s *AuthService) cleanupExpiredBlacklistedTokens() error {
 	return s.DB.Where("expires_at <= ?", time.Now()).Delete(&model.BlacklistedTokenDB{}).Error
+}
+
+// RefreshToken generates a new access token using a valid access token
+func (s *AuthService) RefreshToken(ctx context.Context, input input.RefreshTokenInput) (*model.RefreshTokenResponse, error) {
+	// Validate the access token
+	claims, err := s.validateJWT(input.Token)
+	if err != nil {
+		return &model.RefreshTokenResponse{
+			Code:    401,
+			Success: false,
+			Message: "Invalid token",
+		}, nil
+	}
+
+	// Check if the token is blacklisted
+	if s.isTokenBlacklisted(input.Token) {
+		return &model.RefreshTokenResponse{
+			Code:    401,
+			Success: false,
+			Message: "Token has been revoked",
+		}, nil
+	}
+
+	// Find the user
+	var userDB model.UserDB
+	result := s.DB.Where("id = ? AND is_active = ?", claims.UserID, true).First(&userDB)
+	if result.Error != nil {
+		return &model.RefreshTokenResponse{
+			Code:    404,
+			Success: false,
+			Message: "User not found",
+		}, nil
+	}
+
+	// Get user role
+	var userRole model.UserRoleDB
+	roleName := ""
+	if userDB.RoleID != nil {
+		s.DB.First(&userRole, *userDB.RoleID)
+		if userRole.ID > 0 {
+			roleName = userRole.Name
+		}
+	}
+
+	secureID := ""
+	if userDB.SecureID != nil {
+		secureID = *userDB.SecureID
+	}
+
+	// Generate new access token
+	newToken, err := s.generateJWT(userDB.ID, userDB.Email, roleName, secureID, "login")
+	if err != nil {
+		return &model.RefreshTokenResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("failed to generate new token: %v", err),
+		}, nil
+	}
+
+	// Blacklist the old token
+	err = s.blacklistToken(input.Token, claims.UserID, claims.ExpiresAt.Time)
+	if err != nil {
+		// Log error but don't fail the operation
+		fmt.Printf("Warning: Failed to blacklist old token: %v\n", err)
+	}
+
+	// Convert DB model to GraphQL model using mapper
+	var userRoleDB *model.UserRoleDB
+	if userRole.ID > 0 {
+		userRoleDB = &userRole
+	}
+	user := helper.ToGraphQLUser(userDB, userRoleDB)
+
+	return &model.RefreshTokenResponse{
+		Code:    200,
+		Success: true,
+		Message: "Token refreshed successfully",
+		Data: &model.AuthData{
+			Token: newToken,
+			User:  user,
+		},
+	}, nil
+}
+
+// isTokenBlacklisted checks if a token is in the blacklist
+func (s *AuthService) isTokenBlacklisted(tokenString string) bool {
+	var count int64
+	s.DB.Model(&model.BlacklistedTokenDB{}).Where("token = ? AND expires_at > ?", tokenString, time.Now()).Count(&count)
+	return count > 0
 }

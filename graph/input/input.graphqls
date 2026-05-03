@@ -47,6 +47,10 @@ input NewPasswordInput {
   password: String!
 }
 
+input RefreshTokenInput {
+  token: String!
+}
+
 input CreateRoleInput {
   name: String!
   status: Boolean!

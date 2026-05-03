@@ -81,6 +81,19 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 	return r.AuthService.Logout(ctx, token, serviceClaims)
 }
 
+// RefreshToken is the resolver for the refreshToken field.
+func (r *mutationResolver) RefreshToken(ctx context.Context, input input.RefreshTokenInput) (*model.RefreshTokenResponse, error) {
+	if r.AuthService == nil {
+		return &model.RefreshTokenResponse{
+			Code:    500,
+			Success: false,
+			Message: "auth service not initialized",
+		}, nil
+	}
+
+	return r.AuthService.RefreshToken(ctx, input)
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input input.CreateUserInput, isUser *bool) (*model.CreateUserResponse, error) {
 	userService, err := service.NewUserService(r.DB)

@@ -90,6 +90,13 @@ type NewPasswordResponse {
   message: String!
 }
 
+type RefreshTokenResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: AuthData
+}
+
 type RolesResponse {
   code: Int!
   success: Boolean!

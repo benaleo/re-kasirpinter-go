@@ -111,6 +111,7 @@ type Query {
 type Mutation {
   login(input: LoginInput!): AuthResponse!
   logout: LogoutResponse! @auth
+  refreshToken(input: RefreshTokenInput!): RefreshTokenResponse!
   createUser(
     input: CreateUserInput!
     is_user: Boolean = true

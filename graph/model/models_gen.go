@@ -647,6 +647,13 @@ type ProductsResponse struct {
 type Query struct {
 }
 
+type RefreshTokenResponse struct {
+	Code    int32     `json:"code"`
+	Success bool      `json:"success"`
+	Message string    `json:"message"`
+	Data    *AuthData `json:"data,omitempty"`
+}
+
 type RoleResponse struct {
 	Code    int32     `json:"code"`
 	Success bool      `json:"success"`
