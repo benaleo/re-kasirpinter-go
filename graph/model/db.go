@@ -594,3 +594,106 @@ func (p *ProductHasExtraDB) BeforeCreate(tx *gorm.DB) error {
 	p.UpdatedAt = now
 	return nil
 }
+
+// TransactionDB represents the database model for Transaction
+type TransactionDB struct {
+	ID            int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Date          time.Time `gorm:"not null;index" json:"date"`
+	Sequence      int32     `gorm:"not null" json:"sequence"`
+	Invoice       string    `gorm:"uniqueIndex;not null" json:"invoice"`
+	PaymentMethod string    `gorm:"not null" json:"payment_method"`
+	TotalAmount   float64   `gorm:"not null" json:"total_amount"`
+	TotalBilled   float64   `gorm:"not null" json:"total_billed"`
+	Tax           float64   `gorm:"default:0" json:"tax"`
+	Subtotal      float64   `gorm:"not null" json:"subtotal"`
+	Discount      float64   `gorm:"default:0" json:"discount"`
+	CustomerID    *string   `gorm:"index" json:"customer_id,omitempty"`
+	IsCompleted   bool      `gorm:"default:false" json:"is_completed"`
+	IsCanceled    bool      `gorm:"default:false" json:"is_canceled"`
+	CreatedAt     time.Time `json:"created_at"`
+	CreatedBy     *string   `json:"created_by,omitempty"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	UpdatedBy     *string   `json:"updated_by,omitempty"`
+
+	// Relations
+	Customer *UserDB                `gorm:"foreignKey:CustomerID;references:SecureID" json:"customer,omitempty"`
+	Products []TransactionProductDB `gorm:"foreignKey:TransactionID" json:"products,omitempty"`
+}
+
+// TableName specifies the table name for TransactionDB
+func (TransactionDB) TableName() string {
+	return "transactions"
+}
+
+// BeforeCreate hook for TransactionDB
+func (t *TransactionDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	t.CreatedAt = now
+	t.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for TransactionDB
+func (t *TransactionDB) BeforeUpdate(tx *gorm.DB) error {
+	t.UpdatedAt = time.Now()
+	return nil
+}
+
+// TransactionProductDB represents the database model for TransactionProduct
+type TransactionProductDB struct {
+	ID            int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	TransactionID int64     `gorm:"not null;index" json:"transaction_id"`
+	ProductID     int64     `gorm:"not null;index" json:"product_id"`
+	AvailableType string    `gorm:"not null" json:"available_type"`
+	VariantType   string    `gorm:"not null" json:"variant_type"`
+	Attribute     string    `json:"attribute,omitempty"`
+	VariantName   string    `gorm:"not null" json:"variant_name"`
+	Quantity      int32     `gorm:"not null" json:"quantity"`
+	ProductPrice  float64   `gorm:"not null" json:"product_price"`
+	TotalExtras   float64   `gorm:"default:0" json:"total_extras"`
+	TotalPrice    float64   `gorm:"not null" json:"total_price"`
+	Notes         *string   `json:"notes,omitempty"`
+	CreatedAt     time.Time `json:"created_at"`
+
+	// Relations
+	Transaction *TransactionDB       `gorm:"foreignKey:TransactionID" json:"transaction,omitempty"`
+	Product     *ProductDB           `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	Extras      []TransactionExtraDB `gorm:"foreignKey:TransactionProductID" json:"extras,omitempty"`
+}
+
+// TableName specifies the table name for TransactionProductDB
+func (TransactionProductDB) TableName() string {
+	return "transaction_products"
+}
+
+// BeforeCreate hook for TransactionProductDB
+func (t *TransactionProductDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	t.CreatedAt = now
+	return nil
+}
+
+// TransactionExtraDB represents the database model for TransactionExtra
+type TransactionExtraDB struct {
+	ID                   int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	TransactionProductID int64     `gorm:"not null;index" json:"transaction_product_id"`
+	ExtraName            string    `gorm:"not null" json:"extra_name"`
+	Quantity             int32     `gorm:"not null" json:"quantity"`
+	ExtraPrice           float64   `gorm:"not null" json:"extra_price"`
+	CreatedAt            time.Time `json:"created_at"`
+
+	// Relations
+	TransactionProduct *TransactionProductDB `gorm:"foreignKey:TransactionProductID" json:"transaction_product,omitempty"`
+}
+
+// TableName specifies the table name for TransactionExtraDB
+func (TransactionExtraDB) TableName() string {
+	return "transaction_extras"
+}
+
+// BeforeCreate hook for TransactionExtraDB
+func (t *TransactionExtraDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	t.CreatedAt = now
+	return nil
+}

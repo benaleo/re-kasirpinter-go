@@ -222,3 +222,48 @@ input CreateProductHasExtraInput {
   product_id: Int64!
   product_extra_ids: [Int64!]!
 }
+
+input CreateTransactionInput {
+  payment_method: String!
+  total_amount: Float!
+  total_billed: Float!
+  tax: Float!
+  subtotal: Float!
+  discount: Float!
+  customer_id: String
+  created_by: String
+  products: [CreateTransactionProductInput!]!
+}
+
+input UpdateTransactionInput {
+  payment_method: String
+  total_amount: Float
+  total_billed: Float
+  tax: Float
+  subtotal: Float
+  discount: Float
+  customer_id: String
+  is_completed: Boolean
+  is_canceled: Boolean
+  updated_by: String
+}
+
+input CreateTransactionProductInput {
+  product_id: Int64!
+  available_type: String!
+  variant_type: String!
+  attribute: String
+  variant_name: String!
+  quantity: Int32!
+  product_price: Float!
+  total_extras: Float!
+  total_price: Float!
+  notes: String
+  extras: [CreateTransactionExtraInput!]!
+}
+
+input CreateTransactionExtraInput {
+  extra_name: String!
+  quantity: Int32!
+  extra_price: Float!
+}

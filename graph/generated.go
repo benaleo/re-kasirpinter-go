@@ -148,6 +148,13 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	CreateTransactionResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
 	CreateUserResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
@@ -239,6 +246,13 @@ type ComplexityRoot struct {
 	}
 
 	DeleteRoleResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	DeleteTransactionResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -657,6 +671,72 @@ type ComplexityRoot struct {
 		Success func(childComplexity int) int
 	}
 
+	Transaction struct {
+		CreatedAt     func(childComplexity int) int
+		CreatedBy     func(childComplexity int) int
+		Customer      func(childComplexity int) int
+		CustomerID    func(childComplexity int) int
+		Date          func(childComplexity int) int
+		Discount      func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Invoice       func(childComplexity int) int
+		IsCanceled    func(childComplexity int) int
+		IsCompleted   func(childComplexity int) int
+		PaymentMethod func(childComplexity int) int
+		Products      func(childComplexity int) int
+		Sequence      func(childComplexity int) int
+		Subtotal      func(childComplexity int) int
+		Tax           func(childComplexity int) int
+		TotalAmount   func(childComplexity int) int
+		TotalBilled   func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+		UpdatedBy     func(childComplexity int) int
+	}
+
+	TransactionExtra struct {
+		CreatedAt            func(childComplexity int) int
+		ExtraName            func(childComplexity int) int
+		ExtraPrice           func(childComplexity int) int
+		ID                   func(childComplexity int) int
+		Quantity             func(childComplexity int) int
+		TransactionProduct   func(childComplexity int) int
+		TransactionProductID func(childComplexity int) int
+	}
+
+	TransactionProduct struct {
+		Attribute     func(childComplexity int) int
+		AvailableType func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		Extras        func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Notes         func(childComplexity int) int
+		Product       func(childComplexity int) int
+		ProductID     func(childComplexity int) int
+		ProductPrice  func(childComplexity int) int
+		Quantity      func(childComplexity int) int
+		TotalExtras   func(childComplexity int) int
+		TotalPrice    func(childComplexity int) int
+		Transaction   func(childComplexity int) int
+		TransactionID func(childComplexity int) int
+		VariantName   func(childComplexity int) int
+		VariantType   func(childComplexity int) int
+	}
+
+	TransactionResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	TransactionsResponse struct {
+		Code       func(childComplexity int) int
+		Data       func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Pagination func(childComplexity int) int
+		Success    func(childComplexity int) int
+	}
+
 	UpdateDiscountResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
@@ -721,6 +801,13 @@ type ComplexityRoot struct {
 	}
 
 	UpdateRoleResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
+	UpdateTransactionResponse struct {
 		Code    func(childComplexity int) int
 		Data    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -1251,6 +1338,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.CreateRoleResponse.Success(childComplexity), true
 
+	case "CreateTransactionResponse.code":
+		if e.ComplexityRoot.CreateTransactionResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateTransactionResponse.Code(childComplexity), true
+	case "CreateTransactionResponse.data":
+		if e.ComplexityRoot.CreateTransactionResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateTransactionResponse.Data(childComplexity), true
+	case "CreateTransactionResponse.message":
+		if e.ComplexityRoot.CreateTransactionResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateTransactionResponse.Message(childComplexity), true
+	case "CreateTransactionResponse.success":
+		if e.ComplexityRoot.CreateTransactionResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CreateTransactionResponse.Success(childComplexity), true
+
 	case "CreateUserResponse.code":
 		if e.ComplexityRoot.CreateUserResponse.Code == nil {
 			break
@@ -1594,6 +1706,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.DeleteRoleResponse.Success(childComplexity), true
+
+	case "DeleteTransactionResponse.code":
+		if e.ComplexityRoot.DeleteTransactionResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteTransactionResponse.Code(childComplexity), true
+	case "DeleteTransactionResponse.data":
+		if e.ComplexityRoot.DeleteTransactionResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteTransactionResponse.Data(childComplexity), true
+	case "DeleteTransactionResponse.message":
+		if e.ComplexityRoot.DeleteTransactionResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteTransactionResponse.Message(childComplexity), true
+	case "DeleteTransactionResponse.success":
+		if e.ComplexityRoot.DeleteTransactionResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.DeleteTransactionResponse.Success(childComplexity), true
 
 	case "DeleteUserResponse.code":
 		if e.ComplexityRoot.DeleteUserResponse.Code == nil {
@@ -3643,6 +3780,317 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.RolesResponse.Success(childComplexity), true
 
+	case "Transaction.created_at":
+		if e.ComplexityRoot.Transaction.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.CreatedAt(childComplexity), true
+	case "Transaction.created_by":
+		if e.ComplexityRoot.Transaction.CreatedBy == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.CreatedBy(childComplexity), true
+	case "Transaction.customer":
+		if e.ComplexityRoot.Transaction.Customer == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Customer(childComplexity), true
+	case "Transaction.customer_id":
+		if e.ComplexityRoot.Transaction.CustomerID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.CustomerID(childComplexity), true
+	case "Transaction.date":
+		if e.ComplexityRoot.Transaction.Date == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Date(childComplexity), true
+	case "Transaction.discount":
+		if e.ComplexityRoot.Transaction.Discount == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Discount(childComplexity), true
+	case "Transaction.id":
+		if e.ComplexityRoot.Transaction.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.ID(childComplexity), true
+	case "Transaction.invoice":
+		if e.ComplexityRoot.Transaction.Invoice == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Invoice(childComplexity), true
+	case "Transaction.is_canceled":
+		if e.ComplexityRoot.Transaction.IsCanceled == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.IsCanceled(childComplexity), true
+	case "Transaction.is_completed":
+		if e.ComplexityRoot.Transaction.IsCompleted == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.IsCompleted(childComplexity), true
+	case "Transaction.payment_method":
+		if e.ComplexityRoot.Transaction.PaymentMethod == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.PaymentMethod(childComplexity), true
+	case "Transaction.products":
+		if e.ComplexityRoot.Transaction.Products == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Products(childComplexity), true
+	case "Transaction.sequence":
+		if e.ComplexityRoot.Transaction.Sequence == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Sequence(childComplexity), true
+	case "Transaction.subtotal":
+		if e.ComplexityRoot.Transaction.Subtotal == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Subtotal(childComplexity), true
+	case "Transaction.tax":
+		if e.ComplexityRoot.Transaction.Tax == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.Tax(childComplexity), true
+	case "Transaction.total_amount":
+		if e.ComplexityRoot.Transaction.TotalAmount == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.TotalAmount(childComplexity), true
+	case "Transaction.total_billed":
+		if e.ComplexityRoot.Transaction.TotalBilled == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.TotalBilled(childComplexity), true
+	case "Transaction.updated_at":
+		if e.ComplexityRoot.Transaction.UpdatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.UpdatedAt(childComplexity), true
+	case "Transaction.updated_by":
+		if e.ComplexityRoot.Transaction.UpdatedBy == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.UpdatedBy(childComplexity), true
+
+	case "TransactionExtra.created_at":
+		if e.ComplexityRoot.TransactionExtra.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.CreatedAt(childComplexity), true
+	case "TransactionExtra.extra_name":
+		if e.ComplexityRoot.TransactionExtra.ExtraName == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.ExtraName(childComplexity), true
+	case "TransactionExtra.extra_price":
+		if e.ComplexityRoot.TransactionExtra.ExtraPrice == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.ExtraPrice(childComplexity), true
+	case "TransactionExtra.id":
+		if e.ComplexityRoot.TransactionExtra.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.ID(childComplexity), true
+	case "TransactionExtra.quantity":
+		if e.ComplexityRoot.TransactionExtra.Quantity == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.Quantity(childComplexity), true
+	case "TransactionExtra.transaction_product":
+		if e.ComplexityRoot.TransactionExtra.TransactionProduct == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.TransactionProduct(childComplexity), true
+	case "TransactionExtra.transaction_product_id":
+		if e.ComplexityRoot.TransactionExtra.TransactionProductID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionExtra.TransactionProductID(childComplexity), true
+
+	case "TransactionProduct.attribute":
+		if e.ComplexityRoot.TransactionProduct.Attribute == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.Attribute(childComplexity), true
+	case "TransactionProduct.available_type":
+		if e.ComplexityRoot.TransactionProduct.AvailableType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.AvailableType(childComplexity), true
+	case "TransactionProduct.created_at":
+		if e.ComplexityRoot.TransactionProduct.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.CreatedAt(childComplexity), true
+	case "TransactionProduct.extras":
+		if e.ComplexityRoot.TransactionProduct.Extras == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.Extras(childComplexity), true
+	case "TransactionProduct.id":
+		if e.ComplexityRoot.TransactionProduct.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.ID(childComplexity), true
+	case "TransactionProduct.notes":
+		if e.ComplexityRoot.TransactionProduct.Notes == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.Notes(childComplexity), true
+	case "TransactionProduct.product":
+		if e.ComplexityRoot.TransactionProduct.Product == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.Product(childComplexity), true
+	case "TransactionProduct.product_id":
+		if e.ComplexityRoot.TransactionProduct.ProductID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.ProductID(childComplexity), true
+	case "TransactionProduct.product_price":
+		if e.ComplexityRoot.TransactionProduct.ProductPrice == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.ProductPrice(childComplexity), true
+	case "TransactionProduct.quantity":
+		if e.ComplexityRoot.TransactionProduct.Quantity == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.Quantity(childComplexity), true
+	case "TransactionProduct.total_extras":
+		if e.ComplexityRoot.TransactionProduct.TotalExtras == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.TotalExtras(childComplexity), true
+	case "TransactionProduct.total_price":
+		if e.ComplexityRoot.TransactionProduct.TotalPrice == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.TotalPrice(childComplexity), true
+	case "TransactionProduct.transaction":
+		if e.ComplexityRoot.TransactionProduct.Transaction == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.Transaction(childComplexity), true
+	case "TransactionProduct.transaction_id":
+		if e.ComplexityRoot.TransactionProduct.TransactionID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.TransactionID(childComplexity), true
+	case "TransactionProduct.variant_name":
+		if e.ComplexityRoot.TransactionProduct.VariantName == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.VariantName(childComplexity), true
+	case "TransactionProduct.variant_type":
+		if e.ComplexityRoot.TransactionProduct.VariantType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionProduct.VariantType(childComplexity), true
+
+	case "TransactionResponse.code":
+		if e.ComplexityRoot.TransactionResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionResponse.Code(childComplexity), true
+	case "TransactionResponse.data":
+		if e.ComplexityRoot.TransactionResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionResponse.Data(childComplexity), true
+	case "TransactionResponse.message":
+		if e.ComplexityRoot.TransactionResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionResponse.Message(childComplexity), true
+	case "TransactionResponse.success":
+		if e.ComplexityRoot.TransactionResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionResponse.Success(childComplexity), true
+
+	case "TransactionsResponse.code":
+		if e.ComplexityRoot.TransactionsResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionsResponse.Code(childComplexity), true
+	case "TransactionsResponse.data":
+		if e.ComplexityRoot.TransactionsResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionsResponse.Data(childComplexity), true
+	case "TransactionsResponse.message":
+		if e.ComplexityRoot.TransactionsResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionsResponse.Message(childComplexity), true
+	case "TransactionsResponse.pagination":
+		if e.ComplexityRoot.TransactionsResponse.Pagination == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionsResponse.Pagination(childComplexity), true
+	case "TransactionsResponse.success":
+		if e.ComplexityRoot.TransactionsResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TransactionsResponse.Success(childComplexity), true
+
 	case "UpdateDiscountResponse.code":
 		if e.ComplexityRoot.UpdateDiscountResponse.Code == nil {
 			break
@@ -3892,6 +4340,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.UpdateRoleResponse.Success(childComplexity), true
+
+	case "UpdateTransactionResponse.code":
+		if e.ComplexityRoot.UpdateTransactionResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateTransactionResponse.Code(childComplexity), true
+	case "UpdateTransactionResponse.data":
+		if e.ComplexityRoot.UpdateTransactionResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateTransactionResponse.Data(childComplexity), true
+	case "UpdateTransactionResponse.message":
+		if e.ComplexityRoot.UpdateTransactionResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateTransactionResponse.Message(childComplexity), true
+	case "UpdateTransactionResponse.success":
+		if e.ComplexityRoot.UpdateTransactionResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateTransactionResponse.Success(childComplexity), true
 
 	case "UpdateUserResponse.code":
 		if e.ComplexityRoot.UpdateUserResponse.Code == nil {
@@ -4179,6 +4652,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateProductInput,
 		ec.unmarshalInputCreateProductVariantInput,
 		ec.unmarshalInputCreateRoleInput,
+		ec.unmarshalInputCreateTransactionExtraInput,
+		ec.unmarshalInputCreateTransactionInput,
+		ec.unmarshalInputCreateTransactionProductInput,
 		ec.unmarshalInputCreateUserInput,
 		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputNewPasswordInput,
@@ -4194,6 +4670,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateProductInput,
 		ec.unmarshalInputUpdateProductVariantInput,
 		ec.unmarshalInputUpdateRoleInput,
+		ec.unmarshalInputUpdateTransactionInput,
 		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputVerifyOtpInput,
 	)
@@ -7107,6 +7584,162 @@ func (ec *executionContext) fieldContext_CreateRoleResponse_data(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateTransactionResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CreateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateTransactionResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateTransactionResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateTransactionResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.CreateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateTransactionResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateTransactionResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateTransactionResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.CreateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateTransactionResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateTransactionResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateTransactionResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.CreateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CreateTransactionResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CreateTransactionResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Transaction_date(ctx, field)
+			case "sequence":
+				return ec.fieldContext_Transaction_sequence(ctx, field)
+			case "invoice":
+				return ec.fieldContext_Transaction_invoice(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Transaction_payment_method(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Transaction_total_amount(ctx, field)
+			case "total_billed":
+				return ec.fieldContext_Transaction_total_billed(ctx, field)
+			case "tax":
+				return ec.fieldContext_Transaction_tax(ctx, field)
+			case "subtotal":
+				return ec.fieldContext_Transaction_subtotal(ctx, field)
+			case "discount":
+				return ec.fieldContext_Transaction_discount(ctx, field)
+			case "customer_id":
+				return ec.fieldContext_Transaction_customer_id(ctx, field)
+			case "customer":
+				return ec.fieldContext_Transaction_customer(ctx, field)
+			case "is_completed":
+				return ec.fieldContext_Transaction_is_completed(ctx, field)
+			case "is_canceled":
+				return ec.fieldContext_Transaction_is_canceled(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Transaction_created_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "products":
+				return ec.fieldContext_Transaction_products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateUserResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CreateUserResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -8991,6 +9624,162 @@ func (ec *executionContext) fieldContext_DeleteRoleResponse_data(_ context.Conte
 				return ec.fieldContext_UserRole_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserRole", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTransactionResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteTransactionResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteTransactionResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTransactionResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteTransactionResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteTransactionResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTransactionResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteTransactionResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteTransactionResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTransactionResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeleteTransactionResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeleteTransactionResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Transaction_date(ctx, field)
+			case "sequence":
+				return ec.fieldContext_Transaction_sequence(ctx, field)
+			case "invoice":
+				return ec.fieldContext_Transaction_invoice(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Transaction_payment_method(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Transaction_total_amount(ctx, field)
+			case "total_billed":
+				return ec.fieldContext_Transaction_total_billed(ctx, field)
+			case "tax":
+				return ec.fieldContext_Transaction_tax(ctx, field)
+			case "subtotal":
+				return ec.fieldContext_Transaction_subtotal(ctx, field)
+			case "discount":
+				return ec.fieldContext_Transaction_discount(ctx, field)
+			case "customer_id":
+				return ec.fieldContext_Transaction_customer_id(ctx, field)
+			case "customer":
+				return ec.fieldContext_Transaction_customer(ctx, field)
+			case "is_completed":
+				return ec.fieldContext_Transaction_is_completed(ctx, field)
+			case "is_canceled":
+				return ec.fieldContext_Transaction_is_canceled(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Transaction_created_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "products":
+				return ec.fieldContext_Transaction_products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
 	}
 	return fc, nil
@@ -20454,6 +21243,1749 @@ func (ec *executionContext) fieldContext_RolesResponse_data(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Transaction_id(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_date(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_sequence(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_sequence,
+		func(ctx context.Context) (any, error) {
+			return obj.Sequence, nil
+		},
+		nil,
+		ec.marshalNInt322int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_sequence(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int32 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_invoice(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_invoice,
+		func(ctx context.Context) (any, error) {
+			return obj.Invoice, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_invoice(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_payment_method(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_payment_method,
+		func(ctx context.Context) (any, error) {
+			return obj.PaymentMethod, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_payment_method(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_total_amount(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_total_amount,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalAmount, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_total_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_total_billed(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_total_billed,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalBilled, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_total_billed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_tax(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_tax,
+		func(ctx context.Context) (any, error) {
+			return obj.Tax, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_tax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_subtotal(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_subtotal,
+		func(ctx context.Context) (any, error) {
+			return obj.Subtotal, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_subtotal(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_discount(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_discount,
+		func(ctx context.Context) (any, error) {
+			return obj.Discount, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_discount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_customer_id(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_customer_id,
+		func(ctx context.Context) (any, error) {
+			return obj.CustomerID, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_customer_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_customer(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_customer,
+		func(ctx context.Context) (any, error) {
+			return obj.Customer, nil
+		},
+		nil,
+		ec.marshalOCustomerSearchData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchData,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_customer(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "secure_id":
+				return ec.fieldContext_CustomerSearchData_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CustomerSearchData_name(ctx, field)
+			case "phone":
+				return ec.fieldContext_CustomerSearchData_phone(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CustomerSearchData", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_is_completed(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_is_completed,
+		func(ctx context.Context) (any, error) {
+			return obj.IsCompleted, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_is_completed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_is_canceled(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_is_canceled,
+		func(ctx context.Context) (any, error) {
+			return obj.IsCanceled, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_is_canceled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_created_by,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedBy, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_created_by(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_updated_at,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_updated_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_updated_by,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedBy, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_updated_by(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Transaction_products(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Transaction_products,
+		func(ctx context.Context) (any, error) {
+			return obj.Products, nil
+		},
+		nil,
+		ec.marshalNTransactionProduct2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionProductᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Transaction_products(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Transaction",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TransactionProduct_id(ctx, field)
+			case "transaction_id":
+				return ec.fieldContext_TransactionProduct_transaction_id(ctx, field)
+			case "transaction":
+				return ec.fieldContext_TransactionProduct_transaction(ctx, field)
+			case "product_id":
+				return ec.fieldContext_TransactionProduct_product_id(ctx, field)
+			case "product":
+				return ec.fieldContext_TransactionProduct_product(ctx, field)
+			case "available_type":
+				return ec.fieldContext_TransactionProduct_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_TransactionProduct_variant_type(ctx, field)
+			case "attribute":
+				return ec.fieldContext_TransactionProduct_attribute(ctx, field)
+			case "variant_name":
+				return ec.fieldContext_TransactionProduct_variant_name(ctx, field)
+			case "quantity":
+				return ec.fieldContext_TransactionProduct_quantity(ctx, field)
+			case "product_price":
+				return ec.fieldContext_TransactionProduct_product_price(ctx, field)
+			case "total_extras":
+				return ec.fieldContext_TransactionProduct_total_extras(ctx, field)
+			case "total_price":
+				return ec.fieldContext_TransactionProduct_total_price(ctx, field)
+			case "notes":
+				return ec.fieldContext_TransactionProduct_notes(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TransactionProduct_created_at(ctx, field)
+			case "extras":
+				return ec.fieldContext_TransactionProduct_extras(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TransactionProduct", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_id(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_transaction_product_id(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_transaction_product_id,
+		func(ctx context.Context) (any, error) {
+			return obj.TransactionProductID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_transaction_product_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_transaction_product(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_transaction_product,
+		func(ctx context.Context) (any, error) {
+			return obj.TransactionProduct, nil
+		},
+		nil,
+		ec.marshalOTransactionProduct2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionProduct,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_transaction_product(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TransactionProduct_id(ctx, field)
+			case "transaction_id":
+				return ec.fieldContext_TransactionProduct_transaction_id(ctx, field)
+			case "transaction":
+				return ec.fieldContext_TransactionProduct_transaction(ctx, field)
+			case "product_id":
+				return ec.fieldContext_TransactionProduct_product_id(ctx, field)
+			case "product":
+				return ec.fieldContext_TransactionProduct_product(ctx, field)
+			case "available_type":
+				return ec.fieldContext_TransactionProduct_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_TransactionProduct_variant_type(ctx, field)
+			case "attribute":
+				return ec.fieldContext_TransactionProduct_attribute(ctx, field)
+			case "variant_name":
+				return ec.fieldContext_TransactionProduct_variant_name(ctx, field)
+			case "quantity":
+				return ec.fieldContext_TransactionProduct_quantity(ctx, field)
+			case "product_price":
+				return ec.fieldContext_TransactionProduct_product_price(ctx, field)
+			case "total_extras":
+				return ec.fieldContext_TransactionProduct_total_extras(ctx, field)
+			case "total_price":
+				return ec.fieldContext_TransactionProduct_total_price(ctx, field)
+			case "notes":
+				return ec.fieldContext_TransactionProduct_notes(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TransactionProduct_created_at(ctx, field)
+			case "extras":
+				return ec.fieldContext_TransactionProduct_extras(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TransactionProduct", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_extra_name(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_extra_name,
+		func(ctx context.Context) (any, error) {
+			return obj.ExtraName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_extra_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_quantity(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_quantity,
+		func(ctx context.Context) (any, error) {
+			return obj.Quantity, nil
+		},
+		nil,
+		ec.marshalNInt322int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_quantity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int32 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_extra_price(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_extra_price,
+		func(ctx context.Context) (any, error) {
+			return obj.ExtraPrice, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_extra_price(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionExtra_created_at(ctx context.Context, field graphql.CollectedField, obj *model.TransactionExtra) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionExtra_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionExtra_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionExtra",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_id(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_transaction_id(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_transaction_id,
+		func(ctx context.Context) (any, error) {
+			return obj.TransactionID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_transaction_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_transaction(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_transaction,
+		func(ctx context.Context) (any, error) {
+			return obj.Transaction, nil
+		},
+		nil,
+		ec.marshalOTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_transaction(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Transaction_date(ctx, field)
+			case "sequence":
+				return ec.fieldContext_Transaction_sequence(ctx, field)
+			case "invoice":
+				return ec.fieldContext_Transaction_invoice(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Transaction_payment_method(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Transaction_total_amount(ctx, field)
+			case "total_billed":
+				return ec.fieldContext_Transaction_total_billed(ctx, field)
+			case "tax":
+				return ec.fieldContext_Transaction_tax(ctx, field)
+			case "subtotal":
+				return ec.fieldContext_Transaction_subtotal(ctx, field)
+			case "discount":
+				return ec.fieldContext_Transaction_discount(ctx, field)
+			case "customer_id":
+				return ec.fieldContext_Transaction_customer_id(ctx, field)
+			case "customer":
+				return ec.fieldContext_Transaction_customer(ctx, field)
+			case "is_completed":
+				return ec.fieldContext_Transaction_is_completed(ctx, field)
+			case "is_canceled":
+				return ec.fieldContext_Transaction_is_canceled(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Transaction_created_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "products":
+				return ec.fieldContext_Transaction_products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_product_id(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_product_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductID, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_product_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_product(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_product,
+		func(ctx context.Context) (any, error) {
+			return obj.Product, nil
+		},
+		nil,
+		ec.marshalOProduct2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐProduct,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_product(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Product_id(ctx, field)
+			case "secure_id":
+				return ec.fieldContext_Product_secure_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Product_image(ctx, field)
+			case "category_id":
+				return ec.fieldContext_Product_category_id(ctx, field)
+			case "category":
+				return ec.fieldContext_Product_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Product_description(ctx, field)
+			case "available_type":
+				return ec.fieldContext_Product_available_type(ctx, field)
+			case "variant_type":
+				return ec.fieldContext_Product_variant_type(ctx, field)
+			case "is_available":
+				return ec.fieldContext_Product_is_available(ctx, field)
+			case "is_active":
+				return ec.fieldContext_Product_is_active(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Product_deleted_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Product_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Product_updated_at(ctx, field)
+			case "variants":
+				return ec.fieldContext_Product_variants(ctx, field)
+			case "product_extra_ids":
+				return ec.fieldContext_Product_product_extra_ids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_available_type(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_available_type,
+		func(ctx context.Context) (any, error) {
+			return obj.AvailableType, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_available_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_variant_type(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_variant_type,
+		func(ctx context.Context) (any, error) {
+			return obj.VariantType, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_variant_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_attribute(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_attribute,
+		func(ctx context.Context) (any, error) {
+			return obj.Attribute, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_attribute(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_variant_name(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_variant_name,
+		func(ctx context.Context) (any, error) {
+			return obj.VariantName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_variant_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_quantity(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_quantity,
+		func(ctx context.Context) (any, error) {
+			return obj.Quantity, nil
+		},
+		nil,
+		ec.marshalNInt322int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_quantity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int32 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_product_price(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_product_price,
+		func(ctx context.Context) (any, error) {
+			return obj.ProductPrice, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_product_price(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_total_extras(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_total_extras,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalExtras, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_total_extras(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_total_price(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_total_price,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalPrice, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_total_price(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_notes(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_notes,
+		func(ctx context.Context) (any, error) {
+			return obj.Notes, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_notes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_created_at(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_created_at,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionProduct_extras(ctx context.Context, field graphql.CollectedField, obj *model.TransactionProduct) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionProduct_extras,
+		func(ctx context.Context) (any, error) {
+			return obj.Extras, nil
+		},
+		nil,
+		ec.marshalNTransactionExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionExtraᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionProduct_extras(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionProduct",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TransactionExtra_id(ctx, field)
+			case "transaction_product_id":
+				return ec.fieldContext_TransactionExtra_transaction_product_id(ctx, field)
+			case "transaction_product":
+				return ec.fieldContext_TransactionExtra_transaction_product(ctx, field)
+			case "extra_name":
+				return ec.fieldContext_TransactionExtra_extra_name(ctx, field)
+			case "quantity":
+				return ec.fieldContext_TransactionExtra_quantity(ctx, field)
+			case "extra_price":
+				return ec.fieldContext_TransactionExtra_extra_price(ctx, field)
+			case "created_at":
+				return ec.fieldContext_TransactionExtra_created_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TransactionExtra", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.TransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Transaction_date(ctx, field)
+			case "sequence":
+				return ec.fieldContext_Transaction_sequence(ctx, field)
+			case "invoice":
+				return ec.fieldContext_Transaction_invoice(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Transaction_payment_method(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Transaction_total_amount(ctx, field)
+			case "total_billed":
+				return ec.fieldContext_Transaction_total_billed(ctx, field)
+			case "tax":
+				return ec.fieldContext_Transaction_tax(ctx, field)
+			case "subtotal":
+				return ec.fieldContext_Transaction_subtotal(ctx, field)
+			case "discount":
+				return ec.fieldContext_Transaction_discount(ctx, field)
+			case "customer_id":
+				return ec.fieldContext_Transaction_customer_id(ctx, field)
+			case "customer":
+				return ec.fieldContext_Transaction_customer(ctx, field)
+			case "is_completed":
+				return ec.fieldContext_Transaction_is_completed(ctx, field)
+			case "is_canceled":
+				return ec.fieldContext_Transaction_is_canceled(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Transaction_created_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "products":
+				return ec.fieldContext_Transaction_products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionsResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.TransactionsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionsResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionsResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionsResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.TransactionsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionsResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionsResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionsResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.TransactionsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionsResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionsResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionsResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.TransactionsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionsResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalNTransaction2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionsResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Transaction_date(ctx, field)
+			case "sequence":
+				return ec.fieldContext_Transaction_sequence(ctx, field)
+			case "invoice":
+				return ec.fieldContext_Transaction_invoice(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Transaction_payment_method(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Transaction_total_amount(ctx, field)
+			case "total_billed":
+				return ec.fieldContext_Transaction_total_billed(ctx, field)
+			case "tax":
+				return ec.fieldContext_Transaction_tax(ctx, field)
+			case "subtotal":
+				return ec.fieldContext_Transaction_subtotal(ctx, field)
+			case "discount":
+				return ec.fieldContext_Transaction_discount(ctx, field)
+			case "customer_id":
+				return ec.fieldContext_Transaction_customer_id(ctx, field)
+			case "customer":
+				return ec.fieldContext_Transaction_customer(ctx, field)
+			case "is_completed":
+				return ec.fieldContext_Transaction_is_completed(ctx, field)
+			case "is_canceled":
+				return ec.fieldContext_Transaction_is_canceled(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Transaction_created_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "products":
+				return ec.fieldContext_Transaction_products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionsResponse_pagination(ctx context.Context, field graphql.CollectedField, obj *model.TransactionsResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TransactionsResponse_pagination,
+		func(ctx context.Context) (any, error) {
+			return obj.Pagination, nil
+		},
+		nil,
+		ec.marshalOPageInfo2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐPageInfo,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TransactionsResponse_pagination(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionsResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "current_page":
+				return ec.fieldContext_PageInfo_current_page(ctx, field)
+			case "per_page":
+				return ec.fieldContext_PageInfo_per_page(ctx, field)
+			case "total_items":
+				return ec.fieldContext_PageInfo_total_items(ctx, field)
+			case "total_pages":
+				return ec.fieldContext_PageInfo_total_pages(ctx, field)
+			case "has_next_page":
+				return ec.fieldContext_PageInfo_has_next_page(ctx, field)
+			case "has_previous_page":
+				return ec.fieldContext_PageInfo_has_previous_page(ctx, field)
+			case "start_item":
+				return ec.fieldContext_PageInfo_start_item(ctx, field)
+			case "end_item":
+				return ec.fieldContext_PageInfo_end_item(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateDiscountResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.UpdateDiscountResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -21855,6 +24387,162 @@ func (ec *executionContext) fieldContext_UpdateRoleResponse_data(_ context.Conte
 				return ec.fieldContext_UserRole_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserRole", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTransactionResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.UpdateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateTransactionResponse_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateTransactionResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTransactionResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.UpdateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateTransactionResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateTransactionResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTransactionResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.UpdateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateTransactionResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateTransactionResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTransactionResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.UpdateTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_UpdateTransactionResponse_data,
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		ec.marshalOTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_UpdateTransactionResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Transaction_date(ctx, field)
+			case "sequence":
+				return ec.fieldContext_Transaction_sequence(ctx, field)
+			case "invoice":
+				return ec.fieldContext_Transaction_invoice(ctx, field)
+			case "payment_method":
+				return ec.fieldContext_Transaction_payment_method(ctx, field)
+			case "total_amount":
+				return ec.fieldContext_Transaction_total_amount(ctx, field)
+			case "total_billed":
+				return ec.fieldContext_Transaction_total_billed(ctx, field)
+			case "tax":
+				return ec.fieldContext_Transaction_tax(ctx, field)
+			case "subtotal":
+				return ec.fieldContext_Transaction_subtotal(ctx, field)
+			case "discount":
+				return ec.fieldContext_Transaction_discount(ctx, field)
+			case "customer_id":
+				return ec.fieldContext_Transaction_customer_id(ctx, field)
+			case "customer":
+				return ec.fieldContext_Transaction_customer(ctx, field)
+			case "is_completed":
+				return ec.fieldContext_Transaction_is_completed(ctx, field)
+			case "is_canceled":
+				return ec.fieldContext_Transaction_is_canceled(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Transaction_created_by(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "products":
+				return ec.fieldContext_Transaction_products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
 	}
 	return fc, nil
@@ -25373,6 +28061,236 @@ func (ec *executionContext) unmarshalInputCreateRoleInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateTransactionExtraInput(ctx context.Context, obj any) (model.CreateTransactionExtraInput, error) {
+	var it model.CreateTransactionExtraInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"extra_name", "quantity", "extra_price"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "extra_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extra_name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExtraName = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalNInt322int32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
+		case "extra_price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extra_price"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExtraPrice = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Context, obj any) (model.CreateTransactionInput, error) {
+	var it model.CreateTransactionInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "created_by", "products"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "payment_method":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_method"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentMethod = data
+		case "total_amount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_amount"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalAmount = data
+		case "total_billed":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_billed"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalBilled = data
+		case "tax":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tax"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tax = data
+		case "subtotal":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subtotal"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subtotal = data
+		case "discount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Discount = data
+		case "customer_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customer_id"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerID = data
+		case "created_by":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created_by"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "products":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("products"))
+			data, err := ec.unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Products = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateTransactionProductInput(ctx context.Context, obj any) (model.CreateTransactionProductInput, error) {
+	var it model.CreateTransactionProductInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"product_id", "available_type", "variant_type", "attribute", "variant_name", "quantity", "product_price", "total_extras", "total_price", "notes", "extras"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "product_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_id"))
+			data, err := ec.unmarshalNInt642int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductID = data
+		case "available_type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("available_type"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AvailableType = data
+		case "variant_type":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variant_type"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VariantType = data
+		case "attribute":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attribute"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Attribute = data
+		case "variant_name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("variant_name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VariantName = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalNInt322int32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
+		case "product_price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product_price"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductPrice = data
+		case "total_extras":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_extras"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalExtras = data
+		case "total_price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_price"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalPrice = data
+		case "notes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notes"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Notes = data
+		case "extras":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("extras"))
+			data, err := ec.unmarshalNCreateTransactionExtraInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionExtraInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Extras = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, obj any) (input.CreateUserInput, error) {
 	var it input.CreateUserInput
 	if obj == nil {
@@ -26185,6 +29103,99 @@ func (ec *executionContext) unmarshalInputUpdateRoleInput(ctx context.Context, o
 				return it, err
 			}
 			it.PermissionIds = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Context, obj any) (model.UpdateTransactionInput, error) {
+	var it model.UpdateTransactionInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "is_completed", "is_canceled", "updated_by"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "payment_method":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("payment_method"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PaymentMethod = data
+		case "total_amount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_amount"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalAmount = data
+		case "total_billed":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("total_billed"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TotalBilled = data
+		case "tax":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tax"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tax = data
+		case "subtotal":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subtotal"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subtotal = data
+		case "discount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Discount = data
+		case "customer_id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customer_id"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerID = data
+		case "is_completed":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_completed"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsCompleted = data
+		case "is_canceled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_canceled"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsCanceled = data
+		case "updated_by":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated_by"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
 		}
 	}
 	return it, nil
@@ -27131,6 +30142,57 @@ func (ec *executionContext) _CreateRoleResponse(ctx context.Context, sel ast.Sel
 	return out
 }
 
+var createTransactionResponseImplementors = []string{"CreateTransactionResponse"}
+
+func (ec *executionContext) _CreateTransactionResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateTransactionResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createTransactionResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateTransactionResponse")
+		case "code":
+			out.Values[i] = ec._CreateTransactionResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._CreateTransactionResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._CreateTransactionResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._CreateTransactionResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createUserResponseImplementors = []string{"CreateUserResponse"}
 
 func (ec *executionContext) _CreateUserResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CreateUserResponse) graphql.Marshaler {
@@ -27820,6 +30882,57 @@ func (ec *executionContext) _DeleteRoleResponse(ctx context.Context, sel ast.Sel
 			}
 		case "data":
 			out.Values[i] = ec._DeleteRoleResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteTransactionResponseImplementors = []string{"DeleteTransactionResponse"}
+
+func (ec *executionContext) _DeleteTransactionResponse(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteTransactionResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteTransactionResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteTransactionResponse")
+		case "code":
+			out.Values[i] = ec._DeleteTransactionResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._DeleteTransactionResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._DeleteTransactionResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._DeleteTransactionResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -30827,6 +33940,398 @@ func (ec *executionContext) _RolesResponse(ctx context.Context, sel ast.Selectio
 	return out
 }
 
+var transactionImplementors = []string{"Transaction"}
+
+func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionSet, obj *model.Transaction) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, transactionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Transaction")
+		case "id":
+			out.Values[i] = ec._Transaction_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "date":
+			out.Values[i] = ec._Transaction_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "sequence":
+			out.Values[i] = ec._Transaction_sequence(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "invoice":
+			out.Values[i] = ec._Transaction_invoice(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "payment_method":
+			out.Values[i] = ec._Transaction_payment_method(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total_amount":
+			out.Values[i] = ec._Transaction_total_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total_billed":
+			out.Values[i] = ec._Transaction_total_billed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tax":
+			out.Values[i] = ec._Transaction_tax(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "subtotal":
+			out.Values[i] = ec._Transaction_subtotal(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "discount":
+			out.Values[i] = ec._Transaction_discount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "customer_id":
+			out.Values[i] = ec._Transaction_customer_id(ctx, field, obj)
+		case "customer":
+			out.Values[i] = ec._Transaction_customer(ctx, field, obj)
+		case "is_completed":
+			out.Values[i] = ec._Transaction_is_completed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "is_canceled":
+			out.Values[i] = ec._Transaction_is_canceled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_at":
+			out.Values[i] = ec._Transaction_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_by":
+			out.Values[i] = ec._Transaction_created_by(ctx, field, obj)
+		case "updated_at":
+			out.Values[i] = ec._Transaction_updated_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updated_by":
+			out.Values[i] = ec._Transaction_updated_by(ctx, field, obj)
+		case "products":
+			out.Values[i] = ec._Transaction_products(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var transactionExtraImplementors = []string{"TransactionExtra"}
+
+func (ec *executionContext) _TransactionExtra(ctx context.Context, sel ast.SelectionSet, obj *model.TransactionExtra) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, transactionExtraImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TransactionExtra")
+		case "id":
+			out.Values[i] = ec._TransactionExtra_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "transaction_product_id":
+			out.Values[i] = ec._TransactionExtra_transaction_product_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "transaction_product":
+			out.Values[i] = ec._TransactionExtra_transaction_product(ctx, field, obj)
+		case "extra_name":
+			out.Values[i] = ec._TransactionExtra_extra_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "quantity":
+			out.Values[i] = ec._TransactionExtra_quantity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "extra_price":
+			out.Values[i] = ec._TransactionExtra_extra_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_at":
+			out.Values[i] = ec._TransactionExtra_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var transactionProductImplementors = []string{"TransactionProduct"}
+
+func (ec *executionContext) _TransactionProduct(ctx context.Context, sel ast.SelectionSet, obj *model.TransactionProduct) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, transactionProductImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TransactionProduct")
+		case "id":
+			out.Values[i] = ec._TransactionProduct_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "transaction_id":
+			out.Values[i] = ec._TransactionProduct_transaction_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "transaction":
+			out.Values[i] = ec._TransactionProduct_transaction(ctx, field, obj)
+		case "product_id":
+			out.Values[i] = ec._TransactionProduct_product_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "product":
+			out.Values[i] = ec._TransactionProduct_product(ctx, field, obj)
+		case "available_type":
+			out.Values[i] = ec._TransactionProduct_available_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "variant_type":
+			out.Values[i] = ec._TransactionProduct_variant_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "attribute":
+			out.Values[i] = ec._TransactionProduct_attribute(ctx, field, obj)
+		case "variant_name":
+			out.Values[i] = ec._TransactionProduct_variant_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "quantity":
+			out.Values[i] = ec._TransactionProduct_quantity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "product_price":
+			out.Values[i] = ec._TransactionProduct_product_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total_extras":
+			out.Values[i] = ec._TransactionProduct_total_extras(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total_price":
+			out.Values[i] = ec._TransactionProduct_total_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "notes":
+			out.Values[i] = ec._TransactionProduct_notes(ctx, field, obj)
+		case "created_at":
+			out.Values[i] = ec._TransactionProduct_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "extras":
+			out.Values[i] = ec._TransactionProduct_extras(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var transactionResponseImplementors = []string{"TransactionResponse"}
+
+func (ec *executionContext) _TransactionResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TransactionResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, transactionResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TransactionResponse")
+		case "code":
+			out.Values[i] = ec._TransactionResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._TransactionResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._TransactionResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._TransactionResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var transactionsResponseImplementors = []string{"TransactionsResponse"}
+
+func (ec *executionContext) _TransactionsResponse(ctx context.Context, sel ast.SelectionSet, obj *model.TransactionsResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, transactionsResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TransactionsResponse")
+		case "code":
+			out.Values[i] = ec._TransactionsResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._TransactionsResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._TransactionsResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._TransactionsResponse_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pagination":
+			out.Values[i] = ec._TransactionsResponse_pagination(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var updateDiscountResponseImplementors = []string{"UpdateDiscountResponse"}
 
 func (ec *executionContext) _UpdateDiscountResponse(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateDiscountResponse) graphql.Marshaler {
@@ -31314,6 +34819,57 @@ func (ec *executionContext) _UpdateRoleResponse(ctx context.Context, sel ast.Sel
 			}
 		case "data":
 			out.Values[i] = ec._UpdateRoleResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateTransactionResponseImplementors = []string{"UpdateTransactionResponse"}
+
+func (ec *executionContext) _UpdateTransactionResponse(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateTransactionResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateTransactionResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateTransactionResponse")
+		case "code":
+			out.Values[i] = ec._UpdateTransactionResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._UpdateTransactionResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._UpdateTransactionResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._UpdateTransactionResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -32394,6 +35950,46 @@ func (ec *executionContext) marshalNCreateRoleResponse2ᚖreᚑkasirpinterᚑgo�
 	return ec._CreateRoleResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateTransactionExtraInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionExtraInputᚄ(ctx context.Context, v any) ([]*model.CreateTransactionExtraInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.CreateTransactionExtraInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateTransactionExtraInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionExtraInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateTransactionExtraInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionExtraInput(ctx context.Context, v any) (*model.CreateTransactionExtraInput, error) {
+	res, err := ec.unmarshalInputCreateTransactionExtraInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx context.Context, v any) ([]*model.CreateTransactionProductInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.CreateTransactionProductInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateTransactionProductInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateTransactionProductInput2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInput(ctx context.Context, v any) (*model.CreateTransactionProductInput, error) {
+	res, err := ec.unmarshalInputCreateTransactionProductInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateUserInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐCreateUserInput(ctx context.Context, v any) (input.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -32833,6 +36429,22 @@ func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt322int32(ctx context.Context, v any) (int32, error) {
+	res, err := graphql.UnmarshalInt32(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt322int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalInt32(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNInt642int64(ctx context.Context, v any) (int64, error) {
 	res, err := graphql.UnmarshalInt64(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -33244,6 +36856,84 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTransaction2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Transaction) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v *model.Transaction) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Transaction(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTransactionExtra2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionExtraᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TransactionExtra) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTransactionExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionExtra(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTransactionExtra2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionExtra(ctx context.Context, sel ast.SelectionSet, v *model.TransactionExtra) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TransactionExtra(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTransactionProduct2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionProductᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TransactionProduct) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTransactionProduct2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionProduct(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTransactionProduct2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionProduct(ctx context.Context, sel ast.SelectionSet, v *model.TransactionProduct) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TransactionProduct(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateDiscountInput2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUpdateDiscountInput(ctx context.Context, v any) (model.UpdateDiscountInput, error) {
@@ -33746,6 +37436,13 @@ func (ec *executionContext) marshalOCheckDiscountData2ᚖreᚑkasirpinterᚑgo�
 	return ec._CheckDiscountData(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOCustomerSearchData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCustomerSearchData(ctx context.Context, sel ast.SelectionSet, v *model.CustomerSearchData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CustomerSearchData(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalODiscount2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐDiscount(ctx context.Context, sel ast.SelectionSet, v *model.Discount) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -34060,6 +37757,20 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	_ = ctx
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTransaction2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransaction(ctx context.Context, sel ast.SelectionSet, v *model.Transaction) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Transaction(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTransactionProduct2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐTransactionProduct(ctx context.Context, sel ast.SelectionSet, v *model.TransactionProduct) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TransactionProduct(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUser2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

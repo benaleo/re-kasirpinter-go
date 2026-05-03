@@ -658,3 +658,90 @@ type ProductHasExtra {
   created_at: Time!
   updated_at: Time!
 }
+
+type Transaction {
+  id: Int64!
+  date: Time!
+  sequence: Int32!
+  invoice: String!
+  payment_method: String!
+  total_amount: Float!
+  total_billed: Float!
+  tax: Float!
+  subtotal: Float!
+  discount: Float!
+  customer_id: String
+  customer: CustomerSearchData
+  is_completed: Boolean!
+  is_canceled: Boolean!
+  created_at: Time!
+  created_by: String
+  updated_at: Time!
+  updated_by: String
+  products: [TransactionProduct!]!
+}
+
+type TransactionProduct {
+  id: Int64!
+  transaction_id: Int64!
+  transaction: Transaction
+  product_id: Int64!
+  product: Product
+  available_type: String!
+  variant_type: String!
+  attribute: String
+  variant_name: String!
+  quantity: Int32!
+  product_price: Float!
+  total_extras: Float!
+  total_price: Float!
+  notes: String
+  created_at: Time!
+  extras: [TransactionExtra!]!
+}
+
+type TransactionExtra {
+  id: Int64!
+  transaction_product_id: Int64!
+  transaction_product: TransactionProduct
+  extra_name: String!
+  quantity: Int32!
+  extra_price: Float!
+  created_at: Time!
+}
+
+type TransactionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Transaction
+}
+
+type TransactionsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Transaction!]!
+  pagination: PageInfo
+}
+
+type CreateTransactionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Transaction
+}
+
+type UpdateTransactionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Transaction
+}
+
+type DeleteTransactionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Transaction
+}
