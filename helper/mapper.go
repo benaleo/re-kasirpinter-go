@@ -4,6 +4,14 @@ import (
 	"re-kasirpinter-go/graph/model"
 )
 
+// Float64FromInt32 converts *int32 to float64, returns 0 if nil
+func Float64FromInt32(v *int32) float64 {
+	if v == nil {
+		return 0
+	}
+	return float64(*v)
+}
+
 // ToGraphQLUser converts UserDB to GraphQL User model
 func ToGraphQLUser(userDB model.UserDB, userRoleDB *model.UserRoleDB) *model.User {
 	user := &model.User{
@@ -190,16 +198,18 @@ func ToGraphQLProductCategory(productCategoryDB model.ProductCategoryDB) *model.
 // ToGraphQLProduct converts ProductDB to GraphQL Product model
 func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 	product := &model.Product{
-		ID:          productDB.ID,
-		SecureID:    productDB.SecureID,
-		Name:        productDB.Name,
-		Image:       productDB.Image,
-		CategoryID:  productDB.CategoryID,
-		Description: productDB.Description,
-		IsActive:    productDB.IsActive,
-		DeletedAt:   productDB.DeletedAt,
-		CreatedAt:   productDB.CreatedAt,
-		UpdatedAt:   productDB.UpdatedAt,
+		ID:            productDB.ID,
+		SecureID:      productDB.SecureID,
+		Name:          productDB.Name,
+		Image:         productDB.Image,
+		CategoryID:    productDB.CategoryID,
+		Description:   productDB.Description,
+		AvailableType: productDB.AvailableType,
+		VariantType:   productDB.VariantType,
+		IsActive:      productDB.IsActive,
+		DeletedAt:     productDB.DeletedAt,
+		CreatedAt:     productDB.CreatedAt,
+		UpdatedAt:     productDB.UpdatedAt,
 	}
 
 	// Set category if provided
@@ -207,5 +217,238 @@ func ToGraphQLProduct(productDB model.ProductDB) *model.Product {
 		product.Category = ToGraphQLProductCategory(*productDB.Category)
 	}
 
+	// Set variants if provided (excluding deleted variants)
+	if len(productDB.Variants) > 0 {
+		var activeVariants []model.ProductVariantDB
+		for _, variantDB := range productDB.Variants {
+			if variantDB.DeletedAt == nil {
+				activeVariants = append(activeVariants, variantDB)
+			}
+		}
+		if len(activeVariants) > 0 {
+			variants := make([]*model.ProductVariant, len(activeVariants))
+			for i, variantDB := range activeVariants {
+				variants[i] = ToGraphQLProductVariant(variantDB)
+			}
+			product.Variants = variants
+
+			// Calculate is_available: true if any variant has available_stock > 0 or is_unlimited is true and is_active is true
+			isAvailable := false
+			for _, variant := range variants {
+				if variant.IsActive && (variant.IsUnlimited || variant.AvailableStock > 0) {
+					isAvailable = true
+					break
+				}
+			}
+			product.IsAvailable = isAvailable
+		} else {
+			product.IsAvailable = false
+		}
+	} else {
+		product.IsAvailable = false
+	}
+
+	// Set product_extra_ids if ProductHasExtras relationship is loaded
+	if len(productDB.ProductHasExtras) > 0 {
+		productExtraIds := make([]int64, len(productDB.ProductHasExtras))
+		for i, hasExtra := range productDB.ProductHasExtras {
+			productExtraIds[i] = hasExtra.ProductExtraID
+		}
+		product.ProductExtraIds = productExtraIds
+	}
+
 	return product
+}
+
+// ToGraphQLDiscount converts DiscountDB to GraphQL Discount model
+func ToGraphQLDiscount(discountDB model.DiscountDB) *model.Discount {
+	return &model.Discount{
+		ID:          discountDB.ID,
+		Name:        discountDB.Name,
+		Description: discountDB.Description,
+		Icon:        discountDB.Icon,
+		Code:        discountDB.Code,
+		Type:        model.DiscountType(discountDB.Type),
+		Value:       discountDB.Value,
+		MaxValue:    discountDB.MaxValue,
+		MinOrder:    discountDB.MinOrder,
+		Quota:       discountDB.Quota,
+		StartAt:     discountDB.StartAt,
+		EndAt:       discountDB.EndAt,
+		IsActive:    discountDB.IsActive,
+		DeletedAt:   discountDB.DeletedAt,
+		CreatedAt:   discountDB.CreatedAt,
+		UpdatedAt:   discountDB.UpdatedAt,
+	}
+}
+
+// ToGraphQLProductVariant converts ProductVariantDB to GraphQL ProductVariant model
+func ToGraphQLProductVariant(productVariantDB model.ProductVariantDB) *model.ProductVariant {
+	variant := &model.ProductVariant{
+		ID:            productVariantDB.ID,
+		Image:         productVariantDB.Image,
+		ProductID:     productVariantDB.ProductID,
+		Name:          productVariantDB.Name,
+		Price:         productVariantDB.Price,
+		PriceOriginal: productVariantDB.PriceOriginal,
+		IsUnlimited:   productVariantDB.IsUnlimited,
+		IsActive:      productVariantDB.IsActive,
+		DeletedAt:     productVariantDB.DeletedAt,
+		CreatedAt:     productVariantDB.CreatedAt,
+		UpdatedAt:     productVariantDB.UpdatedAt,
+	}
+
+	// Set product if available
+	if productVariantDB.Product != nil {
+		variant.Product = ToGraphQLProduct(*productVariantDB.Product)
+	}
+
+	// Set ingredients if available and calculate available stock
+	if len(productVariantDB.Ingredients) > 0 {
+		ingredients := make([]*model.ProductIngredient, len(productVariantDB.Ingredients))
+		for i, ingredientDB := range productVariantDB.Ingredients {
+			ingredients[i] = ToGraphQLProductIngredient(ingredientDB)
+		}
+		variant.Ingredients = ingredients
+
+		// If is_unlimited is true, set available_stock to -1 to indicate unlimited
+		if productVariantDB.IsUnlimited {
+			variant.AvailableStock = -1
+		} else {
+			// Calculate available stock based on ingredient availability
+			// For each ingredient, calculate how many units can be made
+			// The variant's available stock is the minimum of all these calculations
+			var availableStock float64 = -1 // -1 means no ingredients
+			for _, ingredientDB := range productVariantDB.Ingredients {
+				if ingredientDB.Ingredient != nil {
+					// Calculate total stock for this ingredient
+					var totalStock float64
+					for _, stock := range ingredientDB.Ingredient.Stocks {
+						if stock.DeletedAt != nil {
+							continue
+						}
+						if stock.Type == model.IngredientStockTypeIncrease {
+							totalStock += stock.Qty
+						} else if stock.Type == model.IngredientStockTypeDecrease {
+							totalStock -= stock.Qty
+						}
+					}
+
+					// Calculate how many units can be made from this ingredient
+					if ingredientDB.IngredientValue > 0 {
+						unitsFromIngredient := totalStock / ingredientDB.IngredientValue
+						if availableStock == -1 || unitsFromIngredient < availableStock {
+							availableStock = unitsFromIngredient
+						}
+					}
+				}
+			}
+
+			// If availableStock is still -1, set it to 0 (no ingredients defined)
+			if availableStock == -1 {
+				availableStock = 0
+			}
+
+			// Ensure stock is not negative
+			if availableStock < 0 {
+				availableStock = 0
+			}
+
+			// Floor to integer (no decimals)
+			availableStock = float64(int(availableStock))
+
+			variant.AvailableStock = availableStock
+		}
+	} else {
+		variant.AvailableStock = 0
+	}
+
+	return variant
+}
+
+// ToGraphQLProductIngredient converts ProductIngredientDB to GraphQL ProductIngredient model
+func ToGraphQLProductIngredient(productIngredientDB model.ProductIngredientDB) *model.ProductIngredient {
+	ingredient := &model.ProductIngredient{
+		ID:              productIngredientDB.ID,
+		VariantID:       productIngredientDB.VariantID,
+		IngredientID:    productIngredientDB.IngredientID,
+		IngredientValue: productIngredientDB.IngredientValue,
+		Unit:            productIngredientDB.Unit,
+		CreatedAt:       productIngredientDB.CreatedAt,
+		UpdatedAt:       productIngredientDB.UpdatedAt,
+	}
+
+	// Set variant if available
+	if productIngredientDB.Variant != nil {
+		ingredient.Variant = ToGraphQLProductVariant(*productIngredientDB.Variant)
+	}
+
+	// Set ingredient if available
+	if productIngredientDB.Ingredient != nil {
+		ingredient.Ingredient = ToGraphQLIngredient(*productIngredientDB.Ingredient)
+	}
+
+	return ingredient
+}
+
+// ToGraphQLProductIngredients converts []ProductIngredientDB to []*model.ProductIngredient
+func ToGraphQLProductIngredients(productIngredientsDB []model.ProductIngredientDB) []*model.ProductIngredient {
+	ingredients := make([]*model.ProductIngredient, len(productIngredientsDB))
+	for i, ingredientDB := range productIngredientsDB {
+		ingredients[i] = ToGraphQLProductIngredient(ingredientDB)
+	}
+	return ingredients
+}
+
+// ToGraphQLProductIngredientSlice converts []*ProductIngredientDB to []*model.ProductIngredient
+func ToGraphQLProductIngredientSlice(productIngredientsDB []*model.ProductIngredientDB) []*model.ProductIngredient {
+	ingredients := make([]*model.ProductIngredient, len(productIngredientsDB))
+	for i, ingredientDB := range productIngredientsDB {
+		ingredients[i] = ToGraphQLProductIngredient(*ingredientDB)
+	}
+	return ingredients
+}
+
+// ToGraphQLProductExtra converts ProductExtraDB to GraphQL ProductExtra model
+func ToGraphQLProductExtra(productExtraDB model.ProductExtraDB) *model.ProductExtra {
+	return &model.ProductExtra{
+		ID:        productExtraDB.ID,
+		Name:      productExtraDB.Name,
+		Price:     productExtraDB.Price,
+		IsActive:  productExtraDB.IsActive,
+		DeletedAt: productExtraDB.DeletedAt,
+		CreatedAt: productExtraDB.CreatedAt,
+		UpdatedAt: productExtraDB.UpdatedAt,
+	}
+}
+
+// ToGraphQLProductHasExtra converts ProductHasExtraDB to GraphQL ProductHasExtra model
+func ToGraphQLProductHasExtra(productHasExtraDB model.ProductHasExtraDB) *model.ProductHasExtra {
+	hasExtra := &model.ProductHasExtra{
+		ProductID:      productHasExtraDB.ProductID,
+		ProductExtraID: productHasExtraDB.ProductExtraID,
+		CreatedAt:      productHasExtraDB.CreatedAt,
+		UpdatedAt:      productHasExtraDB.UpdatedAt,
+	}
+
+	// Set product if available
+	if productHasExtraDB.Product != nil {
+		hasExtra.Product = ToGraphQLProduct(*productHasExtraDB.Product)
+	}
+
+	// Set product extra if available
+	if productHasExtraDB.ProductExtra != nil {
+		hasExtra.ProductExtra = ToGraphQLProductExtra(*productHasExtraDB.ProductExtra)
+	}
+
+	return hasExtra
+}
+
+// ToGraphQLProductHasExtraSlice converts []*ProductHasExtraDB to []*model.ProductHasExtra
+func ToGraphQLProductHasExtraSlice(productHasExtrasDB []*model.ProductHasExtraDB) []*model.ProductHasExtra {
+	hasExtras := make([]*model.ProductHasExtra, len(productHasExtrasDB))
+	for i, hasExtraDB := range productHasExtrasDB {
+		hasExtras[i] = ToGraphQLProductHasExtra(*hasExtraDB)
+	}
+	return hasExtras
 }

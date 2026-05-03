@@ -47,6 +47,10 @@ input NewPasswordInput {
   password: String!
 }
 
+input RefreshTokenInput {
+  token: String!
+}
+
 input CreateRoleInput {
   name: String!
   status: Boolean!
@@ -124,7 +128,10 @@ input CreateProductInput {
   image: String
   category_id: Int64
   description: String
+  available_type: String
+  variant_type: String
   is_active: Boolean!
+  product_extra_ids: [Int64]
 }
 
 input UpdateProductInput {
@@ -132,5 +139,86 @@ input UpdateProductInput {
   image: String
   category_id: Int64
   description: String
+  available_type: String
+  variant_type: String
   is_active: Boolean
+  product_extra_ids: [Int64]
+}
+
+input CreateDiscountInput {
+  name: String!
+  description: String
+  icon: String
+  code: String
+  type: DiscountType!
+  value: Float!
+  max_value: Int
+  min_order: Int
+  quota: Int
+  start_at: Time
+  end_at: Time
+  is_active: Boolean!
+}
+
+input UpdateDiscountInput {
+  name: String
+  description: String
+  icon: String
+  code: String
+  type: DiscountType
+  value: Float
+  max_value: Int
+  min_order: Int
+  quota: Int
+  start_at: Time
+  end_at: Time
+  is_active: Boolean
+}
+
+input CreateProductVariantInput {
+  image: String
+  product_id: Int64!
+  name: String!
+  price: Float!
+  price_original: Float
+  is_unlimited: Boolean!
+  is_active: Boolean!
+}
+
+input UpdateProductVariantInput {
+  image: String
+  name: String
+  price: Float
+  price_original: Float
+  is_unlimited: Boolean
+  is_active: Boolean
+}
+
+input CreateProductIngredientInput {
+  variant_id: Int64!
+  ingredient_id: Int64!
+  ingredient_value: Float!
+  unit: String!
+}
+
+input UpdateProductIngredientInput {
+  ingredient_value: Float
+  unit: String
+}
+
+input CreateProductExtraInput {
+  name: String!
+  price: Float!
+  is_active: Boolean!
+}
+
+input UpdateProductExtraInput {
+  name: String
+  price: Float
+  is_active: Boolean
+}
+
+input CreateProductHasExtraInput {
+  product_id: Int64!
+  product_extra_ids: [Int64!]!
 }

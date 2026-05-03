@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activated - Kasir Pintar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333333;
+            margin: 0;
+            font-size: 24px;
+        }
+        .activation-message {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+        .activation-message p {
+            margin: 0;
+            color: #0c5460;
+            font-size: 14px;
+        }
+        .login-button {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .account-details {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .account-details p {
+            margin: 5px 0;
+            color: #495057;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .footer-links {
+            margin: 10px 0;
+        }
+        .footer-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Account Activated!</h1>
+        </div>
+        
+        <div class="activation-message">
+            <p><strong>Your account is now active and ready to use!</strong></p>
+        </div>
+        
+        <p>Hello {{.Name}},</p>
+        
+        <p>Great news! Your account has been successfully created and activated. You can now access the Kasir Pintar system with your credentials.</p>
+        
+        <div class="account-details">
+            <p><strong>Account Details:</strong></p>
+            <p><strong>Name:</strong> {{.Name}}</p>
+            <p><strong>Email:</strong> {{.Email}}</p>
+            <p><strong>Phone:</strong> {{.Phone}}</p>
+            <p><strong>Role:</strong> {{.Role}}</p>
+            <p><strong>Status:</strong> <span style="color: #28a745;">Active</span></p>
+        </div>
+        
+        <p style="text-align: center;">
+            <a href="{{.LoginURL}}" class="login-button">Login to Your Account</a>
+        </p>
+        
+        <p>You can now log in to the system using the email and password you provided during registration. If you haven't set a password yet or have forgotten it, you can use the password reset feature on the login page.</p>
+        
+        <p>If you have any questions or need assistance getting started, our support team is here to help you.</p>
+        
+        <p>Welcome aboard!<br>Kasir Pintar Team</p>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Support</a>
+                <a href="#">Security Center</a>
+            </div>
+            <p>&copy; 2024 Kasir Pintar. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

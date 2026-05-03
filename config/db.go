@@ -40,7 +40,8 @@ func InitDb() (*gorm.DB, error) {
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, dbname, port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger:      logger.Default.LogMode(logger.Silent),
+		PrepareStmt: false,
 	})
 
 	err = db.AutoMigrate(
@@ -51,16 +52,46 @@ func InitDb() (*gorm.DB, error) {
 		&model.OtpDB{},
 		&model.LogEmailDB{},
 		&model.LoginAuditDB{},
+		&model.ActiveTokenDB{},
 		&model.BlacklistedTokenDB{},
 		&model.IngredientCategoryDB{},
 		&model.IngredientDB{},
 		&model.IngredientStockDB{},
 		&model.ProductCategoryDB{},
 		&model.ProductDB{},
+		&model.DiscountDB{},
+		&model.ProductVariantDB{},
+		&model.ProductIngredientDB{},
+		&model.ProductExtraDB{},
+		&model.ProductHasExtraDB{},
 	)
 
 	if err != nil {
 		return nil, err
+	}
+
+	// Manual migration for ActiveTokenDB device info columns
+	// Check if columns exist and add them if they don't
+	if !db.Migrator().HasColumn(&model.ActiveTokenDB{}, "ip") {
+		if err := db.Migrator().AddColumn(&model.ActiveTokenDB{}, "ip"); err != nil {
+			fmt.Printf("Warning: Failed to add ip column: %v\n", err)
+		}
+	}
+	if !db.Migrator().HasColumn(&model.ActiveTokenDB{}, "browser") {
+		if err := db.Migrator().AddColumn(&model.ActiveTokenDB{}, "browser"); err != nil {
+			fmt.Printf("Warning: Failed to add browser column: %v\n", err)
+		}
+	}
+	if !db.Migrator().HasColumn(&model.ActiveTokenDB{}, "os") {
+		if err := db.Migrator().AddColumn(&model.ActiveTokenDB{}, "os"); err != nil {
+			fmt.Printf("Warning: Failed to add os column: %v\n", err)
+		}
+	}
+
+	// Add unique constraints
+	productIngredientModel := model.ProductIngredientDB{}
+	if err := productIngredientModel.AddUniqueIndexes(db); err != nil {
+		fmt.Println("Warning: Failed to add unique constraint for product_ingredients:", err)
 	}
 
 	// Seed data

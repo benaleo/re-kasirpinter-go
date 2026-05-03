@@ -138,12 +138,17 @@ func (s *IngredientService) DeleteIngredient(id int64) (*model.DeleteIngredientR
 	}, nil
 }
 
-func (s *IngredientService) Ingredients(pagination *model.PaginationInput) (*model.IngredientsResponse, error) {
+func (s *IngredientService) Ingredients(pagination *model.PaginationInput, isActive *bool) (*model.IngredientsResponse, error) {
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
 	// Build base query with category and stocks preload
 	baseQuery := s.DB.Model(&model.IngredientDB{}).Preload("Category").Preload("Stocks", "deleted_at IS NULL").Where("deleted_at IS NULL")
+
+	// Filter by is_active if provided
+	if isActive != nil {
+		baseQuery = baseQuery.Where("is_active = ?", *isActive)
+	}
 
 	// Get total count
 	var total int64

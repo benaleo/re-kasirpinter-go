@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"re-kasirpinter-go/email"
 	"re-kasirpinter-go/graph/input"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
@@ -65,17 +66,18 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 
 		// Handle avatar upload if provided
 		var avatarURL *string
-		if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
-			avatarURLStr, err := s.R2Service.UploadFromBase64(
-				context.Background(),
-				*input.Avatar,
-				"avatars",
-				secureID,
-			)
-			if err != nil {
-				return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+		if input.Avatar != nil && *input.Avatar != "" {
+			// If avatar is already a URL, use it directly
+			if helper.IsImageURL(*input.Avatar) {
+				avatarURL = input.Avatar
+			} else {
+				// Upload to R2 using helper with UUID filename
+				avatarURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Avatar, "avatars")
+				if err != nil {
+					return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+				}
+				avatarURL = &avatarURLStr
 			}
-			avatarURL = &avatarURLStr
 		}
 
 		// Create user DB model
@@ -107,6 +109,14 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 			userRoleDB = &userRole
 		}
 		user := helper.ToGraphQLUser(userDB, userRoleDB)
+
+		// Send welcome email with password
+		loginURL := "https://app.kasirpinter.com/login" // Update with actual login URL
+		go func() {
+			if err := email.SendUserWelcomeEmail(input.Email, input.Name, autoPassword, loginURL); err != nil {
+				fmt.Printf("Failed to send welcome email to %s: %v\n", input.Email, err)
+			}
+		}()
 
 		return helper.SuccessResponse(201, "user created successfully with auto-generated password", user), nil
 	} else {
@@ -149,17 +159,18 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 
 		// Handle avatar upload if provided
 		var avatarURL *string
-		if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
-			avatarURLStr, err := s.R2Service.UploadFromBase64(
-				context.Background(),
-				*input.Avatar,
-				"avatars",
-				secureID,
-			)
-			if err != nil {
-				return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+		if input.Avatar != nil && *input.Avatar != "" {
+			// If avatar is already a URL, use it directly
+			if helper.IsImageURL(*input.Avatar) {
+				avatarURL = input.Avatar
+			} else {
+				// Upload to R2 using helper with UUID filename
+				avatarURLStr, err := helper.UploadImageToR2(context.Background(), s.R2Service, *input.Avatar, "avatars")
+				if err != nil {
+					return helper.InternalServerErrorResponse(fmt.Sprintf("failed to upload avatar: %v", err)), nil
+				}
+				avatarURL = &avatarURLStr
 			}
-			avatarURL = &avatarURLStr
 		}
 
 		// Create user DB model
@@ -194,6 +205,18 @@ func (s *UserService) CreateUser(input input.CreateUserInput, isUser *bool) (*mo
 		}
 		user := helper.ToGraphQLUser(userDB, userRoleDB)
 
+		// Send activation email
+		loginURL := "https://app.kasirpinter.com/login" // Update with actual login URL
+		roleName := "User"                              // Default role name
+		if userRole.ID > 0 {
+			roleName = userRole.Name
+		}
+		go func() {
+			if err := email.SendUserActivationEmail(input.Email, input.Name, input.Phone, roleName, loginURL); err != nil {
+				fmt.Printf("Failed to send activation email to %s: %v\n", input.Email, err)
+			}
+		}()
+
 		return helper.SuccessResponse(201, "user created successfully", user), nil
 	}
 }
@@ -212,21 +235,22 @@ func (s *UserService) UpdateUser(ctx context.Context, id string, input input.Upd
 
 	// Handle avatar upload if provided
 	var avatarURL *string
-	if input.Avatar != nil && *input.Avatar != "" && s.R2Service != nil {
-		avatarURLStr, err := s.R2Service.UploadFromBase64(
-			ctx,
-			*input.Avatar,
-			"avatars",
-			id,
-		)
-		if err != nil {
-			return &model.UpdateUserResponse{
-				Code:    500,
-				Success: false,
-				Message: fmt.Sprintf("failed to upload avatar: %v", err),
-			}, nil
+	if input.Avatar != nil && *input.Avatar != "" {
+		// If avatar is already a URL, use it directly
+		if helper.IsImageURL(*input.Avatar) {
+			avatarURL = input.Avatar
+		} else {
+			// Upload to R2 using helper with UUID filename
+			avatarURLStr, err := helper.UploadImageToR2(ctx, s.R2Service, *input.Avatar, "avatars")
+			if err != nil {
+				return &model.UpdateUserResponse{
+					Code:    500,
+					Success: false,
+					Message: fmt.Sprintf("failed to upload avatar: %v", err),
+				}, nil
+			}
+			avatarURL = &avatarURLStr
 		}
-		avatarURL = &avatarURLStr
 	}
 
 	// Update fields if provided
@@ -447,5 +471,40 @@ func (s *UserService) User(id string) (*model.UserResponse, error) {
 		Success: true,
 		Message: "user retrieved successfully",
 		Data:    user,
+	}, nil
+}
+
+func (s *UserService) CustomerSearch(keyword string) (*model.CustomerSearchResponse, error) {
+	// Search for users by name or phone (case-insensitive) with role_id = 2
+	var usersDB []model.UserDB
+	result := s.DB.Where("deleted_at IS NULL").
+		Where("role_id = ?", 2).
+		Where("LOWER(name) LIKE LOWER(?) OR phone LIKE ?", "%"+keyword+"%", "%"+keyword+"%").
+		Find(&usersDB)
+
+	if result.Error != nil {
+		return &model.CustomerSearchResponse{
+			Code:    500,
+			Success: false,
+			Message: fmt.Sprintf("database error: %v", result.Error),
+		}, nil
+	}
+
+	// Create slice of CustomerSearchData with only the required fields
+	var customersData []*model.CustomerSearchData
+	for _, userDB := range usersDB {
+		customerData := &model.CustomerSearchData{
+			SecureID: userDB.SecureID,
+			Name:     userDB.Name,
+			Phone:    userDB.Phone,
+		}
+		customersData = append(customersData, customerData)
+	}
+
+	return &model.CustomerSearchResponse{
+		Code:    200,
+		Success: true,
+		Message: "customers retrieved successfully",
+		Data:    customersData,
 	}, nil
 }

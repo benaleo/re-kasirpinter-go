@@ -52,25 +52,70 @@ type LogoutResponse {
 }
 
 type Query {
-  users(pagination: PaginationInput, is_user: Boolean = true): UsersResponse! @auth
+  users(pagination: PaginationInput, is_user: Boolean = true): UsersResponse!
+    @auth
   user(id: String!): UserResponse! @auth
+  customerSearch(keyword: String!): CustomerSearchResponse! @auth
+
   # administrator
   roles: RolesResponse! @auth
   role(id: Int64!): RoleResponse! @auth
   permissions: PermissionsResponse! @auth
   # ingredients
-  ingredientCategories(pagination: PaginationInput, is_options: Boolean = false): IngredientCategoriesResponse! @auth
-  ingredients(pagination: PaginationInput): IngredientsResponse! @auth
-  ingredientStocks(pagination: PaginationInput, ingredient_id: Int64): IngredientStocksResponse! @auth
+  ingredientCategories(
+    pagination: PaginationInput
+    is_options: Boolean = false
+  ): IngredientCategoriesResponse! @auth
+  ingredients(
+    pagination: PaginationInput
+    is_active: Boolean
+  ): IngredientsResponse! @auth
+  ingredientStocks(
+    pagination: PaginationInput
+    ingredient_id: Int64
+  ): IngredientStocksResponse! @auth
   # products
-  productCategories(pagination: PaginationInput): ProductCategoriesResponse! @auth
-  products(pagination: PaginationInput): ProductsResponse! @auth
+  productCategories(pagination: PaginationInput): ProductCategoriesResponse!
+    @auth
+  products(
+    pagination: PaginationInput
+    is_active: Boolean
+    product_extra_ids: Boolean
+  ): ProductsResponse! @auth
+  # discounts
+  discounts(
+    pagination: PaginationInput
+    is_active: Boolean
+    is_period: Boolean
+    is_quota: Boolean
+  ): DiscountsResponse! @auth
+  checkDiscount(code: String!): CheckDiscountResponse!
+  #product variant
+  productVariants(
+    pagination: PaginationInput
+    product_id: Int64!
+    is_active: Boolean
+  ): ProductVariantsResponse! @auth
+  #product ingredient
+  productIngredients(
+    pagination: PaginationInput
+    variant_id: Int64!
+  ): ProductIngredientsResponse! @auth
+  #product extras
+  productExtras(
+    pagination: PaginationInput
+    is_active: Boolean
+  ): ProductExtrasResponse! @auth
 }
 
 type Mutation {
   login(input: LoginInput!): AuthResponse!
   logout: LogoutResponse! @auth
-  createUser(input: CreateUserInput!, is_user: Boolean = true): CreateUserResponse! @auth
+  refreshToken(input: RefreshTokenInput!): RefreshTokenResponse!
+  createUser(
+    input: CreateUserInput!
+    is_user: Boolean = true
+  ): CreateUserResponse! @auth
   updateUser(id: String!, input: UpdateUserInput!): UpdateUserResponse! @auth
   deleteUser(id: String!): DeleteUserResponse! @auth
   createOtp(input: CreateOtpInput!): CreateOtpResponse!
@@ -84,27 +129,82 @@ type Mutation {
   deleteRole(id: Int64!): DeleteRoleResponse! @auth
 
   # ingredients category
-  createIngredientCategory(input: CreateIngredientCategoryInput!): CreateIngredientCategoryResponse! @auth
-  updateIngredientCategory(id: Int64!, input: UpdateIngredientCategoryInput!): UpdateIngredientCategoryResponse! @auth
+  createIngredientCategory(
+    input: CreateIngredientCategoryInput!
+  ): CreateIngredientCategoryResponse! @auth
+  updateIngredientCategory(
+    id: Int64!
+    input: UpdateIngredientCategoryInput!
+  ): UpdateIngredientCategoryResponse! @auth
   deleteIngredientCategory(id: Int64!): DeleteIngredientCategoryResponse! @auth
 
   # ingredients
-  createIngredient(input: CreateIngredientInput!): CreateIngredientResponse! @auth
-  updateIngredient(id: Int64!, input: UpdateIngredientInput!): UpdateIngredientResponse! @auth
+  createIngredient(input: CreateIngredientInput!): CreateIngredientResponse!
+    @auth
+  updateIngredient(
+    id: Int64!
+    input: UpdateIngredientInput!
+  ): UpdateIngredientResponse! @auth
   deleteIngredient(id: Int64!): DeleteIngredientResponse! @auth
 
   # ingredient stocks
-  createIngredientStock(input: CreateIngredientStockInput!): CreateIngredientStockResponse! @auth
-  updateIngredientStock(id: Int64!, input: UpdateIngredientStockInput!): UpdateIngredientStockResponse! @auth
+  createIngredientStock(
+    input: CreateIngredientStockInput!
+  ): CreateIngredientStockResponse! @auth
+  updateIngredientStock(
+    id: Int64!
+    input: UpdateIngredientStockInput!
+  ): UpdateIngredientStockResponse! @auth
   deleteIngredientStock(id: Int64!): DeleteIngredientStockResponse! @auth
 
   # product category
-  createProductCategory(input: CreateProductCategoryInput!): CreateProductCategoryResponse! @auth
-  updateProductCategory(id: Int64!, input: UpdateProductCategoryInput!): UpdateProductCategoryResponse! @auth
+  createProductCategory(
+    input: CreateProductCategoryInput!
+  ): CreateProductCategoryResponse! @auth
+  updateProductCategory(
+    id: Int64!
+    input: UpdateProductCategoryInput!
+  ): UpdateProductCategoryResponse! @auth
   deleteProductCategory(id: Int64!): DeleteProductCategoryResponse! @auth
 
   # products
   createProduct(input: CreateProductInput!): CreateProductResponse! @auth
-  updateProduct(id: Int64!, input: UpdateProductInput!): UpdateProductResponse! @auth
+  updateProduct(id: Int64!, input: UpdateProductInput!): UpdateProductResponse!
+    @auth
   deleteProduct(id: Int64!): DeleteProductResponse! @auth
+
+  # discounts
+  createDiscount(input: CreateDiscountInput!): CreateDiscountResponse! @auth
+  updateDiscount(
+    id: Int64!
+    input: UpdateDiscountInput!
+  ): UpdateDiscountResponse! @auth
+  deleteDiscount(id: Int64!): DeleteDiscountResponse! @auth
+
+  # product variants
+  createProductVariant(
+    input: CreateProductVariantInput!
+  ): CreateProductVariantResponse! @auth
+  updateProductVariant(
+    id: Int64!
+    input: UpdateProductVariantInput!
+  ): UpdateProductVariantResponse! @auth
+  deleteProductVariant(id: Int64!): DeleteProductVariantResponse! @auth
+
+  # product ingredients
+  createProductIngredient(
+    input: [CreateProductIngredientInput!]!
+  ): CreateProductIngredientResponse! @auth
+  deleteProductIngredient(variant_id: Int64!): DeleteProductIngredientResponse!
+    @auth
+
+  # product extras
+  createProductExtra(
+    input: CreateProductExtraInput!
+  ): CreateProductExtraResponse! @auth
+  updateProductExtra(
+    id: Int64!
+    input: UpdateProductExtraInput!
+  ): UpdateProductExtraResponse! @auth
+  deleteProductExtra(id: Int64!): DeleteProductExtraResponse! @auth
 }

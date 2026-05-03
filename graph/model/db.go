@@ -177,12 +177,44 @@ func (l *LoginAuditDB) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// ActiveTokenDB represents the database model for active tokens with managed expiry
+type ActiveTokenDB struct {
+	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	Token     string    `gorm:"uniqueIndex;not null;size:500" json:"token"`
+	UserID    int32     `gorm:"not null;index" json:"user_id"`
+	IP        *string   `json:"ip,omitempty"`
+	Browser   *string   `json:"browser,omitempty"`
+	OS        *string   `json:"os,omitempty"`
+	ExpiresAt time.Time `gorm:"not null;index" json:"expires_at"`
+	CreatedAt time.Time `gorm:"not null;index" json:"created_at"`
+	UpdatedAt time.Time `gorm:"not null" json:"updated_at"`
+}
+
+// TableName specifies the table name for ActiveTokenDB
+func (ActiveTokenDB) TableName() string {
+	return "active_tokens"
+}
+
+// BeforeCreate hook for ActiveTokenDB
+func (a *ActiveTokenDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	a.CreatedAt = now
+	a.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ActiveTokenDB
+func (a *ActiveTokenDB) BeforeUpdate(tx *gorm.DB) error {
+	a.UpdatedAt = time.Now()
+	return nil
+}
+
 // BlacklistedTokenDB represents the database model for blacklisted tokens
 type BlacklistedTokenDB struct {
 	ID        int64     `gorm:"primaryKey;autoIncrement" json:"id"`
 	Token     string    `gorm:"uniqueIndex;not null;size:500" json:"token"`
 	UserID    int32     `gorm:"not null;index" json:"user_id"`
-	ExpiresAt time.Time `gorm:"not null;index" json:"expired_at"`
+	ExpiresAt time.Time `gorm:"not null;index" json:"expires_at"`
 	CreatedAt time.Time `gorm:"not null;index" json:"created_at"`
 }
 
@@ -347,19 +379,23 @@ func (p *ProductCategoryDB) BeforeUpdate(tx *gorm.DB) error {
 
 // ProductDB represents the database model for Product
 type ProductDB struct {
-	ID          int64      `gorm:"primaryKey;autoIncrement" json:"id"`
-	SecureID    *string    `gorm:"uniqueIndex" json:"secure_id,omitempty"`
-	Name        string     `gorm:"not null" json:"name"`
-	Image       *string    `json:"image,omitempty"`
-	CategoryID  *int64     `json:"category_id,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	IsActive    bool       `gorm:"default:true" json:"is_active"`
-	DeletedAt   *time.Time `gorm:"index" json:"deleted_at,omitempty"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ID            int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	SecureID      *string    `gorm:"uniqueIndex" json:"secure_id,omitempty"`
+	Name          string     `gorm:"not null" json:"name"`
+	Image         *string    `json:"image,omitempty"`
+	CategoryID    *int64     `json:"category_id,omitempty"`
+	Description   *string    `json:"description,omitempty"`
+	AvailableType *string    `json:"available_type,omitempty"`
+	VariantType   *string    `json:"variant_type,omitempty"`
+	IsActive      bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt     *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
 
 	// Relations
-	Category *ProductCategoryDB `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Category         *ProductCategoryDB  `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Variants         []ProductVariantDB  `gorm:"foreignKey:ProductID" json:"variants,omitempty"`
+	ProductHasExtras []ProductHasExtraDB `gorm:"foreignKey:ProductID" json:"product_has_extras,omitempty"`
 }
 
 // TableName specifies the table name for ProductDB
@@ -378,5 +414,183 @@ func (p *ProductDB) BeforeCreate(tx *gorm.DB) error {
 // BeforeUpdate hook for ProductDB
 func (p *ProductDB) BeforeUpdate(tx *gorm.DB) error {
 	p.UpdatedAt = time.Now()
+	return nil
+}
+
+// DiscountType represents the type of discount
+type DiscountType string
+
+const (
+	DiscountTypePercent DiscountType = "percent"
+	DiscountTypeAmount  DiscountType = "amount"
+)
+
+// DiscountDB represents the database model for Discount
+type DiscountDB struct {
+	ID          int64        `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name        string       `gorm:"not null" json:"name"`
+	Description *string      `json:"description,omitempty"`
+	Icon        *string      `json:"icon,omitempty"`
+	Code        *string      `gorm:"uniqueIndex" json:"code,omitempty"`
+	Type        DiscountType `gorm:"not null" json:"type"`
+	Value       float64      `gorm:"not null" json:"value"`
+	MaxValue    *int32       `json:"max_value,omitempty"`
+	MinOrder    *int32       `json:"min_order,omitempty"`
+	Quota       *int32       `json:"quota,omitempty"`
+	StartAt     *time.Time   `json:"start_at,omitempty"`
+	EndAt       *time.Time   `json:"end_at,omitempty"`
+	IsActive    bool         `gorm:"default:true" json:"is_active"`
+	DeletedAt   *time.Time   `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+// TableName specifies the table name for DiscountDB
+func (DiscountDB) TableName() string {
+	return "discounts"
+}
+
+// BeforeCreate hook for DiscountDB
+func (d *DiscountDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	d.CreatedAt = now
+	d.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for DiscountDB
+func (d *DiscountDB) BeforeUpdate(tx *gorm.DB) error {
+	d.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductVariantDB represents the database model for ProductVariant
+type ProductVariantDB struct {
+	ID            int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Image         *string    `json:"image,omitempty"`
+	ProductID     int64      `gorm:"not null;index" json:"product_id"`
+	Name          string     `gorm:"not null" json:"name"`
+	Price         float64    `gorm:"not null" json:"price"`
+	PriceOriginal *float64   `json:"price_original,omitempty"`
+	IsUnlimited   bool       `gorm:"default:true" json:"is_unlimited"`
+	IsActive      bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt     *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
+
+	// Relations
+	Product     *ProductDB            `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	Ingredients []ProductIngredientDB `gorm:"foreignKey:VariantID" json:"ingredients,omitempty"`
+}
+
+// TableName specifies the table name for ProductVariantDB
+func (ProductVariantDB) TableName() string {
+	return "product_variants"
+}
+
+// BeforeCreate hook for ProductVariantDB
+func (p *ProductVariantDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ProductVariantDB
+func (p *ProductVariantDB) BeforeUpdate(tx *gorm.DB) error {
+	p.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductIngredientDB represents the database model for ProductIngredient
+type ProductIngredientDB struct {
+	ID              int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	VariantID       int64     `gorm:"not null;index" json:"variant_id"`
+	IngredientID    int64     `gorm:"not null;index" json:"ingredient_id"`
+	IngredientValue float64   `gorm:"not null" json:"ingredient_value"`
+	Unit            string    `gorm:"not null" json:"unit"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+
+	// Relations
+	Variant    *ProductVariantDB `gorm:"foreignKey:VariantID" json:"variant,omitempty"`
+	Ingredient *IngredientDB     `gorm:"foreignKey:IngredientID" json:"ingredient,omitempty"`
+}
+
+// TableName specifies the table name for ProductIngredientDB with unique constraint
+func (ProductIngredientDB) TableName() string {
+	return "product_ingredients"
+}
+
+// AddUniqueIndexes adds the unique constraint for variant_id and ingredient_id
+func (ProductIngredientDB) AddUniqueIndexes(db *gorm.DB) error {
+	return db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_variant_ingredient ON product_ingredients(variant_id, ingredient_id)").Error
+}
+
+// BeforeCreate hook for ProductIngredientDB
+func (p *ProductIngredientDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// ProductExtraDB represents the database model for ProductExtra
+type ProductExtraDB struct {
+	ID        int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name      string     `gorm:"not null" json:"name"`
+	Price     float64    `gorm:"not null" json:"price"`
+	IsActive  bool       `gorm:"default:true" json:"is_active"`
+	DeletedAt *time.Time `gorm:"index" json:"deleted_at,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+}
+
+// TableName specifies the table name for ProductExtraDB
+func (ProductExtraDB) TableName() string {
+	return "product_extras"
+}
+
+// BeforeCreate hook for ProductExtraDB
+func (p *ProductExtraDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	return nil
+}
+
+// BeforeUpdate hook for ProductExtraDB
+func (p *ProductExtraDB) BeforeUpdate(tx *gorm.DB) error {
+	p.UpdatedAt = time.Now()
+	return nil
+}
+
+// ProductHasExtraDB represents the database model for ProductHasExtra
+type ProductHasExtraDB struct {
+	ProductID      int64     `gorm:"primaryKey;not null" json:"product_id"`
+	ProductExtraID int64     `gorm:"primaryKey;not null" json:"product_extra_id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+
+	// Relations
+	Product      *ProductDB      `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	ProductExtra *ProductExtraDB `gorm:"foreignKey:ProductExtraID" json:"product_extra,omitempty"`
+}
+
+// TableName specifies the table name for ProductHasExtraDB
+func (ProductHasExtraDB) TableName() string {
+	return "product_has_extras"
+}
+
+// AddUniqueIndexes adds the unique constraint for product_id and product_extra_id
+func (ProductHasExtraDB) AddUniqueIndexes(db *gorm.DB) error {
+	return db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_product_extra ON product_has_extras(product_id, product_extra_id)").Error
+}
+
+// BeforeCreate hook for ProductHasExtraDB
+func (p *ProductHasExtraDB) BeforeCreate(tx *gorm.DB) error {
+	now := time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
 	return nil
 }

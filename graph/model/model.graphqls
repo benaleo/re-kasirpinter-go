@@ -58,6 +58,19 @@ type UsersResponse {
   pagination: PageInfo!
 }
 
+type CustomerSearchData {
+  secure_id: String
+  name: String!
+  phone: String!
+}
+
+type CustomerSearchResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [CustomerSearchData!]!
+}
+
 type CreateOtpResponse {
   code: Int!
   success: Boolean!
@@ -75,6 +88,13 @@ type NewPasswordResponse {
   code: Int!
   success: Boolean!
   message: String!
+}
+
+type RefreshTokenResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: AuthData
 }
 
 type RolesResponse {
@@ -303,6 +323,143 @@ type DeleteProductResponse {
   data: Product
 }
 
+type ProductVariantsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductVariant!]!
+  pagination: PageInfo
+}
+
+type ProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type CreateProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type UpdateProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type DeleteProductVariantResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductVariant
+}
+
+type ProductIngredientsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductIngredient!]!
+  pagination: PageInfo
+}
+
+type ProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductIngredient
+}
+
+type CreateProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductIngredient]
+}
+
+type UpdateProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductIngredient
+}
+
+type DeleteProductIngredientResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductIngredient]
+}
+
+type ProductExtrasResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductExtra!]!
+  pagination: PageInfo
+}
+
+type ProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type CreateProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type UpdateProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type DeleteProductExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: ProductExtra
+}
+
+type ProductHasExtrasResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra!]!
+  pagination: PageInfo
+}
+
+type ProductHasExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra]
+}
+
+type CreateProductHasExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra]
+}
+
+type DeleteProductHasExtraResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [ProductHasExtra]
+}
+
 type IngredientCategory {
   id: Int64!
   name: String!
@@ -369,8 +526,135 @@ type Product {
   category_id: Int64
   category: ProductCategory
   description: String
+  available_type: String
+  variant_type: String
+  is_available: Boolean!
   is_active: Boolean!
   deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+  variants: [ProductVariant!]!
+  product_extra_ids: [Int64!]
+}
+
+enum DiscountType {
+  percent
+  amount
+}
+
+type Discount {
+  id: Int64!
+  name: String!
+  description: String
+  icon: String
+  code: String
+  type: DiscountType!
+  value: Float!
+  max_value: Int
+  min_order: Int
+  quota: Int
+  start_at: Time
+  end_at: Time
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type DiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type DiscountsResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: [Discount!]!
+  pagination: PageInfo
+}
+
+type CreateDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type UpdateDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type DeleteDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: Discount
+}
+
+type CheckDiscountData {
+  type: DiscountType!
+  value: Float!
+  max_value: Float!
+  min_order: Float!
+}
+
+type CheckDiscountResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: CheckDiscountData
+}
+
+type ProductVariant {
+  id: Int64!
+  image: String
+  product_id: Int64!
+  product: Product
+  name: String!
+  price: Float!
+  price_original: Float
+  ingredients: [ProductIngredient!]!
+  available_stock: Float!
+  is_unlimited: Boolean!
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type ProductIngredient {
+  id: Int64!
+  variant_id: Int64!
+  variant: ProductVariant
+  ingredient_id: Int64!
+  ingredient: Ingredient
+  ingredient_value: Float!
+  unit: String!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type ProductExtra {
+  id: Int64!
+  name: String!
+  price: Float!
+  is_active: Boolean!
+  deleted_at: Time
+  created_at: Time!
+  updated_at: Time!
+}
+
+type ProductHasExtra {
+  product_id: Int64!
+  product: Product
+  product_extra_id: Int64!
+  product_extra: ProductExtra
   created_at: Time!
   updated_at: Time!
 }

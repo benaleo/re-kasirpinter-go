@@ -120,13 +120,34 @@ func main() {
 		log.Printf("Warning: Failed to initialize product service: %v", err)
 	}
 
+	// Initialize discount service
+	discountService, err := service.NewDiscountService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize discount service: %v", err)
+	}
+
+	// Initialize product variant service
+	productVariantService, err := service.NewProductVariantService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize product variant service: %v", err)
+	}
+
+	// Initialize product ingredient service
+	productIngredientService := service.NewProductIngredientService(db)
+
+	// Initialize product extra service
+	productExtraService, err := service.NewProductExtraService(db)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize product extra service: %v", err)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
-		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService},
+		Resolvers:  &graph.Resolver{DB: db, R2Service: r2Service, UserService: userService, AuthService: authService, RoleService: roleService, IngredientCategoryService: ingredientCategoryService, IngredientService: ingredientService, IngredientStockService: ingredientStockService, ProductCategoryService: productCategoryService, ProductService: productService, DiscountService: discountService, ProductVariantService: productVariantService, ProductIngredientService: productIngredientService, ProductExtraService: productExtraService},
 		Directives: graph.DirectiveRoot{Auth: graph.AuthDirective},
 	}))
 
@@ -140,6 +161,8 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New[string](100),
 	})
+	srv.Use(&graph.AuthStatusInterceptor{})
+	srv.Use(&graph.LoggingInterceptor{})
 
 	// Wrap handlers with CORS middleware
 	mux := http.NewServeMux()
