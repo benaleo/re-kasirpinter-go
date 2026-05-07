@@ -218,7 +218,7 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 
 	// Get transactions with relations
 	if err := query.Preload("Customer").
-		Preload("Products.Product").
+		Preload("Products").
 		Preload("Products.Extras").
 		Order(sortBy).
 		Limit(limit).
@@ -229,6 +229,18 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 			Success: false,
 			Message: "Failed to retrieve transactions: " + err.Error(),
 		}, err
+	}
+
+	// Manually load products if preload didn't work
+	for i := range transactions {
+		if len(transactions[i].Products) > 0 {
+			for j := range transactions[i].Products {
+				var product model.ProductDB
+				if err := s.DB.Where("id = ?", transactions[i].Products[j].ProductID).First(&product).Error; err == nil {
+					transactions[i].Products[j].Product = &product
+				}
+			}
+		}
 	}
 
 	// Convert to GraphQL
@@ -457,10 +469,30 @@ func (s *TransactionService) convertTransactionDBToGraphQL(tx *model.Transaction
 			})
 		}
 
+		// Convert ProductDB to GraphQL Product
+		var productData *model.Product
+		if product.Product != nil {
+			productData = &model.Product{
+				ID:            product.Product.ID,
+				SecureID:      product.Product.SecureID,
+				Name:          product.Product.Name,
+				Image:         product.Product.Image,
+				CategoryID:    product.Product.CategoryID,
+				Description:   product.Product.Description,
+				AvailableType: product.Product.AvailableType,
+				VariantType:   product.Product.VariantType,
+				IsActive:      product.Product.IsActive,
+				DeletedAt:     product.Product.DeletedAt,
+				CreatedAt:     product.Product.CreatedAt,
+				UpdatedAt:     product.Product.UpdatedAt,
+			}
+		}
+
 		products = append(products, &model.TransactionProduct{
 			ID:            product.ID,
 			TransactionID: product.TransactionID,
 			ProductID:     product.ProductID,
+			Product:       productData,
 			AvailableType: product.AvailableType,
 			VariantType:   product.VariantType,
 			Attribute:     &product.Attribute,
