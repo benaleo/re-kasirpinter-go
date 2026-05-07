@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -80,7 +81,7 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 	// Create transaction
 	transaction := model.TransactionDB{
 		SecureID:      &secureID,
-		Date:          now,
+		Date:          now.Format("2006-01-02"),
 		Sequence:      sequence,
 		Invoice:       invoice,
 		PaymentMethod: input.PaymentMethod,
@@ -182,18 +183,27 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 }
 
 // GetTransactions retrieves paginated transactions
-func (s *TransactionService) GetTransactions(ctx context.Context, pagination model.PaginationInput) (*model.TransactionsResponse, error) {
+func (s *TransactionService) GetTransactions(ctx context.Context, pagination model.PaginationInput, date *string) (*model.TransactionsResponse, error) {
 	var transactions []model.TransactionDB
 	var total int64
 
 	// Parse sort by
 	sortBy := "created_at desc"
 	if pagination.SortBy != nil && *pagination.SortBy != "" {
-		sortBy = *pagination.SortBy
+		// Replace comma with space for proper SQL ORDER BY syntax
+		sortBy = strings.ReplaceAll(*pagination.SortBy, ",", " ")
+	}
+
+	// Build query
+	query := s.DB.Model(&model.TransactionDB{})
+
+	// Filter by date if provided
+	if date != nil && *date != "" {
+		query = query.Where("DATE(date) = ?", *date)
 	}
 
 	// Get total count
-	if err := s.DB.Model(&model.TransactionDB{}).Count(&total).Error; err != nil {
+	if err := query.Count(&total).Error; err != nil {
 		return &model.TransactionsResponse{
 			Code:    500,
 			Success: false,

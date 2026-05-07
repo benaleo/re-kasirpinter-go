@@ -109,7 +109,10 @@ type Query {
   ): ProductExtrasResponse! @auth
 
   # transactions
-  transactions(pagination: PaginationInput): TransactionsResponse! @auth
+  transactions(
+    pagination: PaginationInput
+    date: String
+  ): TransactionsResponse! @auth
   transaction(id: String!): TransactionResponse! @auth
 }
 
