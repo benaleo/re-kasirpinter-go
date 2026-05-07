@@ -199,7 +199,7 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 
 	// Filter by date if provided
 	if date != nil && *date != "" {
-		query = query.Where("DATE(date) = ?", *date)
+		query = query.Where("date = ?", *date)
 	}
 
 	// Get total count
@@ -217,7 +217,7 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 	offset := (page - 1) * limit
 
 	// Get transactions with relations
-	if err := s.DB.Preload("Customer").
+	if err := query.Preload("Customer").
 		Preload("Products.Product").
 		Preload("Products.Extras").
 		Order(sortBy).
