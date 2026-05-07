@@ -163,6 +163,7 @@ type ComplexityRoot struct {
 	}
 
 	CustomerSearchData struct {
+		Email    func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Phone    func(childComplexity int) int
 		SecureID func(childComplexity int) int
@@ -1398,6 +1399,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.CreateUserResponse.Success(childComplexity), true
 
+	case "CustomerSearchData.email":
+		if e.ComplexityRoot.CustomerSearchData.Email == nil {
+			break
+		}
+
+		return e.ComplexityRoot.CustomerSearchData.Email(childComplexity), true
 	case "CustomerSearchData.name":
 		if e.ComplexityRoot.CustomerSearchData.Name == nil {
 			break
@@ -8094,6 +8101,35 @@ func (ec *executionContext) fieldContext_CustomerSearchData_phone(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _CustomerSearchData_email(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CustomerSearchData_email,
+		func(ctx context.Context) (any, error) {
+			return obj.Email, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CustomerSearchData_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomerSearchData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CustomerSearchResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.CustomerSearchResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -8211,6 +8247,8 @@ func (ec *executionContext) fieldContext_CustomerSearchResponse_data(_ context.C
 				return ec.fieldContext_CustomerSearchData_name(ctx, field)
 			case "phone":
 				return ec.fieldContext_CustomerSearchData_phone(ctx, field)
+			case "email":
+				return ec.fieldContext_CustomerSearchData_email(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CustomerSearchData", field.Name)
 		},
@@ -22039,6 +22077,8 @@ func (ec *executionContext) fieldContext_Transaction_customer(_ context.Context,
 				return ec.fieldContext_CustomerSearchData_name(ctx, field)
 			case "phone":
 				return ec.fieldContext_CustomerSearchData_phone(ctx, field)
+			case "email":
+				return ec.fieldContext_CustomerSearchData_email(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CustomerSearchData", field.Name)
 		},
@@ -30714,6 +30754,8 @@ func (ec *executionContext) _CustomerSearchData(ctx context.Context, sel ast.Sel
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "email":
+			out.Values[i] = ec._CustomerSearchData_email(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

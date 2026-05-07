@@ -62,6 +62,7 @@ type CustomerSearchData {
   secure_id: String
   name: String!
   phone: String!
+  email: String
 }
 
 type CustomerSearchResponse {

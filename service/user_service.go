@@ -490,13 +490,14 @@ func (s *UserService) CustomerSearch(keyword string) (*model.CustomerSearchRespo
 		}, nil
 	}
 
-	// Create slice of CustomerSearchData with only the required fields
+	// Create slice of CustomerSearchData with only required fields
 	var customersData []*model.CustomerSearchData
 	for _, userDB := range usersDB {
 		customerData := &model.CustomerSearchData{
 			SecureID: userDB.SecureID,
 			Name:     userDB.Name,
 			Phone:    userDB.Phone,
+			Email:    &userDB.Email,
 		}
 		customersData = append(customersData, customerData)
 	}

@@ -254,6 +254,7 @@ type CustomerSearchData struct {
 	SecureID *string `json:"secure_id,omitempty"`
 	Name     string  `json:"name"`
 	Phone    string  `json:"phone"`
+	Email    *string `json:"email,omitempty"`
 }
 
 type CustomerSearchResponse struct {
