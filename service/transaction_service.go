@@ -605,8 +605,13 @@ func (s *TransactionService) convertTransactionDBToGraphQL(tx *model.Transaction
 		})
 	}
 
+	var id string
+	if tx.SecureID != nil {
+		id = *tx.SecureID
+	}
+
 	return &model.Transaction{
-		ID:            tx.ID,
+		ID:            id,
 		Date:          tx.Date,
 		Sequence:      tx.Sequence,
 		Invoice:       tx.Invoice,

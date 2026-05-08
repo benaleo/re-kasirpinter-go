@@ -19855,15 +19855,15 @@ func (ec *executionContext) _Transaction_id(ctx context.Context, field graphql.C
 			return obj.ID, nil
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v int64) graphql.Marshaler {
-			return ec.marshalNInt642int64(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
 		},
 		true,
 		true,
 	)
 }
 func (ec *executionContext) fieldContext_Transaction_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	return graphql.NewScalarFieldContext("Transaction", field, false, false, errors.New("field of type Int64 does not have child fields"))
+	return graphql.NewScalarFieldContext("Transaction", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) _Transaction_date(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {

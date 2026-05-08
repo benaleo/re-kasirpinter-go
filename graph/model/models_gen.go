@@ -720,7 +720,7 @@ type RolesResponse struct {
 }
 
 type Transaction struct {
-	ID            int64                 `json:"id"`
+	ID            string                `json:"id"`
 	Date          string                `json:"date"`
 	Sequence      int32                 `json:"sequence"`
 	Invoice       string                `json:"invoice"`

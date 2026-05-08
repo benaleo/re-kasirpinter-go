@@ -663,7 +663,7 @@ type ProductHasExtra {
 }
 
 type Transaction {
-  id: Int64!
+  id: String!
   date: String!
   sequence: Int32!
   invoice: String!
