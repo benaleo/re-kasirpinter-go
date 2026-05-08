@@ -123,7 +123,7 @@ func main() {
 	}
 
 	// Initialize product service
-	productService, err := service.NewProductService(db)
+	productService, err := service.NewProductService(db, config.RedisClient)
 	if err != nil {
 		log.Printf("Warning: Failed to initialize product service: %v", err)
 	}
