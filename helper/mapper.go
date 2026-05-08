@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"math"
 	"re-kasirpinter-go/graph/model"
 )
 
@@ -10,6 +11,14 @@ func Float64FromInt32(v *int32) float64 {
 		return 0
 	}
 	return float64(*v)
+}
+
+// Int32FromPtr converts *int32 to int32, returns 0 if nil
+func Int32FromPtr(v *int32) int32 {
+	if v == nil {
+		return 0
+	}
+	return *v
 }
 
 // ToGraphQLUser converts UserDB to GraphQL User model
@@ -73,6 +82,7 @@ func ToGraphQLIngredientCategory(ingredientCategoryDB model.IngredientCategoryDB
 		Name:        ingredientCategoryDB.Name,
 		Unit:        ingredientCategoryDB.Unit,
 		ConvertUnit: ingredientCategoryDB.ConvertUnit,
+		ConvertCalc: ingredientCategoryDB.ConvertCalc,
 		IsActive:    ingredientCategoryDB.IsActive,
 		DeletedAt:   ingredientCategoryDB.DeletedAt,
 		CreatedAt:   ingredientCategoryDB.CreatedAt,
@@ -139,8 +149,8 @@ func ToGraphQLIngredientStock(ingredientStockDB model.IngredientStockDB) *model.
 		Code:         ingredientStockDB.Code,
 		Qty:          ingredientStockDB.Qty,
 		Type:         model.IngredientStockType(ingredientStockDB.Type),
-		Capital:      ingredientStockDB.Capital,
-		CapitalItem:  ingredientStockDB.CapitalItem,
+		Capital:      math.Round(ingredientStockDB.Capital*100) / 100,
+		CapitalItem:  math.Round(ingredientStockDB.CapitalItem*100) / 100,
 		Message:      ingredientStockDB.Message,
 		Image:        ingredientStockDB.Image,
 		DeletedAt:    ingredientStockDB.DeletedAt,

@@ -79,6 +79,7 @@ func (s *IngredientCategoryService) CreateIngredientCategory(input model.CreateI
 		Name:        input.Name,
 		Unit:        input.Unit,
 		ConvertUnit: input.ConvertUnit,
+		ConvertCalc: helper.Int32FromPtr(input.ConvertCalc),
 		IsActive:    input.IsActive,
 	}
 
@@ -118,6 +119,7 @@ func (s *IngredientCategoryService) UpdateIngredientCategory(id int64, input mod
 	// Update fields
 	categoryDB.Name = input.Name
 	categoryDB.Unit = input.Unit
+	categoryDB.ConvertCalc = helper.Int32FromPtr(input.ConvertCalc)
 	categoryDB.ConvertUnit = input.ConvertUnit
 	categoryDB.IsActive = input.IsActive
 

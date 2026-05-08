@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"re-kasirpinter-go/graph/model"
+	"re-kasirpinter-go/helper"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -142,8 +143,8 @@ func AuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *Claims {
-	raw, _ := ctx.Value(userCtxKey).(*Claims)
+func ForContext(ctx context.Context) *helper.Claims {
+	raw, _ := ctx.Value(userCtxKey).(*helper.Claims)
 	return raw
 }
 
@@ -254,7 +255,7 @@ func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver) 
 		if field.Field.Name == "logout" {
 			// Allow logout to proceed with expired token
 			// Create a minimal user context for logout processing
-			expiredUser := &Claims{
+			expiredUser := &helper.Claims{
 				Purpose: "login",
 			}
 			ctx = context.WithValue(ctx, userCtxKey, expiredUser)

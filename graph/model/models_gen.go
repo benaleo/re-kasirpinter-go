@@ -51,6 +51,7 @@ type CreateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
 	ConvertUnit *string `json:"convert_unit,omitempty"`
+	ConvertCalc *int32  `json:"convert_calc,omitempty"`
 	IsActive    bool    `json:"is_active"`
 }
 
@@ -204,6 +205,46 @@ type CreateRoleResponse struct {
 	Data    *UserRole `json:"data,omitempty"`
 }
 
+type CreateTransactionExtraInput struct {
+	ExtraName  string  `json:"extra_name"`
+	Quantity   int32   `json:"quantity"`
+	ExtraPrice float64 `json:"extra_price"`
+}
+
+type CreateTransactionInput struct {
+	PaymentMethod string                           `json:"payment_method"`
+	TotalAmount   float64                          `json:"total_amount"`
+	TotalBilled   float64                          `json:"total_billed"`
+	Tax           float64                          `json:"tax"`
+	Subtotal      float64                          `json:"subtotal"`
+	Discount      float64                          `json:"discount"`
+	CustomerID    *string                          `json:"customer_id,omitempty"`
+	CreatedBy     *string                          `json:"created_by,omitempty"`
+	IsCompleted   *bool                            `json:"is_completed,omitempty"`
+	Products      []*CreateTransactionProductInput `json:"products"`
+}
+
+type CreateTransactionProductInput struct {
+	ProductID     int64                          `json:"product_id"`
+	AvailableType string                         `json:"available_type"`
+	VariantType   string                         `json:"variant_type"`
+	Attribute     *string                        `json:"attribute,omitempty"`
+	VariantName   string                         `json:"variant_name"`
+	Quantity      int32                          `json:"quantity"`
+	ProductPrice  float64                        `json:"product_price"`
+	TotalExtras   float64                        `json:"total_extras"`
+	TotalPrice    float64                        `json:"total_price"`
+	Notes         *string                        `json:"notes,omitempty"`
+	Extras        []*CreateTransactionExtraInput `json:"extras"`
+}
+
+type CreateTransactionResponse struct {
+	Code    int32        `json:"code"`
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    *Transaction `json:"data,omitempty"`
+}
+
 type CreateUserResponse struct {
 	Code    int32  `json:"code"`
 	Success bool   `json:"success"`
@@ -215,6 +256,7 @@ type CustomerSearchData struct {
 	SecureID *string `json:"secure_id,omitempty"`
 	Name     string  `json:"name"`
 	Phone    string  `json:"phone"`
+	Email    *string `json:"email,omitempty"`
 }
 
 type CustomerSearchResponse struct {
@@ -301,6 +343,13 @@ type DeleteRoleResponse struct {
 	Data    *UserRole `json:"data,omitempty"`
 }
 
+type DeleteTransactionResponse struct {
+	Code    int32        `json:"code"`
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    *Transaction `json:"data,omitempty"`
+}
+
 type DeleteUserResponse struct {
 	Code    int32  `json:"code"`
 	Success bool   `json:"success"`
@@ -368,6 +417,7 @@ type IngredientCategory struct {
 	Name        string     `json:"name"`
 	Unit        string     `json:"unit"`
 	ConvertUnit *string    `json:"convert_unit,omitempty"`
+	ConvertCalc int32      `json:"convert_calc"`
 	IsActive    bool       `json:"is_active"`
 	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
@@ -419,6 +469,7 @@ type IngredientStocksResponse struct {
 	TotalStocks    *float64           `json:"total_stocks,omitempty"`
 	Unit           *string            `json:"unit,omitempty"`
 	ConvertUnit    *string            `json:"convert_unit,omitempty"`
+	ConvertCalc    *int32             `json:"convert_calc,omitempty"`
 	Data           []*IngredientStock `json:"data"`
 	Pagination     *PageInfo          `json:"pagination,omitempty"`
 }
@@ -668,6 +719,72 @@ type RolesResponse struct {
 	Data    []*UserRole `json:"data"`
 }
 
+type Transaction struct {
+	ID            string                `json:"id"`
+	Date          string                `json:"date"`
+	Sequence      int32                 `json:"sequence"`
+	Invoice       string                `json:"invoice"`
+	PaymentMethod string                `json:"payment_method"`
+	TotalAmount   float64               `json:"total_amount"`
+	TotalBilled   float64               `json:"total_billed"`
+	Tax           float64               `json:"tax"`
+	Subtotal      float64               `json:"subtotal"`
+	Discount      float64               `json:"discount"`
+	CustomerID    *string               `json:"customer_id,omitempty"`
+	Customer      *CustomerSearchData   `json:"customer,omitempty"`
+	IsCompleted   bool                  `json:"is_completed"`
+	IsCanceled    bool                  `json:"is_canceled"`
+	CreatedAt     time.Time             `json:"created_at"`
+	CreatedBy     *string               `json:"created_by,omitempty"`
+	UpdatedAt     time.Time             `json:"updated_at"`
+	UpdatedBy     *string               `json:"updated_by,omitempty"`
+	Products      []*TransactionProduct `json:"products"`
+}
+
+type TransactionExtra struct {
+	ID                   int64               `json:"id"`
+	TransactionProductID int64               `json:"transaction_product_id"`
+	TransactionProduct   *TransactionProduct `json:"transaction_product,omitempty"`
+	ExtraName            string              `json:"extra_name"`
+	Quantity             int32               `json:"quantity"`
+	ExtraPrice           float64             `json:"extra_price"`
+	CreatedAt            time.Time           `json:"created_at"`
+}
+
+type TransactionProduct struct {
+	ID            int64               `json:"id"`
+	TransactionID int64               `json:"transaction_id"`
+	Transaction   *Transaction        `json:"transaction,omitempty"`
+	ProductID     int64               `json:"product_id"`
+	Product       *Product            `json:"product,omitempty"`
+	AvailableType string              `json:"available_type"`
+	VariantType   string              `json:"variant_type"`
+	Attribute     *string             `json:"attribute,omitempty"`
+	VariantName   string              `json:"variant_name"`
+	Quantity      int32               `json:"quantity"`
+	ProductPrice  float64             `json:"product_price"`
+	TotalExtras   float64             `json:"total_extras"`
+	TotalPrice    float64             `json:"total_price"`
+	Notes         *string             `json:"notes,omitempty"`
+	CreatedAt     time.Time           `json:"created_at"`
+	Extras        []*TransactionExtra `json:"extras"`
+}
+
+type TransactionResponse struct {
+	Code    int32        `json:"code"`
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    *Transaction `json:"data,omitempty"`
+}
+
+type TransactionsResponse struct {
+	Code       int32          `json:"code"`
+	Success    bool           `json:"success"`
+	Message    string         `json:"message"`
+	Data       []*Transaction `json:"data"`
+	Pagination *PageInfo      `json:"pagination,omitempty"`
+}
+
 type UpdateDiscountInput struct {
 	Name        *string       `json:"name,omitempty"`
 	Description *string       `json:"description,omitempty"`
@@ -694,6 +811,7 @@ type UpdateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
 	ConvertUnit *string `json:"convert_unit,omitempty"`
+	ConvertCalc *int32  `json:"convert_calc,omitempty"`
 	IsActive    bool    `json:"is_active"`
 }
 
@@ -818,6 +936,27 @@ type UpdateRoleResponse struct {
 	Success bool      `json:"success"`
 	Message string    `json:"message"`
 	Data    *UserRole `json:"data,omitempty"`
+}
+
+type UpdateTransactionInput struct {
+	PaymentMethod *string                          `json:"payment_method,omitempty"`
+	TotalAmount   *float64                         `json:"total_amount,omitempty"`
+	TotalBilled   *float64                         `json:"total_billed,omitempty"`
+	Tax           *float64                         `json:"tax,omitempty"`
+	Subtotal      *float64                         `json:"subtotal,omitempty"`
+	Discount      *float64                         `json:"discount,omitempty"`
+	CustomerID    *string                          `json:"customer_id,omitempty"`
+	IsCompleted   *bool                            `json:"is_completed,omitempty"`
+	IsCanceled    *bool                            `json:"is_canceled,omitempty"`
+	UpdatedBy     *string                          `json:"updated_by,omitempty"`
+	Products      []*CreateTransactionProductInput `json:"products"`
+}
+
+type UpdateTransactionResponse struct {
+	Code    int32        `json:"code"`
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    *Transaction `json:"data,omitempty"`
 }
 
 type UpdateUserResponse struct {

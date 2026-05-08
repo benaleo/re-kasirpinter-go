@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"math"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
 	"time"
@@ -76,26 +77,34 @@ func (s *IngredientStockService) IngredientStocks(pagination *model.PaginationIn
 	var totalStocks *float64
 	var unit *string
 	var convertUnit *string
+	var convertCalc *int32
 
-	if ingredientID != nil && len(stocksDB) > 0 {
-		// Get ingredient name from first stock
-		if stocksDB[0].Ingredient != nil {
-			name := stocksDB[0].Ingredient.Name
+	if ingredientID != nil {
+		// Query ingredient data separately to ensure it's available even when no stocks exist
+		var ingredientDB model.IngredientDB
+		ingredientResult := s.DB.Preload("Category").Where("id = ? AND deleted_at IS NULL", *ingredientID).First(&ingredientDB)
+
+		if ingredientResult.Error == nil {
+			name := ingredientDB.Name
 			ingredientName = &name
+
+			// Get unit, convert_unit, and convert_calc from ingredient's category
+			if ingredientDB.Category != nil {
+				u := ingredientDB.Category.Unit
+				unit = &u
+				convertUnit = ingredientDB.Category.ConvertUnit
+				calc := ingredientDB.Category.ConvertCalc
+				convertCalc = &calc
+			}
 		}
 
-		// Calculate total stocks
-		total := 0.0
-		for _, stock := range stocksDB {
-			total += stock.Qty
-		}
-		totalStocks = &total
-
-		// Get unit and convert_unit from ingredient's category
-		if stocksDB[0].Ingredient != nil && stocksDB[0].Ingredient.Category != nil {
-			u := stocksDB[0].Ingredient.Category.Unit
-			unit = &u
-			convertUnit = stocksDB[0].Ingredient.Category.ConvertUnit
+		// Calculate total stocks from the stocks data
+		if len(stocksDB) > 0 {
+			total := 0.0
+			for _, stock := range stocksDB {
+				total += stock.Qty
+			}
+			totalStocks = &total
 		}
 	}
 
@@ -107,14 +116,15 @@ func (s *IngredientStockService) IngredientStocks(pagination *model.PaginationIn
 		TotalStocks:    totalStocks,
 		Unit:           unit,
 		ConvertUnit:    convertUnit,
+		ConvertCalc:    convertCalc,
 		Data:           stocks,
 		Pagination:     paginationResult.PageInfo,
 	}, nil
 }
 
 func (s *IngredientStockService) CreateIngredientStock(input model.CreateIngredientStockInput) (*model.CreateIngredientStockResponse, error) {
-	// Calculate capital_item as capital divided by qty
-	capitalItem := input.Capital / input.Qty
+	// Calculate capital_item as capital divided by qty, rounded to 2 decimal places
+	capitalItem := math.Round(input.Capital/input.Qty*100) / 100
 
 	// Create ingredient stock DB model
 	stockDB := model.IngredientStockDB{
@@ -190,9 +200,9 @@ func (s *IngredientStockService) UpdateIngredientStock(id int64, input model.Upd
 		stockDB.IngredientID = *input.IngredientID
 	}
 
-	// Recalculate capital_item if capital or qty changed
+	// Recalculate capital_item if capital or qty changed, rounded to 2 decimal places
 	if needsRecalculation && stockDB.Qty > 0 {
-		stockDB.CapitalItem = stockDB.Capital / stockDB.Qty
+		stockDB.CapitalItem = math.Round(stockDB.Capital/stockDB.Qty*100) / 100
 	}
 
 	// Save to database
