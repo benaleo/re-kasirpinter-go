@@ -220,6 +220,7 @@ type CreateTransactionInput struct {
 	Discount      float64                          `json:"discount"`
 	CustomerID    *string                          `json:"customer_id,omitempty"`
 	CreatedBy     *string                          `json:"created_by,omitempty"`
+	IsCompleted   *bool                            `json:"is_completed,omitempty"`
 	Products      []*CreateTransactionProductInput `json:"products"`
 }
 

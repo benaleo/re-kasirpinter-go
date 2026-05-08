@@ -92,7 +92,7 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 		Discount:      input.Discount,
 		CustomerID:    input.CustomerID,
 		CreatedBy:     input.CreatedBy,
-		IsCompleted:   false,
+		IsCompleted:   input.IsCompleted != nil && *input.IsCompleted,
 		IsCanceled:    false,
 	}
 

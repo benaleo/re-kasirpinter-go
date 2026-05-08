@@ -25052,7 +25052,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "created_by", "products"}
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "created_by", "is_completed", "products"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25115,6 +25115,13 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.CreatedBy = data
+		case "is_completed":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_completed"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsCompleted = data
 		case "products":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("products"))
 			data, err := ec.unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx, v)

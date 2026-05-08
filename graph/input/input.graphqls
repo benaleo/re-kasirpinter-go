@@ -234,6 +234,7 @@ input CreateTransactionInput {
   discount: Float!
   customer_id: String
   created_by: String
+  is_completed: Boolean
   products: [CreateTransactionProductInput!]!
 }
 
