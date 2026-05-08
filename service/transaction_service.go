@@ -381,15 +381,30 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID str
 	}
 
 	// Remove all existing transaction products and their extras for this transaction
-	if err := tx.Where("transaction_id = ?", transaction.ID).Delete(&model.TransactionExtraDB{}).Error; err != nil {
+	// First, get all transaction product IDs for this transaction
+	var transactionProductIDs []int64
+	if err := tx.Model(&model.TransactionProductDB{}).Where("transaction_id = ?", transaction.ID).Pluck("id", &transactionProductIDs).Error; err != nil {
 		tx.Rollback()
 		return &model.UpdateTransactionResponse{
 			Code:    500,
 			Success: false,
-			Message: "Failed to delete transaction extras: " + err.Error(),
+			Message: "Failed to get transaction product IDs: " + err.Error(),
 		}, err
 	}
 
+	// Delete transaction extras using the correct column (transaction_product_id)
+	if len(transactionProductIDs) > 0 {
+		if err := tx.Where("transaction_product_id IN ?", transactionProductIDs).Delete(&model.TransactionExtraDB{}).Error; err != nil {
+			tx.Rollback()
+			return &model.UpdateTransactionResponse{
+				Code:    500,
+				Success: false,
+				Message: "Failed to delete transaction extras: " + err.Error(),
+			}, err
+		}
+	}
+
+	// Delete transaction products
 	if err := tx.Where("transaction_id = ?", transaction.ID).Delete(&model.TransactionProductDB{}).Error; err != nil {
 		tx.Rollback()
 		return &model.UpdateTransactionResponse{
