@@ -2,22 +2,26 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
 	"strings"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type TransactionService struct {
-	DB *gorm.DB
+	DB    *gorm.DB
+	Redis *redis.Client
 }
 
-func NewTransactionService(db *gorm.DB) *TransactionService {
+func NewTransactionService(db *gorm.DB, redisClient *redis.Client) *TransactionService {
 	return &TransactionService{
-		DB: db,
+		DB:    db,
+		Redis: redisClient,
 	}
 }
 
@@ -174,6 +178,9 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 		}, err
 	}
 
+	// Evict cache
+	s.evictTransactionCache(ctx, result.SecureID)
+
 	return &model.CreateTransactionResponse{
 		Code:    201,
 		Success: true,
@@ -186,6 +193,43 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 func (s *TransactionService) GetTransactions(ctx context.Context, pagination model.PaginationInput, date *string, isCompleted *bool, isCanceled *bool) (*model.TransactionsResponse, error) {
 	var transactions []model.TransactionDB
 	var total int64
+
+	// Generate cache key
+	limitVal := int32(0)
+	if pagination.Limit != nil {
+		limitVal = *pagination.Limit
+	}
+	pageVal := int32(0)
+	if pagination.Page != nil {
+		pageVal = *pagination.Page
+	}
+	dateStr := ""
+	if date != nil {
+		dateStr = *date
+	}
+	isCompletedStr := ""
+	if isCompleted != nil {
+		isCompletedStr = fmt.Sprintf("%v", *isCompleted)
+	}
+	isCanceledStr := ""
+	if isCanceled != nil {
+		isCanceledStr = fmt.Sprintf("%v", *isCanceled)
+	}
+	cacheKey := fmt.Sprintf("transactions:%v:%v:%s:%s:%s", limitVal, pageVal, dateStr, isCompletedStr, isCanceledStr)
+
+	// Try to get from cache first
+	if s.Redis != nil {
+		cachedData, err := s.Redis.Get(ctx, cacheKey).Result()
+		if err == nil {
+			var response model.TransactionsResponse
+			if err := json.Unmarshal([]byte(cachedData), &response); err == nil {
+				fmt.Printf("[Redis] Loading transactions from cache: %s\n", cacheKey)
+				return &response, nil
+			}
+		}
+	}
+
+	fmt.Printf("[DB] Loading transactions from database\n")
 
 	// Parse sort by
 	sortBy := "created_at desc"
@@ -270,18 +314,46 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 		HasPreviousPage: page > 1,
 	}
 
-	return &model.TransactionsResponse{
+	response := &model.TransactionsResponse{
 		Code:       200,
 		Success:    true,
 		Message:    "Transactions retrieved successfully",
 		Data:       result,
 		Pagination: &paginationInfo,
-	}, nil
+	}
+
+	// Cache the result
+	if s.Redis != nil {
+		cachedData, err := json.Marshal(response)
+		if err == nil {
+			s.Redis.Set(ctx, cacheKey, cachedData, 5*time.Minute)
+			fmt.Printf("[Redis] Cached transactions list: %s\n", cacheKey)
+		}
+	}
+
+	return response, nil
 }
 
 // GetTransactionByID retrieves a single transaction by secure_id
 func (s *TransactionService) GetTransactionByID(ctx context.Context, secureID string) (*model.TransactionResponse, error) {
 	var transaction model.TransactionDB
+
+	// Generate cache key
+	cacheKey := fmt.Sprintf("transaction:%s", secureID)
+
+	// Try to get from cache first
+	if s.Redis != nil {
+		cachedData, err := s.Redis.Get(ctx, cacheKey).Result()
+		if err == nil {
+			var response model.TransactionResponse
+			if err := json.Unmarshal([]byte(cachedData), &response); err == nil {
+				fmt.Printf("[Redis] Loading transaction from cache: %s\n", cacheKey)
+				return &response, nil
+			}
+		}
+	}
+
+	fmt.Printf("[DB] Loading transaction from database: %s\n", secureID)
 
 	if err := s.DB.Preload("Customer").
 		Preload("Products.Product").
@@ -302,12 +374,23 @@ func (s *TransactionService) GetTransactionByID(ctx context.Context, secureID st
 		}, err
 	}
 
-	return &model.TransactionResponse{
+	response := &model.TransactionResponse{
 		Code:    200,
 		Success: true,
 		Message: "Transaction retrieved successfully",
 		Data:    s.convertTransactionDBToGraphQL(&transaction),
-	}, nil
+	}
+
+	// Cache the result
+	if s.Redis != nil {
+		cachedData, err := json.Marshal(response)
+		if err == nil {
+			s.Redis.Set(ctx, cacheKey, cachedData, 5*time.Minute)
+			fmt.Printf("[Redis] Cached transaction: %s\n", cacheKey)
+		}
+	}
+
+	return response, nil
 }
 
 // UpdateTransaction updates an existing transaction
@@ -483,6 +566,9 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID str
 		}, err
 	}
 
+	// Evict cache
+	s.evictTransactionCache(ctx, result.SecureID)
+
 	return &model.UpdateTransactionResponse{
 		Code:    200,
 		Success: true,
@@ -553,6 +639,9 @@ func (s *TransactionService) CancelTransaction(ctx context.Context, secureID str
 			Message: "Failed to retrieve updated transaction: " + err.Error(),
 		}, err
 	}
+
+	// Evict cache
+	s.evictTransactionCache(ctx, result.SecureID)
 
 	return &model.UpdateTransactionResponse{
 		Code:    200,
@@ -651,4 +740,25 @@ func (s *TransactionService) convertTransactionDBToGraphQL(tx *model.Transaction
 		UpdatedBy:     tx.UpdatedBy,
 		Products:      products,
 	}
+}
+
+// evictTransactionCache evicts transaction-related cache entries
+func (s *TransactionService) evictTransactionCache(ctx context.Context, secureID *string) {
+	if s.Redis == nil || secureID == nil {
+		return
+	}
+
+	// Evict single transaction cache
+	cacheKey := fmt.Sprintf("transaction:%s", *secureID)
+	s.Redis.Del(ctx, cacheKey)
+	fmt.Printf("[Redis] Evicted transaction cache: %s\n", cacheKey)
+
+	// Evict all transaction list caches (pattern-based deletion)
+	iter := s.Redis.Scan(ctx, 0, "transactions:*", 0).Iterator()
+	count := 0
+	for iter.Next(ctx) {
+		s.Redis.Del(ctx, iter.Val())
+		count++
+	}
+	fmt.Printf("[Redis] Evicted %d transaction list cache entries\n", count)
 }

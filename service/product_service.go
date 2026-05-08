@@ -2,21 +2,24 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type ProductService struct {
 	DB        *gorm.DB
+	Redis     *redis.Client
 	R2Service *R2Service
 }
 
-func NewProductService(db *gorm.DB) (*ProductService, error) {
+func NewProductService(db *gorm.DB, redisClient *redis.Client) (*ProductService, error) {
 	r2Service, err := NewR2Service()
 	if err != nil {
 		// Log the error but don't fail service creation
@@ -26,11 +29,50 @@ func NewProductService(db *gorm.DB) (*ProductService, error) {
 
 	return &ProductService{
 		DB:        db,
+		Redis:     redisClient,
 		R2Service: r2Service,
 	}, nil
 }
 
-func (s *ProductService) Products(pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error) {
+// generateProductCacheKey generates a cache key for product list queries
+func (s *ProductService) generateProductCacheKey(pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) string {
+	limitVal := int32(0)
+	if pagination != nil && pagination.Limit != nil {
+		limitVal = *pagination.Limit
+	}
+	pageVal := int32(0)
+	if pagination != nil && pagination.Page != nil {
+		pageVal = *pagination.Page
+	}
+	isActiveStr := ""
+	if isActive != nil {
+		isActiveStr = fmt.Sprintf("%v", *isActive)
+	}
+	productExtraIdsStr := ""
+	if productExtraIds != nil {
+		productExtraIdsStr = fmt.Sprintf("%v", *productExtraIds)
+	}
+	return fmt.Sprintf("products:%v:%v:%s:%s", limitVal, pageVal, isActiveStr, productExtraIdsStr)
+}
+
+func (s *ProductService) Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error) {
+	// Generate cache key
+	cacheKey := s.generateProductCacheKey(pagination, isActive, productExtraIds)
+
+	// Try to get from cache first
+	if s.Redis != nil {
+		cachedData, err := s.Redis.Get(ctx, cacheKey).Result()
+		if err == nil {
+			var response model.ProductsResponse
+			if err := json.Unmarshal([]byte(cachedData), &response); err == nil {
+				fmt.Printf("[Redis] Loading products from cache: %s\n", cacheKey)
+				return &response, nil
+			}
+		}
+	}
+
+	fmt.Printf("[DB] Loading products from database\n")
+
 	// Parse pagination parameters
 	params := helper.ParsePagination(pagination)
 
@@ -87,16 +129,27 @@ func (s *ProductService) Products(pagination *model.PaginationInput, isActive *b
 		products[i] = helper.ToGraphQLProduct(productDB)
 	}
 
-	return &model.ProductsResponse{
+	response := &model.ProductsResponse{
 		Code:       200,
 		Success:    true,
 		Message:    "products retrieved successfully",
 		Data:       products,
 		Pagination: paginationResult.PageInfo,
-	}, nil
+	}
+
+	// Cache the result
+	if s.Redis != nil {
+		cachedData, err := json.Marshal(response)
+		if err == nil {
+			s.Redis.Set(ctx, cacheKey, cachedData, 5*time.Minute)
+			fmt.Printf("[Redis] Cached products list: %s\n", cacheKey)
+		}
+	}
+
+	return response, nil
 }
 
-func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.CreateProductResponse, error) {
+func (s *ProductService) CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.CreateProductResponse, error) {
 	// Generate UUID v4 for secure_id
 	secureID := uuid.New().String()
 
@@ -173,6 +226,9 @@ func (s *ProductService) CreateProduct(input model.CreateProductInput) (*model.C
 
 	// Convert DB model to GraphQL model
 	product := helper.ToGraphQLProduct(productDB)
+
+	// Evict cache
+	s.evictProductCache(ctx)
 
 	return &model.CreateProductResponse{
 		Code:    201,
@@ -283,6 +339,9 @@ func (s *ProductService) UpdateProduct(ctx context.Context, id int64, input mode
 	// Convert DB model to GraphQL model
 	product := helper.ToGraphQLProduct(productDB)
 
+	// Evict cache
+	s.evictProductCache(ctx)
+
 	return &model.UpdateProductResponse{
 		Code:    200,
 		Success: true,
@@ -291,7 +350,7 @@ func (s *ProductService) UpdateProduct(ctx context.Context, id int64, input mode
 	}, nil
 }
 
-func (s *ProductService) DeleteProduct(id int64) (*model.DeleteProductResponse, error) {
+func (s *ProductService) DeleteProduct(ctx context.Context, id int64) (*model.DeleteProductResponse, error) {
 	// Find product by ID
 	var productDB model.ProductDB
 	result := s.DB.Where("id = ? AND deleted_at IS NULL", id).First(&productDB)
@@ -323,10 +382,29 @@ func (s *ProductService) DeleteProduct(id int64) (*model.DeleteProductResponse, 
 	// Convert DB model to GraphQL model
 	product := helper.ToGraphQLProduct(productDB)
 
+	// Evict cache
+	s.evictProductCache(ctx)
+
 	return &model.DeleteProductResponse{
 		Code:    200,
 		Success: true,
 		Message: "product deleted successfully",
 		Data:    product,
 	}, nil
+}
+
+// evictProductCache evicts product-related cache entries
+func (s *ProductService) evictProductCache(ctx context.Context) {
+	if s.Redis == nil {
+		return
+	}
+
+	// Evict all product list caches (pattern-based deletion)
+	iter := s.Redis.Scan(ctx, 0, "products:*", 0).Iterator()
+	count := 0
+	for iter.Next(ctx) {
+		s.Redis.Del(ctx, iter.Val())
+		count++
+	}
+	fmt.Printf("[Redis] Evicted %d product cache entries\n", count)
 }

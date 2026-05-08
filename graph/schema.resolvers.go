@@ -400,7 +400,7 @@ func (r *mutationResolver) CreateProduct(ctx context.Context, input model.Create
 			Message: "product service not initialized",
 		}, nil
 	}
-	return r.ProductService.CreateProduct(input)
+	return r.ProductService.CreateProduct(ctx, input)
 }
 
 // UpdateProduct is the resolver for the updateProduct field.
@@ -424,7 +424,7 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id int64) (*model.
 			Message: "product service not initialized",
 		}, nil
 	}
-	return r.ProductService.DeleteProduct(id)
+	return r.ProductService.DeleteProduct(ctx, id)
 }
 
 // CreateDiscount is the resolver for the createDiscount field.
@@ -851,7 +851,7 @@ func (r *queryResolver) Products(ctx context.Context, pagination *model.Paginati
 			Message: "product service not initialized",
 		}, nil
 	}
-	return r.ProductService.Products(pagination, isActive, productExtraIds)
+	return r.ProductService.Products(ctx, pagination, isActive, productExtraIds)
 }
 
 // Discounts is the resolver for the discounts field.

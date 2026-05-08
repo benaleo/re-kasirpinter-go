@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/robfig/cron/v3"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -66,6 +67,14 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Initialize Redis
+	if err := config.InitRedis(); err != nil {
+		log.Printf("Warning: Failed to initialize Redis: %v", err)
+	} else {
+		log.Println("Redis initialized successfully")
+	}
+	defer config.CloseRedis()
+
 	// Initialize email queue
 	graph.GetEmailQueue()
 	log.Println("Email queue initialized with background workers")
@@ -115,7 +124,7 @@ func main() {
 	}
 
 	// Initialize product service
-	productService, err := service.NewProductService(db)
+	productService, err := service.NewProductService(db, config.RedisClient)
 	if err != nil {
 		log.Printf("Warning: Failed to initialize product service: %v", err)
 	}
@@ -142,7 +151,29 @@ func main() {
 	}
 
 	// Initialize transaction service
-	transactionService := service.NewTransactionService(db)
+	transactionService := service.NewTransactionService(db, config.RedisClient)
+
+	// Initialize cleanup service
+	cleanupService := service.NewCleanupService(db)
+
+	// Initialize cron scheduler for cleanup jobs
+	cronScheduler := cron.New(cron.WithSeconds())
+
+	// Schedule cleanup of expired active_tokens to run every midnight
+	_, err = cronScheduler.AddFunc("0 0 0 * * *", func() {
+		log.Println("[Cron] Running cleanup of expired active_tokens")
+		if err := cleanupService.CleanupExpiredTokens(); err != nil {
+			log.Printf("[Cron] Error cleaning up expired tokens: %v", err)
+		}
+	})
+	if err != nil {
+		log.Printf("Warning: Failed to schedule cleanup cron job: %v", err)
+	} else {
+		log.Println("Cron scheduler initialized - cleanup job scheduled for midnight")
+	}
+
+	// Start the cron scheduler
+	cronScheduler.Start()
 
 	port := os.Getenv("PORT")
 	if port == "" {
