@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"math"
 	"re-kasirpinter-go/graph/model"
 )
 
@@ -139,8 +140,8 @@ func ToGraphQLIngredientStock(ingredientStockDB model.IngredientStockDB) *model.
 		Code:         ingredientStockDB.Code,
 		Qty:          ingredientStockDB.Qty,
 		Type:         model.IngredientStockType(ingredientStockDB.Type),
-		Capital:      ingredientStockDB.Capital,
-		CapitalItem:  ingredientStockDB.CapitalItem,
+		Capital:      math.Round(ingredientStockDB.Capital*100) / 100,
+		CapitalItem:  math.Round(ingredientStockDB.CapitalItem*100) / 100,
 		Message:      ingredientStockDB.Message,
 		Image:        ingredientStockDB.Image,
 		DeletedAt:    ingredientStockDB.DeletedAt,
