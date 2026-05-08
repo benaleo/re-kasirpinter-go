@@ -939,16 +939,17 @@ type UpdateRoleResponse struct {
 }
 
 type UpdateTransactionInput struct {
-	PaymentMethod *string  `json:"payment_method,omitempty"`
-	TotalAmount   *float64 `json:"total_amount,omitempty"`
-	TotalBilled   *float64 `json:"total_billed,omitempty"`
-	Tax           *float64 `json:"tax,omitempty"`
-	Subtotal      *float64 `json:"subtotal,omitempty"`
-	Discount      *float64 `json:"discount,omitempty"`
-	CustomerID    *string  `json:"customer_id,omitempty"`
-	IsCompleted   *bool    `json:"is_completed,omitempty"`
-	IsCanceled    *bool    `json:"is_canceled,omitempty"`
-	UpdatedBy     *string  `json:"updated_by,omitempty"`
+	PaymentMethod *string                          `json:"payment_method,omitempty"`
+	TotalAmount   *float64                         `json:"total_amount,omitempty"`
+	TotalBilled   *float64                         `json:"total_billed,omitempty"`
+	Tax           *float64                         `json:"tax,omitempty"`
+	Subtotal      *float64                         `json:"subtotal,omitempty"`
+	Discount      *float64                         `json:"discount,omitempty"`
+	CustomerID    *string                          `json:"customer_id,omitempty"`
+	IsCompleted   *bool                            `json:"is_completed,omitempty"`
+	IsCanceled    *bool                            `json:"is_canceled,omitempty"`
+	UpdatedBy     *string                          `json:"updated_by,omitempty"`
+	Products      []*CreateTransactionProductInput `json:"products"`
 }
 
 type UpdateTransactionResponse struct {

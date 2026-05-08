@@ -26085,7 +26085,7 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "is_completed", "is_canceled", "updated_by"}
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "is_completed", "is_canceled", "updated_by", "products"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26162,6 +26162,13 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.UpdatedBy = data
+		case "products":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("products"))
+			data, err := ec.unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Products = data
 		}
 	}
 	return it, nil

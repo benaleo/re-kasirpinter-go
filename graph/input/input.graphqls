@@ -249,6 +249,7 @@ input UpdateTransactionInput {
   is_completed: Boolean
   is_canceled: Boolean
   updated_by: String
+  products: [CreateTransactionProductInput!]!
 }
 
 input CreateTransactionProductInput {

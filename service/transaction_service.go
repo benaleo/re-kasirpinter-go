@@ -312,17 +312,26 @@ func (s *TransactionService) GetTransactionByID(ctx context.Context, secureID st
 
 // UpdateTransaction updates an existing transaction
 func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID string, input model.UpdateTransactionInput) (*model.UpdateTransactionResponse, error) {
+	tx := s.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	var transaction model.TransactionDB
 
 	// Check if transaction exists
-	if err := s.DB.Where("secure_id = ?", secureID).First(&transaction).Error; err != nil {
+	if err := tx.Where("secure_id = ?", secureID).First(&transaction).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
+			tx.Rollback()
 			return &model.UpdateTransactionResponse{
 				Code:    404,
 				Success: false,
 				Message: "Transaction not found",
 			}, nil
 		}
+		tx.Rollback()
 		return &model.UpdateTransactionResponse{
 			Code:    500,
 			Success: false,
@@ -362,11 +371,90 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID str
 		transaction.UpdatedBy = input.UpdatedBy
 	}
 
-	if err := s.DB.Save(&transaction).Error; err != nil {
+	if err := tx.Save(&transaction).Error; err != nil {
+		tx.Rollback()
 		return &model.UpdateTransactionResponse{
 			Code:    500,
 			Success: false,
 			Message: "Failed to update transaction: " + err.Error(),
+		}, err
+	}
+
+	// Remove all existing transaction products and their extras for this transaction
+	if err := tx.Where("transaction_id = ?", transaction.ID).Delete(&model.TransactionExtraDB{}).Error; err != nil {
+		tx.Rollback()
+		return &model.UpdateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to delete transaction extras: " + err.Error(),
+		}, err
+	}
+
+	if err := tx.Where("transaction_id = ?", transaction.ID).Delete(&model.TransactionProductDB{}).Error; err != nil {
+		tx.Rollback()
+		return &model.UpdateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to delete transaction products: " + err.Error(),
+		}, err
+	}
+
+	// Create new transaction products and extras from input
+	for _, productInput := range input.Products {
+		// Create transaction product
+		var attribute string
+		if productInput.Attribute != nil {
+			attribute = *productInput.Attribute
+		}
+
+		product := model.TransactionProductDB{
+			TransactionID: transaction.ID,
+			ProductID:     productInput.ProductID,
+			AvailableType: productInput.AvailableType,
+			VariantType:   productInput.VariantType,
+			Attribute:     attribute,
+			VariantName:   productInput.VariantName,
+			Quantity:      productInput.Quantity,
+			ProductPrice:  productInput.ProductPrice,
+			TotalExtras:   productInput.TotalExtras,
+			TotalPrice:    productInput.TotalPrice,
+			Notes:         productInput.Notes,
+		}
+
+		if err := tx.Create(&product).Error; err != nil {
+			tx.Rollback()
+			return &model.UpdateTransactionResponse{
+				Code:    500,
+				Success: false,
+				Message: "Failed to create transaction product: " + err.Error(),
+			}, err
+		}
+
+		// Create transaction extras
+		for _, extraInput := range productInput.Extras {
+			extra := model.TransactionExtraDB{
+				TransactionProductID: product.ID,
+				ExtraName:            extraInput.ExtraName,
+				Quantity:             extraInput.Quantity,
+				ExtraPrice:           extraInput.ExtraPrice,
+			}
+
+			if err := tx.Create(&extra).Error; err != nil {
+				tx.Rollback()
+				return &model.UpdateTransactionResponse{
+					Code:    500,
+					Success: false,
+					Message: "Failed to create transaction extra: " + err.Error(),
+				}, err
+			}
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return &model.UpdateTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to commit transaction: " + err.Error(),
 		}, err
 	}
 
