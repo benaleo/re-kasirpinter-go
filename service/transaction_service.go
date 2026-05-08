@@ -183,7 +183,7 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 }
 
 // GetTransactions retrieves paginated transactions
-func (s *TransactionService) GetTransactions(ctx context.Context, pagination model.PaginationInput, date *string) (*model.TransactionsResponse, error) {
+func (s *TransactionService) GetTransactions(ctx context.Context, pagination model.PaginationInput, date *string, isCompleted *bool, isCanceled *bool) (*model.TransactionsResponse, error) {
 	var transactions []model.TransactionDB
 	var total int64
 
@@ -200,6 +200,16 @@ func (s *TransactionService) GetTransactions(ctx context.Context, pagination mod
 	// Filter by date if provided
 	if date != nil && *date != "" {
 		query = query.Where("date = ?", *date)
+	}
+
+	// Filter by is_completed if provided
+	if isCompleted != nil {
+		query = query.Where("is_completed = ?", *isCompleted)
+	}
+
+	// Filter by is_canceled if provided
+	if isCanceled != nil {
+		query = query.Where("is_canceled = ?", *isCanceled)
 	}
 
 	// Get total count

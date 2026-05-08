@@ -986,7 +986,7 @@ func (r *queryResolver) ProductExtras(ctx context.Context, pagination *model.Pag
 }
 
 // Transactions is the resolver for the transactions field.
-func (r *queryResolver) Transactions(ctx context.Context, pagination *model.PaginationInput, date *string) (*model.TransactionsResponse, error) {
+func (r *queryResolver) Transactions(ctx context.Context, pagination *model.PaginationInput, date *string, isCompleted *bool, isCanceled *bool) (*model.TransactionsResponse, error) {
 	if r.TransactionService == nil {
 		return &model.TransactionsResponse{
 			Code:    500,
@@ -995,7 +995,7 @@ func (r *queryResolver) Transactions(ctx context.Context, pagination *model.Pagi
 		}, nil
 	}
 
-	return r.TransactionService.GetTransactions(ctx, *pagination, date)
+	return r.TransactionService.GetTransactions(ctx, *pagination, date, isCompleted, isCanceled)
 }
 
 // Transaction is the resolver for the transaction field.

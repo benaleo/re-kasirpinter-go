@@ -112,6 +112,8 @@ type Query {
   transactions(
     pagination: PaginationInput
     date: String
+    is_completed: Boolean
+    is_canceled: Boolean
   ): TransactionsResponse! @auth
   transaction(id: String!): TransactionResponse! @auth
 }

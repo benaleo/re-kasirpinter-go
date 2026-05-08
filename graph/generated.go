@@ -654,7 +654,7 @@ type ComplexityRoot struct {
 		Role                 func(childComplexity int, id int64) int
 		Roles                func(childComplexity int) int
 		Transaction          func(childComplexity int, id string) int
-		Transactions         func(childComplexity int, pagination *model.PaginationInput, date *string) int
+		Transactions         func(childComplexity int, pagination *model.PaginationInput, date *string, isCompleted *bool, isCanceled *bool) int
 		User                 func(childComplexity int, id string) int
 		Users                func(childComplexity int, pagination *model.PaginationInput, isUser *bool) int
 	}
@@ -952,7 +952,7 @@ type QueryResolver interface {
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
 	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
 	ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error)
-	Transactions(ctx context.Context, pagination *model.PaginationInput, date *string) (*model.TransactionsResponse, error)
+	Transactions(ctx context.Context, pagination *model.PaginationInput, date *string, isCompleted *bool, isCanceled *bool) (*model.TransactionsResponse, error)
 	Transaction(ctx context.Context, id string) (*model.TransactionResponse, error)
 }
 
@@ -3768,7 +3768,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Transactions(childComplexity, args["pagination"].(*model.PaginationInput), args["date"].(*string)), true
+		return e.ComplexityRoot.Query.Transactions(childComplexity, args["pagination"].(*model.PaginationInput), args["date"].(*string), args["is_completed"].(*bool), args["is_canceled"].(*bool)), true
 	case "Query.user":
 		if e.ComplexityRoot.Query.User == nil {
 			break
@@ -7285,6 +7285,22 @@ func (ec *executionContext) field_Query_transactions_args(ctx context.Context, r
 		return nil, err
 	}
 	args["date"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "is_completed",
+		func(ctx context.Context, v any) (*bool, error) {
+			return ec.unmarshalOBoolean2ᚖbool(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["is_completed"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "is_canceled",
+		func(ctx context.Context, v any) (*bool, error) {
+			return ec.unmarshalOBoolean2ᚖbool(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["is_canceled"] = arg3
 	return args, nil
 }
 
@@ -19344,7 +19360,7 @@ func (ec *executionContext) _Query_transactions(ctx context.Context, field graph
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Transactions(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["date"].(*string))
+			return ec.Resolvers.Query().Transactions(ctx, fc.Args["pagination"].(*model.PaginationInput), fc.Args["date"].(*string), fc.Args["is_completed"].(*bool), fc.Args["is_canceled"].(*bool))
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			directive0 := next
