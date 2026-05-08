@@ -220,6 +220,7 @@ type IngredientStocksResponse {
   total_stocks: Float
   unit: String
   convert_unit: String
+  convert_calc: Int
   data: [IngredientStock!]!
   pagination: PageInfo
 }
@@ -466,6 +467,7 @@ type IngredientCategory {
   name: String!
   unit: String!
   convert_unit: String
+  convert_calc: Int!
   is_active: Boolean!
   deleted_at: Time
   created_at: Time!

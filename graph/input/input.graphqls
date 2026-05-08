@@ -67,6 +67,7 @@ input CreateIngredientCategoryInput {
   name: String!
   unit: String!
   convert_unit: String
+  convert_calc: Int
   is_active: Boolean!
 }
 
@@ -74,6 +75,7 @@ input UpdateIngredientCategoryInput {
   name: String!
   unit: String!
   convert_unit: String
+  convert_calc: Int
   is_active: Boolean!
 }
 

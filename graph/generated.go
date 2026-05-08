@@ -324,6 +324,7 @@ type ComplexityRoot struct {
 	}
 
 	IngredientCategory struct {
+		ConvertCalc func(childComplexity int) int
 		ConvertUnit func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		DeletedAt   func(childComplexity int) int
@@ -373,6 +374,7 @@ type ComplexityRoot struct {
 
 	IngredientStocksResponse struct {
 		Code           func(childComplexity int) int
+		ConvertCalc    func(childComplexity int) int
 		ConvertUnit    func(childComplexity int) int
 		Data           func(childComplexity int) int
 		IngredientName func(childComplexity int) int
@@ -2020,6 +2022,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.IngredientCategoriesResponse.Success(childComplexity), true
 
+	case "IngredientCategory.convert_calc":
+		if e.ComplexityRoot.IngredientCategory.ConvertCalc == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientCategory.ConvertCalc(childComplexity), true
 	case "IngredientCategory.convert_unit":
 		if e.ComplexityRoot.IngredientCategory.ConvertUnit == nil {
 			break
@@ -2229,6 +2237,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.IngredientStocksResponse.Code(childComplexity), true
+	case "IngredientStocksResponse.convert_calc":
+		if e.ComplexityRoot.IngredientStocksResponse.ConvertCalc == nil {
+			break
+		}
+
+		return e.ComplexityRoot.IngredientStocksResponse.ConvertCalc(childComplexity), true
 	case "IngredientStocksResponse.convert_unit":
 		if e.ComplexityRoot.IngredientStocksResponse.ConvertUnit == nil {
 			break
@@ -5362,6 +5376,8 @@ func (ec *executionContext) childFields_IngredientCategory(ctx context.Context, 
 		return ec.fieldContext_IngredientCategory_unit(ctx, field)
 	case "convert_unit":
 		return ec.fieldContext_IngredientCategory_convert_unit(ctx, field)
+	case "convert_calc":
+		return ec.fieldContext_IngredientCategory_convert_calc(ctx, field)
 	case "is_active":
 		return ec.fieldContext_IngredientCategory_is_active(ctx, field)
 	case "deleted_at":
@@ -5422,6 +5438,8 @@ func (ec *executionContext) childFields_IngredientStocksResponse(ctx context.Con
 		return ec.fieldContext_IngredientStocksResponse_unit(ctx, field)
 	case "convert_unit":
 		return ec.fieldContext_IngredientStocksResponse_convert_unit(ctx, field)
+	case "convert_calc":
+		return ec.fieldContext_IngredientStocksResponse_convert_calc(ctx, field)
 	case "data":
 		return ec.fieldContext_IngredientStocksResponse_data(ctx, field)
 	case "pagination":
@@ -11682,6 +11700,29 @@ func (ec *executionContext) fieldContext_IngredientCategory_convert_unit(_ conte
 	return graphql.NewScalarFieldContext("IngredientCategory", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
+func (ec *executionContext) _IngredientCategory_convert_calc(ctx context.Context, field graphql.CollectedField, obj *model.IngredientCategory) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_IngredientCategory_convert_calc(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ConvertCalc, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v int32) graphql.Marshaler {
+			return ec.marshalNInt2int32(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_IngredientCategory_convert_calc(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("IngredientCategory", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
 func (ec *executionContext) _IngredientCategory_is_active(ctx context.Context, field graphql.CollectedField, obj *model.IngredientCategory) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -12544,6 +12585,29 @@ func (ec *executionContext) _IngredientStocksResponse_convert_unit(ctx context.C
 }
 func (ec *executionContext) fieldContext_IngredientStocksResponse_convert_unit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("IngredientStocksResponse", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _IngredientStocksResponse_convert_calc(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_IngredientStocksResponse_convert_calc(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ConvertCalc, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *int32) graphql.Marshaler {
+			return ec.marshalOInt2ᚖint32(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_IngredientStocksResponse_convert_calc(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("IngredientStocksResponse", field, false, false, errors.New("field of type Int does not have child fields"))
 }
 
 func (ec *executionContext) _IngredientStocksResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.IngredientStocksResponse) (ret graphql.Marshaler) {
@@ -24348,7 +24412,7 @@ func (ec *executionContext) unmarshalInputCreateIngredientCategoryInput(ctx cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "is_active"}
+	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "convert_calc", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -24376,6 +24440,13 @@ func (ec *executionContext) unmarshalInputCreateIngredientCategoryInput(ctx cont
 				return it, err
 			}
 			it.ConvertUnit = data
+		case "convert_calc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("convert_calc"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ConvertCalc = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
@@ -25497,7 +25568,7 @@ func (ec *executionContext) unmarshalInputUpdateIngredientCategoryInput(ctx cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "is_active"}
+	fieldsInOrder := [...]string{"name", "unit", "convert_unit", "convert_calc", "is_active"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25525,6 +25596,13 @@ func (ec *executionContext) unmarshalInputUpdateIngredientCategoryInput(ctx cont
 				return it, err
 			}
 			it.ConvertUnit = data
+		case "convert_calc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("convert_calc"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ConvertCalc = data
 		case "is_active":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_active"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
@@ -28227,6 +28305,11 @@ func (ec *executionContext) _IngredientCategory(ctx context.Context, sel ast.Sel
 			}
 		case "convert_unit":
 			out.Values[i] = ec._IngredientCategory_convert_unit(ctx, field, obj)
+		case "convert_calc":
+			out.Values[i] = ec._IngredientCategory_convert_calc(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "is_active":
 			out.Values[i] = ec._IngredientCategory_is_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -28538,6 +28621,8 @@ func (ec *executionContext) _IngredientStocksResponse(ctx context.Context, sel a
 			out.Values[i] = ec._IngredientStocksResponse_unit(ctx, field, obj)
 		case "convert_unit":
 			out.Values[i] = ec._IngredientStocksResponse_convert_unit(ctx, field, obj)
+		case "convert_calc":
+			out.Values[i] = ec._IngredientStocksResponse_convert_calc(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._IngredientStocksResponse_data(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

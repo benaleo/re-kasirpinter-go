@@ -13,6 +13,14 @@ func Float64FromInt32(v *int32) float64 {
 	return float64(*v)
 }
 
+// Int32FromPtr converts *int32 to int32, returns 0 if nil
+func Int32FromPtr(v *int32) int32 {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+
 // ToGraphQLUser converts UserDB to GraphQL User model
 func ToGraphQLUser(userDB model.UserDB, userRoleDB *model.UserRoleDB) *model.User {
 	user := &model.User{
@@ -74,6 +82,7 @@ func ToGraphQLIngredientCategory(ingredientCategoryDB model.IngredientCategoryDB
 		Name:        ingredientCategoryDB.Name,
 		Unit:        ingredientCategoryDB.Unit,
 		ConvertUnit: ingredientCategoryDB.ConvertUnit,
+		ConvertCalc: ingredientCategoryDB.ConvertCalc,
 		IsActive:    ingredientCategoryDB.IsActive,
 		DeletedAt:   ingredientCategoryDB.DeletedAt,
 		CreatedAt:   ingredientCategoryDB.CreatedAt,

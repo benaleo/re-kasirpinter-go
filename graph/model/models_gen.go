@@ -51,6 +51,7 @@ type CreateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
 	ConvertUnit *string `json:"convert_unit,omitempty"`
+	ConvertCalc *int32  `json:"convert_calc,omitempty"`
 	IsActive    bool    `json:"is_active"`
 }
 
@@ -415,6 +416,7 @@ type IngredientCategory struct {
 	Name        string     `json:"name"`
 	Unit        string     `json:"unit"`
 	ConvertUnit *string    `json:"convert_unit,omitempty"`
+	ConvertCalc int32      `json:"convert_calc"`
 	IsActive    bool       `json:"is_active"`
 	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
@@ -466,6 +468,7 @@ type IngredientStocksResponse struct {
 	TotalStocks    *float64           `json:"total_stocks,omitempty"`
 	Unit           *string            `json:"unit,omitempty"`
 	ConvertUnit    *string            `json:"convert_unit,omitempty"`
+	ConvertCalc    *int32             `json:"convert_calc,omitempty"`
 	Data           []*IngredientStock `json:"data"`
 	Pagination     *PageInfo          `json:"pagination,omitempty"`
 }
@@ -807,6 +810,7 @@ type UpdateIngredientCategoryInput struct {
 	Name        string  `json:"name"`
 	Unit        string  `json:"unit"`
 	ConvertUnit *string `json:"convert_unit,omitempty"`
+	ConvertCalc *int32  `json:"convert_calc,omitempty"`
 	IsActive    bool    `json:"is_active"`
 }
 

@@ -77,6 +77,7 @@ func (s *IngredientStockService) IngredientStocks(pagination *model.PaginationIn
 	var totalStocks *float64
 	var unit *string
 	var convertUnit *string
+	var convertCalc *int32
 
 	if ingredientID != nil {
 		// Query ingredient data separately to ensure it's available even when no stocks exist
@@ -87,11 +88,13 @@ func (s *IngredientStockService) IngredientStocks(pagination *model.PaginationIn
 			name := ingredientDB.Name
 			ingredientName = &name
 
-			// Get unit and convert_unit from ingredient's category
+			// Get unit, convert_unit, and convert_calc from ingredient's category
 			if ingredientDB.Category != nil {
 				u := ingredientDB.Category.Unit
 				unit = &u
 				convertUnit = ingredientDB.Category.ConvertUnit
+				calc := ingredientDB.Category.ConvertCalc
+				convertCalc = &calc
 			}
 		}
 
@@ -113,6 +116,7 @@ func (s *IngredientStockService) IngredientStocks(pagination *model.PaginationIn
 		TotalStocks:    totalStocks,
 		Unit:           unit,
 		ConvertUnit:    convertUnit,
+		ConvertCalc:    convertCalc,
 		Data:           stocks,
 		Pagination:     paginationResult.PageInfo,
 	}, nil
