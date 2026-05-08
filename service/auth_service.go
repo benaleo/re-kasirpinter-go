@@ -30,15 +30,6 @@ type ClientInfo struct {
 	OS      string
 }
 
-type Claims struct {
-	UserID   int32  `json:"user_id"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
-	SecureID string `json:"secure_id"`
-	Purpose  string `json:"purpose"`
-	jwt.RegisteredClaims
-}
-
 // Login handles user authentication
 func (s *AuthService) Login(ctx context.Context, input input.LoginInput, clientInfo *ClientInfo) (*model.AuthResponse, error) {
 	var ip, browser, os *string
@@ -210,7 +201,7 @@ func (s *AuthService) Login(ctx context.Context, input input.LoginInput, clientI
 }
 
 // Logout handles user logout by blacklisting the token
-func (s *AuthService) Logout(ctx context.Context, token string, userClaims *Claims) (*model.LogoutResponse, error) {
+func (s *AuthService) Logout(ctx context.Context, token string, userClaims *helper.Claims) (*model.LogoutResponse, error) {
 	if userClaims == nil {
 		return &model.LogoutResponse{
 			Code:    401,
@@ -437,7 +428,7 @@ func (s *AuthService) VerifyOtp(ctx context.Context, input model.VerifyOtpInput)
 }
 
 // NewPassword updates the user's password
-func (s *AuthService) NewPassword(ctx context.Context, input model.NewPasswordInput, userClaims *Claims) (*model.NewPasswordResponse, error) {
+func (s *AuthService) NewPassword(ctx context.Context, input model.NewPasswordInput, userClaims *helper.Claims) (*model.NewPasswordResponse, error) {
 	if userClaims == nil {
 		return &model.NewPasswordResponse{
 			Code:    401,
@@ -524,7 +515,7 @@ func (s *AuthService) generateJWT(userID int32, email string, role string, secur
 	}
 	expirationTime := time.Now().Add(expiry)
 
-	claims := &Claims{
+	claims := &helper.Claims{
 		UserID:   userID,
 		Email:    email,
 		Role:     role,
@@ -547,9 +538,9 @@ func (s *AuthService) generateJWT(userID int32, email string, role string, secur
 	return tokenString, nil
 }
 
-func (s *AuthService) validateJWT(tokenString string) (*Claims, error) {
+func (s *AuthService) validateJWT(tokenString string) (*helper.Claims, error) {
 	jwtSecret := s.getJWTSecret()
-	claims := &Claims{}
+	claims := &helper.Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil

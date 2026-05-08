@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"os"
 	"re-kasirpinter-go/graph/model"
+	"re-kasirpinter-go/helper"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,15 +16,6 @@ import (
 var (
 	jwtSecret = []byte(getEnv("JWT_SECRET", "your-256-bit-secret"))
 )
-
-type Claims struct {
-	UserID   int32  `json:"user_id"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
-	SecureID string `json:"secure_id"`
-	Purpose  string `json:"purpose"` // "login" or "password_reset"
-	jwt.RegisteredClaims
-}
 
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
@@ -48,7 +40,7 @@ func generateJWT(userID int32, email string, role string, secureID string, purpo
 	}
 	expirationTime := time.Now().Add(expiry)
 
-	claims := &Claims{
+	claims := &helper.Claims{
 		UserID:   userID,
 		Email:    email,
 		Role:     role,
@@ -71,8 +63,8 @@ func generateJWT(userID int32, email string, role string, secureID string, purpo
 	return tokenString, nil
 }
 
-func validateJWT(tokenString string) (*Claims, error) {
-	claims := &Claims{}
+func validateJWT(tokenString string) (*helper.Claims, error) {
+	claims := &helper.Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil

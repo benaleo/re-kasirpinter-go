@@ -492,7 +492,7 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID str
 }
 
 // CancelTransaction cancels a transaction by setting is_canceled to true
-func (s *TransactionService) CancelTransaction(ctx context.Context, secureID string) (*model.UpdateTransactionResponse, error) {
+func (s *TransactionService) CancelTransaction(ctx context.Context, secureID string, userClaims *helper.Claims) (*model.UpdateTransactionResponse, error) {
 	var transaction model.TransactionDB
 
 	// Check if transaction exists
@@ -527,6 +527,11 @@ func (s *TransactionService) CancelTransaction(ctx context.Context, secureID str
 			Success: false,
 			Message: "Transaction is already canceled",
 		}, nil
+	}
+
+	// Set updated_by from user claims
+	if userClaims != nil {
+		transaction.UpdatedBy = &userClaims.SecureID
 	}
 
 	// Cancel transaction

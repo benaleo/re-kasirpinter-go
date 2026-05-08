@@ -12,8 +12,6 @@ import (
 	"re-kasirpinter-go/graph/model"
 	"re-kasirpinter-go/helper"
 	"re-kasirpinter-go/service"
-
-	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 // Login is the resolver for the login field.
@@ -70,22 +68,7 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, e
 	// Get the token from context (set by middleware)
 	token := GetToken(ctx)
 
-	// Convert Claims to service.Claims
-	serviceClaims := &service.Claims{
-		UserID:   userClaims.UserID,
-		Email:    userClaims.Email,
-		Role:     userClaims.Role,
-		SecureID: userClaims.SecureID,
-		Purpose:  userClaims.Purpose,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: userClaims.ExpiresAt,
-			IssuedAt:  userClaims.IssuedAt,
-			NotBefore: userClaims.NotBefore,
-			Issuer:    userClaims.Issuer,
-		},
-	}
-
-	return r.AuthService.Logout(ctx, token, serviceClaims)
+	return r.AuthService.Logout(ctx, token, userClaims)
 }
 
 // RefreshToken is the resolver for the refreshToken field.
@@ -196,22 +179,7 @@ func (r *mutationResolver) NewPassword(ctx context.Context, input model.NewPassw
 		}, nil
 	}
 
-	// Convert Claims to service.Claims
-	serviceClaims := &service.Claims{
-		UserID:   userClaims.UserID,
-		Email:    userClaims.Email,
-		Role:     userClaims.Role,
-		SecureID: userClaims.SecureID,
-		Purpose:  userClaims.Purpose,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: userClaims.ExpiresAt,
-			IssuedAt:  userClaims.IssuedAt,
-			NotBefore: userClaims.NotBefore,
-			Issuer:    userClaims.Issuer,
-		},
-	}
-
-	return r.AuthService.NewPassword(ctx, input, serviceClaims)
+	return r.AuthService.NewPassword(ctx, input, userClaims)
 }
 
 // TestR2Connection is the resolver for the testR2Connection field.
@@ -726,7 +694,10 @@ func (r *mutationResolver) CancelTransaction(ctx context.Context, id string) (*m
 		}, nil
 	}
 
-	return r.TransactionService.CancelTransaction(ctx, id)
+	// Get user claims from context
+	userClaims := ForContext(ctx)
+
+	return r.TransactionService.CancelTransaction(ctx, id, userClaims)
 }
 
 // Users is the resolver for the users field.
