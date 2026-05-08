@@ -38,6 +38,10 @@ func LoadEnv() error {
 	setDefaultEnv("R2_SECRET_ACCESS_KEY", os.Getenv("R2_SECRET_ACCESS_KEY"))
 	setDefaultEnv("R2_BUCKET_NAME", os.Getenv("R2_BUCKET_NAME"))
 	setDefaultEnv("R2_REGION", os.Getenv("R2_REGION"))
+	setDefaultEnv("REDIS_ADDR", os.Getenv("REDIS_ADDR"))
+	setDefaultEnv("REDIS_USERNAME", os.Getenv("REDIS_USERNAME"))
+	setDefaultEnv("REDIS_PASSWORD", os.Getenv("REDIS_PASSWORD"))
+	setDefaultEnv("REDIS_DB", os.Getenv("REDIS_DB"))
 
 	return nil
 }

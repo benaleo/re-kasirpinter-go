@@ -66,6 +66,14 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Initialize Redis
+	if err := config.InitRedis(); err != nil {
+		log.Printf("Warning: Failed to initialize Redis: %v", err)
+	} else {
+		log.Println("Redis initialized successfully")
+	}
+	defer config.CloseRedis()
+
 	// Initialize email queue
 	graph.GetEmailQueue()
 	log.Println("Email queue initialized with background workers")
@@ -142,7 +150,7 @@ func main() {
 	}
 
 	// Initialize transaction service
-	transactionService := service.NewTransactionService(db)
+	transactionService := service.NewTransactionService(db, config.RedisClient)
 
 	port := os.Getenv("PORT")
 	if port == "" {
