@@ -94,6 +94,7 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 		Tax:           input.Tax,
 		Subtotal:      input.Subtotal,
 		Discount:      input.Discount,
+		DiscountCode:  input.DiscountCode,
 		CustomerID:    input.CustomerID,
 		CreatedBy:     input.CreatedBy,
 		IsCompleted:   input.IsCompleted != nil && *input.IsCompleted,
@@ -441,6 +442,9 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID str
 	if input.Discount != nil {
 		transaction.Discount = *input.Discount
 	}
+	if input.DiscountCode != nil {
+		transaction.DiscountCode = input.DiscountCode
+	}
 	if input.CustomerID != nil {
 		transaction.CustomerID = input.CustomerID
 	}
@@ -730,6 +734,7 @@ func (s *TransactionService) convertTransactionDBToGraphQL(tx *model.Transaction
 		Tax:           tx.Tax,
 		Subtotal:      tx.Subtotal,
 		Discount:      tx.Discount,
+		DiscountCode:  tx.DiscountCode,
 		CustomerID:    tx.CustomerID,
 		Customer:      customer,
 		IsCompleted:   tx.IsCompleted,

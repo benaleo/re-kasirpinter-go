@@ -687,6 +687,7 @@ type ComplexityRoot struct {
 		CustomerID    func(childComplexity int) int
 		Date          func(childComplexity int) int
 		Discount      func(childComplexity int) int
+		DiscountCode  func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Invoice       func(childComplexity int) int
 		IsCanceled    func(childComplexity int) int
@@ -3903,6 +3904,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Transaction.Discount(childComplexity), true
+	case "Transaction.discount_code":
+		if e.ComplexityRoot.Transaction.DiscountCode == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.DiscountCode(childComplexity), true
 	case "Transaction.id":
 		if e.ComplexityRoot.Transaction.ID == nil {
 			break
@@ -5828,6 +5835,8 @@ func (ec *executionContext) childFields_Transaction(ctx context.Context, field g
 		return ec.fieldContext_Transaction_subtotal(ctx, field)
 	case "discount":
 		return ec.fieldContext_Transaction_discount(ctx, field)
+	case "discount_code":
+		return ec.fieldContext_Transaction_discount_code(ctx, field)
 	case "customer_id":
 		return ec.fieldContext_Transaction_customer_id(ctx, field)
 	case "customer":
@@ -20081,6 +20090,29 @@ func (ec *executionContext) fieldContext_Transaction_discount(_ context.Context,
 	return graphql.NewScalarFieldContext("Transaction", field, false, false, errors.New("field of type Float does not have child fields"))
 }
 
+func (ec *executionContext) _Transaction_discount_code(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Transaction_discount_code(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.DiscountCode, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Transaction_discount_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Transaction", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
 func (ec *executionContext) _Transaction_customer_id(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -25076,7 +25108,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "created_by", "is_completed", "products"}
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "discount_code", "customer_id", "created_by", "is_completed", "is_canceled", "products"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25125,6 +25157,13 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.Discount = data
+		case "discount_code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount_code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DiscountCode = data
 		case "customer_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customer_id"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -25146,6 +25185,13 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.IsCompleted = data
+		case "is_canceled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_canceled"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsCanceled = data
 		case "products":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("products"))
 			data, err := ec.unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx, v)
@@ -26093,7 +26139,7 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "is_completed", "is_canceled", "updated_by", "products"}
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount_code", "discount", "customer_id", "is_completed", "is_canceled", "updated_by", "products"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26135,6 +26181,13 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.Subtotal = data
+		case "discount_code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount_code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DiscountCode = data
 		case "discount":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount"))
 			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
@@ -31056,6 +31109,8 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "discount_code":
+			out.Values[i] = ec._Transaction_discount_code(ctx, field, obj)
 		case "customer_id":
 			out.Values[i] = ec._Transaction_customer_id(ctx, field, obj)
 		case "customer":

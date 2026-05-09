@@ -218,9 +218,11 @@ type CreateTransactionInput struct {
 	Tax           float64                          `json:"tax"`
 	Subtotal      float64                          `json:"subtotal"`
 	Discount      float64                          `json:"discount"`
+	DiscountCode  *string                          `json:"discount_code,omitempty"`
 	CustomerID    *string                          `json:"customer_id,omitempty"`
 	CreatedBy     *string                          `json:"created_by,omitempty"`
 	IsCompleted   *bool                            `json:"is_completed,omitempty"`
+	IsCanceled    *bool                            `json:"is_canceled,omitempty"`
 	Products      []*CreateTransactionProductInput `json:"products"`
 }
 
@@ -730,6 +732,7 @@ type Transaction struct {
 	Tax           float64               `json:"tax"`
 	Subtotal      float64               `json:"subtotal"`
 	Discount      float64               `json:"discount"`
+	DiscountCode  *string               `json:"discount_code,omitempty"`
 	CustomerID    *string               `json:"customer_id,omitempty"`
 	Customer      *CustomerSearchData   `json:"customer,omitempty"`
 	IsCompleted   bool                  `json:"is_completed"`
@@ -944,6 +947,7 @@ type UpdateTransactionInput struct {
 	TotalBilled   *float64                         `json:"total_billed,omitempty"`
 	Tax           *float64                         `json:"tax,omitempty"`
 	Subtotal      *float64                         `json:"subtotal,omitempty"`
+	DiscountCode  *string                          `json:"discount_code,omitempty"`
 	Discount      *float64                         `json:"discount,omitempty"`
 	CustomerID    *string                          `json:"customer_id,omitempty"`
 	IsCompleted   *bool                            `json:"is_completed,omitempty"`

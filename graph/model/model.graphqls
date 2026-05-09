@@ -673,6 +673,7 @@ type Transaction {
   tax: Float!
   subtotal: Float!
   discount: Float!
+  discount_code: String
   customer_id: String
   customer: CustomerSearchData
   is_completed: Boolean!

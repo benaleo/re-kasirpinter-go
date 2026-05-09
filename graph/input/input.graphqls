@@ -232,6 +232,7 @@ input CreateTransactionInput {
   tax: Float!
   subtotal: Float!
   discount: Float!
+  discount_code: String
   customer_id: String
   created_by: String
   is_completed: Boolean
@@ -245,6 +246,7 @@ input UpdateTransactionInput {
   total_billed: Float
   tax: Float
   subtotal: Float
+  discount_code: String
   discount: Float
   customer_id: String
   is_completed: Boolean
