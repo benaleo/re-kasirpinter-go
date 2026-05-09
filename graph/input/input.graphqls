@@ -235,6 +235,7 @@ input CreateTransactionInput {
   customer_id: String
   created_by: String
   is_completed: Boolean
+  is_canceled: Boolean
   products: [CreateTransactionProductInput!]!
 }
 
