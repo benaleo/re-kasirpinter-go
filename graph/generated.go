@@ -639,7 +639,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		CheckDiscount        func(childComplexity int, code string) int
+		CheckDiscount        func(childComplexity int, code string, totalOrder float64) int
 		CustomerSearch       func(childComplexity int, keyword string) int
 		Discounts            func(childComplexity int, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) int
 		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
@@ -948,7 +948,7 @@ type QueryResolver interface {
 	ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error)
 	Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error)
 	Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error)
-	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
+	CheckDiscount(ctx context.Context, code string, totalOrder float64) (*model.CheckDiscountResponse, error)
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
 	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
 	ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error)
@@ -3612,7 +3612,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.CheckDiscount(childComplexity, args["code"].(string)), true
+		return e.ComplexityRoot.Query.CheckDiscount(childComplexity, args["code"].(string), args["total_order"].(float64)), true
 	case "Query.customerSearch":
 		if e.ComplexityRoot.Query.CustomerSearch == nil {
 			break
@@ -6999,6 +6999,14 @@ func (ec *executionContext) field_Query_checkDiscount_args(ctx context.Context, 
 		return nil, err
 	}
 	args["code"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "total_order",
+		func(ctx context.Context, v any) (float64, error) {
+			return ec.unmarshalNFloat2float64(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["total_order"] = arg1
 	return args, nil
 }
 
@@ -19145,7 +19153,7 @@ func (ec *executionContext) _Query_checkDiscount(ctx context.Context, field grap
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().CheckDiscount(ctx, fc.Args["code"].(string))
+			return ec.Resolvers.Query().CheckDiscount(ctx, fc.Args["code"].(string), fc.Args["total_order"].(float64))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.CheckDiscountResponse) graphql.Marshaler {

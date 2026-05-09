@@ -296,33 +296,42 @@ func (s *DiscountService) DeleteDiscount(id int64) (*model.DeleteDiscountRespons
 	}, nil
 }
 
-func (s *DiscountService) CheckDiscount(code string) (*model.CheckDiscountResponse, error) {
+func (s *DiscountService) CheckDiscount(code string, totalOrder float64) (*model.CheckDiscountResponse, error) {
 	// Find discount by code with validation
 	var discountDB model.DiscountDB
 	now := time.Now()
 
 	result := s.DB.Where("code = ? AND deleted_at IS NULL AND is_active = ?", code, true).First(&discountDB)
 
-	// Check if discount is valid (found, quota available, and within date range)
+	// Check if discount is valid (found, quota available, within date range, and meets min order)
 	isValid := true
+	message := "Invalid discount code"
 	if result.Error != nil {
 		isValid = false
 	}
 	if discountDB.Quota != nil && *discountDB.Quota <= 0 {
 		isValid = false
+		message = "Ups, Kuota sudah habis"
 	}
 	if discountDB.StartAt != nil && now.Before(*discountDB.StartAt) {
 		isValid = false
+		message = "Ups, Discount belum berlaku"
 	}
 	if discountDB.EndAt != nil && now.After(*discountDB.EndAt) {
 		isValid = false
+		message = "Ups, Discount sudah kadaluarsa"
+	}
+	// Check if total order meets minimum order requirement
+	if discountDB.MinOrder != nil && totalOrder < float64(*discountDB.MinOrder) {
+		isValid = false
+		message = "Ups, Transaksi ini belum memenuhi minimal order"
 	}
 
 	if !isValid {
 		return &model.CheckDiscountResponse{
 			Code:    404,
 			Success: false,
-			Message: "invalid discount code",
+			Message: message,
 			Data:    nil,
 		}, nil
 	}

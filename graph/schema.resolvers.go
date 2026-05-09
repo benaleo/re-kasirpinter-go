@@ -867,7 +867,7 @@ func (r *queryResolver) Discounts(ctx context.Context, pagination *model.Paginat
 }
 
 // CheckDiscount is the resolver for the checkDiscount field.
-func (r *queryResolver) CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error) {
+func (r *queryResolver) CheckDiscount(ctx context.Context, code string, totalOrder float64) (*model.CheckDiscountResponse, error) {
 	if r.DiscountService == nil {
 		return &model.CheckDiscountResponse{
 			Code:    500,
@@ -876,7 +876,7 @@ func (r *queryResolver) CheckDiscount(ctx context.Context, code string) (*model.
 			Data:    nil,
 		}, nil
 	}
-	return r.DiscountService.CheckDiscount(code)
+	return r.DiscountService.CheckDiscount(code, totalOrder)
 }
 
 // ProductVariants is the resolver for the productVariants field.
