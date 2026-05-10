@@ -697,6 +697,26 @@ type ProductsResponse struct {
 	Pagination *PageInfo  `json:"pagination,omitempty"`
 }
 
+type QrisTransactionData struct {
+	TransactionID     string `json:"transaction_id"`
+	OrderID           string `json:"order_id"`
+	GrossAmount       string `json:"gross_amount"`
+	Currency          string `json:"currency"`
+	PaymentType       string `json:"payment_type"`
+	TransactionTime   string `json:"transaction_time"`
+	TransactionStatus string `json:"transaction_status"`
+	QRString          string `json:"qr_string"`
+	QRCodeURL         string `json:"qr_code_url"`
+	Acquirer          string `json:"acquirer"`
+}
+
+type QrisTransactionResponse struct {
+	Code    int32                `json:"code"`
+	Success bool                 `json:"success"`
+	Message string               `json:"message"`
+	Data    *QrisTransactionData `json:"data,omitempty"`
+}
+
 type Query struct {
 }
 

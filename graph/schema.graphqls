@@ -226,4 +226,8 @@ type Mutation {
     input: UpdateTransactionInput!
   ): UpdateTransactionResponse! @auth
   cancelTransaction(id: String!): UpdateTransactionResponse! @auth
+  createTransactionQris(
+    id: String!
+    expiry_minutes: Int = 60
+  ): QrisTransactionResponse! @auth
 }

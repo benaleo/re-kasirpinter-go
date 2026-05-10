@@ -749,3 +749,23 @@ type DeleteTransactionResponse {
   message: String!
   data: Transaction
 }
+
+type QrisTransactionData {
+  transaction_id: String!
+  order_id: String!
+  gross_amount: String!
+  currency: String!
+  payment_type: String!
+  transaction_time: String!
+  transaction_status: String!
+  qr_string: String!
+  qr_code_url: String!
+  acquirer: String!
+}
+
+type QrisTransactionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: QrisTransactionData
+}

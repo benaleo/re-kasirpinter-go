@@ -14,14 +14,16 @@ import (
 )
 
 type TransactionService struct {
-	DB    *gorm.DB
-	Redis *redis.Client
+	DB       *gorm.DB
+	Redis    *redis.Client
+	Midtrans *MidtransService
 }
 
 func NewTransactionService(db *gorm.DB, redisClient *redis.Client) *TransactionService {
 	return &TransactionService{
-		DB:    db,
-		Redis: redisClient,
+		DB:       db,
+		Redis:    redisClient,
+		Midtrans: NewMidtransService(),
 	}
 }
 
@@ -167,6 +169,19 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, input model.
 			Success: false,
 			Message: "Failed to commit transaction: " + err.Error(),
 		}, err
+	}
+
+	// Reduce discount quota if transaction is completed and has discount code
+	if transaction.IsCompleted && transaction.DiscountCode != nil {
+		if err := s.reduceDiscountQuota(s.DB, *transaction.DiscountCode); err != nil {
+			// Rollback transaction if discount quota fails
+			tx.Rollback()
+			return &model.CreateTransactionResponse{
+				Code:    400,
+				Success: false,
+				Message: err.Error(),
+			}, err
+		}
 	}
 
 	// Get the complete transaction with relations
@@ -560,6 +575,19 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, secureID str
 		}, err
 	}
 
+	// Reduce discount quota if transaction is completed and has discount code
+	if transaction.IsCompleted && transaction.DiscountCode != nil {
+		if err := s.reduceDiscountQuota(s.DB, *transaction.DiscountCode); err != nil {
+			// Rollback transaction if discount quota fails
+			tx.Rollback()
+			return &model.UpdateTransactionResponse{
+				Code:    400,
+				Success: false,
+				Message: err.Error(),
+			}, err
+		}
+	}
+
 	// Get updated transaction with relations
 	var result model.TransactionDB
 	if err := s.DB.Preload("Customer").Preload("Products.Product").Preload("Products.Extras").Where("secure_id = ?", secureID).First(&result).Error; err != nil {
@@ -747,6 +775,38 @@ func (s *TransactionService) convertTransactionDBToGraphQL(tx *model.Transaction
 	}
 }
 
+// reduceDiscountQuota reduces the quota of a discount by 1
+func (s *TransactionService) reduceDiscountQuota(db *gorm.DB, discountCode string) error {
+	var discount model.DiscountDB
+	if err := db.Where("code = ? AND is_active = ?", discountCode, true).First(&discount).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("discount not found or inactive")
+		}
+		return fmt.Errorf("failed to find discount: %w", err)
+	}
+
+	// Check if quota is null (unlimited) or has available quota
+	if discount.Quota == nil {
+		// Unlimited quota, no need to reduce
+		return nil
+	}
+
+	if *discount.Quota == 0 {
+		return fmt.Errorf("Ups, kuota diskon sudah habis. Gunakan diskon lain atau hapus diskon ini.")
+	}
+
+	if *discount.Quota > 0 {
+		newQuota := *discount.Quota - 1
+		discount.Quota = &newQuota
+		if err := db.Save(&discount).Error; err != nil {
+			return fmt.Errorf("failed to update discount quota: %w", err)
+		}
+		fmt.Printf("[Discount] Reduced quota for code '%s' from %d to %d\n", discountCode, *discount.Quota+1, newQuota)
+	}
+
+	return nil
+}
+
 // evictTransactionCache evicts transaction-related cache entries
 func (s *TransactionService) evictTransactionCache(ctx context.Context, secureID *string) {
 	if s.Redis == nil || secureID == nil {
@@ -766,4 +826,77 @@ func (s *TransactionService) evictTransactionCache(ctx context.Context, secureID
 		count++
 	}
 	fmt.Printf("[Redis] Evicted %d transaction list cache entries\n", count)
+}
+
+// CreateTransactionQris creates a QRIS transaction using Midtrans MPM API
+func (s *TransactionService) CreateTransactionQris(ctx context.Context, invoice string, expiryMinutes int) (*model.QrisTransactionResponse, error) {
+	var transaction model.TransactionDB
+
+	// Get transaction by secure_id
+	if err := s.DB.Where("invoice = ?", invoice).First(&transaction).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &model.QrisTransactionResponse{
+				Code:    404,
+				Success: false,
+				Message: "Transaction not found",
+			}, nil
+		}
+		return &model.QrisTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to retrieve transaction: " + err.Error(),
+		}, err
+	}
+
+	// Check if transaction is already completed
+	if transaction.IsCompleted {
+		return &model.QrisTransactionResponse{
+			Code:    400,
+			Success: false,
+			Message: "Transaction is already completed",
+		}, nil
+	}
+
+	// Check if transaction is canceled
+	if transaction.IsCanceled {
+		return &model.QrisTransactionResponse{
+			Code:    400,
+			Success: false,
+			Message: "Transaction is canceled",
+		}, nil
+	}
+
+	// Create QRIS transaction with Midtrans
+	orderID := transaction.Invoice
+	grossAmount := transaction.TotalAmount
+
+	midtransResponse, err := s.Midtrans.CreateQrisTransaction(orderID, grossAmount, expiryMinutes)
+	if err != nil {
+		return &model.QrisTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "Failed to create QRIS transaction: " + err.Error(),
+		}, err
+	}
+
+	// Get QR code URL
+	qrCodeURL := s.Midtrans.GetQrCodeURL(midtransResponse.TransactionID)
+
+	return &model.QrisTransactionResponse{
+		Code:    200,
+		Success: true,
+		Message: "QRIS transaction created successfully",
+		Data: &model.QrisTransactionData{
+			TransactionID:     midtransResponse.TransactionID,
+			OrderID:           midtransResponse.OrderID,
+			GrossAmount:       midtransResponse.GrossAmount,
+			Currency:          midtransResponse.Currency,
+			PaymentType:       midtransResponse.PaymentType,
+			TransactionTime:   midtransResponse.TransactionTime,
+			TransactionStatus: midtransResponse.TransactionStatus,
+			QRString:          midtransResponse.QrString,
+			QRCodeURL:         qrCodeURL,
+			Acquirer:          midtransResponse.Acquirer,
+		},
+	}, nil
 }

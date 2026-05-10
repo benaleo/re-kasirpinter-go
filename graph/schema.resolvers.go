@@ -700,6 +700,25 @@ func (r *mutationResolver) CancelTransaction(ctx context.Context, id string) (*m
 	return r.TransactionService.CancelTransaction(ctx, id, userClaims)
 }
 
+// CreateTransactionQris is the resolver for the createTransactionQris field.
+func (r *mutationResolver) CreateTransactionQris(ctx context.Context, id string, expiryMinutes *int32) (*model.QrisTransactionResponse, error) {
+	if r.TransactionService == nil {
+		return &model.QrisTransactionResponse{
+			Code:    500,
+			Success: false,
+			Message: "transaction service not initialized",
+		}, nil
+	}
+
+	// Set default expiry minutes if not provided
+	expiry := 60
+	if expiryMinutes != nil {
+		expiry = int(*expiryMinutes)
+	}
+
+	return r.TransactionService.CreateTransactionQris(ctx, id, expiry)
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error) {
 	userService, err := service.NewUserService(r.DB)
