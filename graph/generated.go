@@ -413,6 +413,7 @@ type ComplexityRoot struct {
 		CreateProductVariant     func(childComplexity int, input model.CreateProductVariantInput) int
 		CreateRole               func(childComplexity int, input model.CreateRoleInput) int
 		CreateTransaction        func(childComplexity int, input model.CreateTransactionInput) int
+		CreateTransactionQris    func(childComplexity int, id string, expiryMinutes *int32) int
 		CreateUser               func(childComplexity int, input input.CreateUserInput, isUser *bool) int
 		DeleteDiscount           func(childComplexity int, id int64) int
 		DeleteIngredient         func(childComplexity int, id int64) int
@@ -638,8 +639,28 @@ type ComplexityRoot struct {
 		Success    func(childComplexity int) int
 	}
 
+	QrisTransactionData struct {
+		Acquirer          func(childComplexity int) int
+		Currency          func(childComplexity int) int
+		GrossAmount       func(childComplexity int) int
+		OrderID           func(childComplexity int) int
+		PaymentType       func(childComplexity int) int
+		QRCodeURL         func(childComplexity int) int
+		QRString          func(childComplexity int) int
+		TransactionID     func(childComplexity int) int
+		TransactionStatus func(childComplexity int) int
+		TransactionTime   func(childComplexity int) int
+	}
+
+	QrisTransactionResponse struct {
+		Code    func(childComplexity int) int
+		Data    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
 	Query struct {
-		CheckDiscount        func(childComplexity int, code string) int
+		CheckDiscount        func(childComplexity int, code string, totalOrder float64) int
 		CustomerSearch       func(childComplexity int, keyword string) int
 		Discounts            func(childComplexity int, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) int
 		IngredientCategories func(childComplexity int, pagination *model.PaginationInput, isOptions *bool) int
@@ -687,6 +708,7 @@ type ComplexityRoot struct {
 		CustomerID    func(childComplexity int) int
 		Date          func(childComplexity int) int
 		Discount      func(childComplexity int) int
+		DiscountCode  func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Invoice       func(childComplexity int) int
 		IsCanceled    func(childComplexity int) int
@@ -934,6 +956,7 @@ type MutationResolver interface {
 	CreateTransaction(ctx context.Context, input model.CreateTransactionInput) (*model.CreateTransactionResponse, error)
 	UpdateTransaction(ctx context.Context, id string, input model.UpdateTransactionInput) (*model.UpdateTransactionResponse, error)
 	CancelTransaction(ctx context.Context, id string) (*model.UpdateTransactionResponse, error)
+	CreateTransactionQris(ctx context.Context, id string, expiryMinutes *int32) (*model.QrisTransactionResponse, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context, pagination *model.PaginationInput, isUser *bool) (*model.UsersResponse, error)
@@ -948,7 +971,7 @@ type QueryResolver interface {
 	ProductCategories(ctx context.Context, pagination *model.PaginationInput) (*model.ProductCategoriesResponse, error)
 	Products(ctx context.Context, pagination *model.PaginationInput, isActive *bool, productExtraIds *bool) (*model.ProductsResponse, error)
 	Discounts(ctx context.Context, pagination *model.PaginationInput, isActive *bool, isPeriod *bool, isQuota *bool) (*model.DiscountsResponse, error)
-	CheckDiscount(ctx context.Context, code string) (*model.CheckDiscountResponse, error)
+	CheckDiscount(ctx context.Context, code string, totalOrder float64) (*model.CheckDiscountResponse, error)
 	ProductVariants(ctx context.Context, pagination *model.PaginationInput, productID int64, isActive *bool) (*model.ProductVariantsResponse, error)
 	ProductIngredients(ctx context.Context, pagination *model.PaginationInput, variantID int64) (*model.ProductIngredientsResponse, error)
 	ProductExtras(ctx context.Context, pagination *model.PaginationInput, isActive *bool) (*model.ProductExtrasResponse, error)
@@ -2485,6 +2508,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateTransaction(childComplexity, args["input"].(model.CreateTransactionInput)), true
+	case "Mutation.createTransactionQris":
+		if e.ComplexityRoot.Mutation.CreateTransactionQris == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTransactionQris_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateTransactionQris(childComplexity, args["id"].(string), args["expiry_minutes"].(*int32)), true
 	case "Mutation.createUser":
 		if e.ComplexityRoot.Mutation.CreateUser == nil {
 			break
@@ -3602,6 +3636,92 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.ProductsResponse.Success(childComplexity), true
 
+	case "QrisTransactionData.acquirer":
+		if e.ComplexityRoot.QrisTransactionData.Acquirer == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.Acquirer(childComplexity), true
+	case "QrisTransactionData.currency":
+		if e.ComplexityRoot.QrisTransactionData.Currency == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.Currency(childComplexity), true
+	case "QrisTransactionData.gross_amount":
+		if e.ComplexityRoot.QrisTransactionData.GrossAmount == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.GrossAmount(childComplexity), true
+	case "QrisTransactionData.order_id":
+		if e.ComplexityRoot.QrisTransactionData.OrderID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.OrderID(childComplexity), true
+	case "QrisTransactionData.payment_type":
+		if e.ComplexityRoot.QrisTransactionData.PaymentType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.PaymentType(childComplexity), true
+	case "QrisTransactionData.qr_code_url":
+		if e.ComplexityRoot.QrisTransactionData.QRCodeURL == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.QRCodeURL(childComplexity), true
+	case "QrisTransactionData.qr_string":
+		if e.ComplexityRoot.QrisTransactionData.QRString == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.QRString(childComplexity), true
+	case "QrisTransactionData.transaction_id":
+		if e.ComplexityRoot.QrisTransactionData.TransactionID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.TransactionID(childComplexity), true
+	case "QrisTransactionData.transaction_status":
+		if e.ComplexityRoot.QrisTransactionData.TransactionStatus == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.TransactionStatus(childComplexity), true
+	case "QrisTransactionData.transaction_time":
+		if e.ComplexityRoot.QrisTransactionData.TransactionTime == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionData.TransactionTime(childComplexity), true
+
+	case "QrisTransactionResponse.code":
+		if e.ComplexityRoot.QrisTransactionResponse.Code == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionResponse.Code(childComplexity), true
+	case "QrisTransactionResponse.data":
+		if e.ComplexityRoot.QrisTransactionResponse.Data == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionResponse.Data(childComplexity), true
+	case "QrisTransactionResponse.message":
+		if e.ComplexityRoot.QrisTransactionResponse.Message == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionResponse.Message(childComplexity), true
+	case "QrisTransactionResponse.success":
+		if e.ComplexityRoot.QrisTransactionResponse.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.QrisTransactionResponse.Success(childComplexity), true
+
 	case "Query.checkDiscount":
 		if e.ComplexityRoot.Query.CheckDiscount == nil {
 			break
@@ -3612,7 +3732,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.CheckDiscount(childComplexity, args["code"].(string)), true
+		return e.ComplexityRoot.Query.CheckDiscount(childComplexity, args["code"].(string), args["total_order"].(float64)), true
 	case "Query.customerSearch":
 		if e.ComplexityRoot.Query.CustomerSearch == nil {
 			break
@@ -3903,6 +4023,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Transaction.Discount(childComplexity), true
+	case "Transaction.discount_code":
+		if e.ComplexityRoot.Transaction.DiscountCode == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Transaction.DiscountCode(childComplexity), true
 	case "Transaction.id":
 		if e.ComplexityRoot.Transaction.ID == nil {
 			break
@@ -5764,6 +5890,46 @@ func (ec *executionContext) childFields_ProductsResponse(ctx context.Context, fi
 	return nil, fmt.Errorf("no field named %q was found under type ProductsResponse", field.Name)
 }
 
+func (ec *executionContext) childFields_QrisTransactionData(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "transaction_id":
+		return ec.fieldContext_QrisTransactionData_transaction_id(ctx, field)
+	case "order_id":
+		return ec.fieldContext_QrisTransactionData_order_id(ctx, field)
+	case "gross_amount":
+		return ec.fieldContext_QrisTransactionData_gross_amount(ctx, field)
+	case "currency":
+		return ec.fieldContext_QrisTransactionData_currency(ctx, field)
+	case "payment_type":
+		return ec.fieldContext_QrisTransactionData_payment_type(ctx, field)
+	case "transaction_time":
+		return ec.fieldContext_QrisTransactionData_transaction_time(ctx, field)
+	case "transaction_status":
+		return ec.fieldContext_QrisTransactionData_transaction_status(ctx, field)
+	case "qr_string":
+		return ec.fieldContext_QrisTransactionData_qr_string(ctx, field)
+	case "qr_code_url":
+		return ec.fieldContext_QrisTransactionData_qr_code_url(ctx, field)
+	case "acquirer":
+		return ec.fieldContext_QrisTransactionData_acquirer(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type QrisTransactionData", field.Name)
+}
+
+func (ec *executionContext) childFields_QrisTransactionResponse(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "code":
+		return ec.fieldContext_QrisTransactionResponse_code(ctx, field)
+	case "success":
+		return ec.fieldContext_QrisTransactionResponse_success(ctx, field)
+	case "message":
+		return ec.fieldContext_QrisTransactionResponse_message(ctx, field)
+	case "data":
+		return ec.fieldContext_QrisTransactionResponse_data(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type QrisTransactionResponse", field.Name)
+}
+
 func (ec *executionContext) childFields_RefreshTokenResponse(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 	switch field.Name {
 	case "code":
@@ -5828,6 +5994,8 @@ func (ec *executionContext) childFields_Transaction(ctx context.Context, field g
 		return ec.fieldContext_Transaction_subtotal(ctx, field)
 	case "discount":
 		return ec.fieldContext_Transaction_discount(ctx, field)
+	case "discount_code":
+		return ec.fieldContext_Transaction_discount_code(ctx, field)
 	case "customer_id":
 		return ec.fieldContext_Transaction_customer_id(ctx, field)
 	case "customer":
@@ -6486,6 +6654,28 @@ func (ec *executionContext) field_Mutation_createRole_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createTransactionQris_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "expiry_minutes",
+		func(ctx context.Context, v any) (*int32, error) {
+			return ec.unmarshalOInt2ᚖint32(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["expiry_minutes"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createTransaction_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -6999,6 +7189,14 @@ func (ec *executionContext) field_Query_checkDiscount_args(ctx context.Context, 
 		return nil, err
 	}
 	args["code"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "total_order",
+		func(ctx context.Context, v any) (float64, error) {
+			return ec.unmarshalNFloat2float64(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["total_order"] = arg1
 	return args, nil
 }
 
@@ -15201,6 +15399,63 @@ func (ec *executionContext) fieldContext_Mutation_cancelTransaction(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createTransactionQris(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_createTransactionQris(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CreateTransactionQris(ctx, fc.Args["id"].(string), fc.Args["expiry_minutes"].(*int32))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.Directives.Auth == nil {
+					var zeroVal *model.QrisTransactionResponse
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.Directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		func(ctx context.Context, selections ast.SelectionSet, v *model.QrisTransactionResponse) graphql.Marshaler {
+			return ec.marshalNQrisTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐQrisTransactionResponse(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_createTransactionQris(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_QrisTransactionResponse(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTransactionQris_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _NewPasswordResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.NewPasswordResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -18475,6 +18730,337 @@ func (ec *executionContext) fieldContext_ProductsResponse_pagination(_ context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _QrisTransactionData_transaction_id(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_transaction_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.TransactionID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_transaction_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_order_id(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_order_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.OrderID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_order_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_gross_amount(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_gross_amount(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.GrossAmount, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_gross_amount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_currency(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_currency(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Currency, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_currency(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_payment_type(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_payment_type(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.PaymentType, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_payment_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_transaction_time(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_transaction_time(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.TransactionTime, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_transaction_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_transaction_status(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_transaction_status(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.TransactionStatus, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_transaction_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_qr_string(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_qr_string(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.QRString, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_qr_string(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_qr_code_url(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_qr_code_url(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.QRCodeURL, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_qr_code_url(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionData_acquirer(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionData_acquirer(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Acquirer, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionData_acquirer(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionData", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionResponse_code(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v int32) graphql.Marshaler {
+			return ec.marshalNInt2int32(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionResponse_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionResponse", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionResponse_success(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionResponse", field, false, false, errors.New("field of type Boolean does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionResponse_message(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("QrisTransactionResponse", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _QrisTransactionResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.QrisTransactionResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_QrisTransactionResponse_data(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Data, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.QrisTransactionData) graphql.Marshaler {
+			return ec.marshalOQrisTransactionData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐQrisTransactionData(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_QrisTransactionResponse_data(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QrisTransactionResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_QrisTransactionData(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -19145,7 +19731,7 @@ func (ec *executionContext) _Query_checkDiscount(ctx context.Context, field grap
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().CheckDiscount(ctx, fc.Args["code"].(string))
+			return ec.Resolvers.Query().CheckDiscount(ctx, fc.Args["code"].(string), fc.Args["total_order"].(float64))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.CheckDiscountResponse) graphql.Marshaler {
@@ -20071,6 +20657,29 @@ func (ec *executionContext) _Transaction_discount(ctx context.Context, field gra
 }
 func (ec *executionContext) fieldContext_Transaction_discount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Transaction", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _Transaction_discount_code(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Transaction_discount_code(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.DiscountCode, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Transaction_discount_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Transaction", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) _Transaction_customer_id(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
@@ -25068,7 +25677,7 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "created_by", "is_completed", "products"}
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "discount_code", "customer_id", "created_by", "is_completed", "is_canceled", "products"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25117,6 +25726,13 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.Discount = data
+		case "discount_code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount_code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DiscountCode = data
 		case "customer_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customer_id"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -25138,6 +25754,13 @@ func (ec *executionContext) unmarshalInputCreateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.IsCompleted = data
+		case "is_canceled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_canceled"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsCanceled = data
 		case "products":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("products"))
 			data, err := ec.unmarshalNCreateTransactionProductInput2ᚕᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐCreateTransactionProductInputᚄ(ctx, v)
@@ -26085,7 +26708,7 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount", "customer_id", "is_completed", "is_canceled", "updated_by", "products"}
+	fieldsInOrder := [...]string{"payment_method", "total_amount", "total_billed", "tax", "subtotal", "discount_code", "discount", "customer_id", "is_completed", "is_canceled", "updated_by", "products"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -26127,6 +26750,13 @@ func (ec *executionContext) unmarshalInputUpdateTransactionInput(ctx context.Con
 				return it, err
 			}
 			it.Subtotal = data
+		case "discount_code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount_code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DiscountCode = data
 		case "discount":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("discount"))
 			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
@@ -29101,6 +29731,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createTransactionQris":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTransactionQris(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -30385,6 +31022,141 @@ func (ec *executionContext) _ProductsResponse(ctx context.Context, sel ast.Selec
 	return out
 }
 
+var qrisTransactionDataImplementors = []string{"QrisTransactionData"}
+
+func (ec *executionContext) _QrisTransactionData(ctx context.Context, sel ast.SelectionSet, obj *model.QrisTransactionData) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, qrisTransactionDataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("QrisTransactionData")
+		case "transaction_id":
+			out.Values[i] = ec._QrisTransactionData_transaction_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "order_id":
+			out.Values[i] = ec._QrisTransactionData_order_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "gross_amount":
+			out.Values[i] = ec._QrisTransactionData_gross_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "currency":
+			out.Values[i] = ec._QrisTransactionData_currency(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "payment_type":
+			out.Values[i] = ec._QrisTransactionData_payment_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "transaction_time":
+			out.Values[i] = ec._QrisTransactionData_transaction_time(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "transaction_status":
+			out.Values[i] = ec._QrisTransactionData_transaction_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "qr_string":
+			out.Values[i] = ec._QrisTransactionData_qr_string(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "qr_code_url":
+			out.Values[i] = ec._QrisTransactionData_qr_code_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "acquirer":
+			out.Values[i] = ec._QrisTransactionData_acquirer(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var qrisTransactionResponseImplementors = []string{"QrisTransactionResponse"}
+
+func (ec *executionContext) _QrisTransactionResponse(ctx context.Context, sel ast.SelectionSet, obj *model.QrisTransactionResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, qrisTransactionResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("QrisTransactionResponse")
+		case "code":
+			out.Values[i] = ec._QrisTransactionResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "success":
+			out.Values[i] = ec._QrisTransactionResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._QrisTransactionResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "data":
+			out.Values[i] = ec._QrisTransactionResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -31048,6 +31820,8 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "discount_code":
+			out.Values[i] = ec._Transaction_discount_code(ctx, field, obj)
 		case "customer_id":
 			out.Values[i] = ec._Transaction_customer_id(ctx, field, obj)
 		case "customer":
@@ -33845,6 +34619,20 @@ func (ec *executionContext) marshalNProductsResponse2ᚖreᚑkasirpinterᚑgoᚋ
 	return ec._ProductsResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNQrisTransactionResponse2reᚑkasirpinterᚑgoᚋgraphᚋmodelᚐQrisTransactionResponse(ctx context.Context, sel ast.SelectionSet, v model.QrisTransactionResponse) graphql.Marshaler {
+	return ec._QrisTransactionResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNQrisTransactionResponse2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐQrisTransactionResponse(ctx context.Context, sel ast.SelectionSet, v *model.QrisTransactionResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._QrisTransactionResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNRefreshTokenInput2reᚑkasirpinterᚑgoᚋgraphᚋinputᚐRefreshTokenInput(ctx context.Context, v any) (input.RefreshTokenInput, error) {
 	res, err := ec.unmarshalInputRefreshTokenInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -34822,6 +35610,13 @@ func (ec *executionContext) marshalOProductVariant2ᚖreᚑkasirpinterᚑgoᚋgr
 		return graphql.Null
 	}
 	return ec._ProductVariant(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOQrisTransactionData2ᚖreᚑkasirpinterᚑgoᚋgraphᚋmodelᚐQrisTransactionData(ctx context.Context, sel ast.SelectionSet, v *model.QrisTransactionData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._QrisTransactionData(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v any) (string, error) {

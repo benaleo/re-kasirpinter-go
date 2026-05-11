@@ -673,6 +673,7 @@ type Transaction {
   tax: Float!
   subtotal: Float!
   discount: Float!
+  discount_code: String
   customer_id: String
   customer: CustomerSearchData
   is_completed: Boolean!
@@ -747,4 +748,24 @@ type DeleteTransactionResponse {
   success: Boolean!
   message: String!
   data: Transaction
+}
+
+type QrisTransactionData {
+  transaction_id: String!
+  order_id: String!
+  gross_amount: String!
+  currency: String!
+  payment_type: String!
+  transaction_time: String!
+  transaction_status: String!
+  qr_string: String!
+  qr_code_url: String!
+  acquirer: String!
+}
+
+type QrisTransactionResponse {
+  code: Int!
+  success: Boolean!
+  message: String!
+  data: QrisTransactionData
 }

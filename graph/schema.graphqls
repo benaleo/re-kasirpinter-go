@@ -90,7 +90,7 @@ type Query {
     is_period: Boolean
     is_quota: Boolean
   ): DiscountsResponse! @auth
-  checkDiscount(code: String!): CheckDiscountResponse!
+  checkDiscount(code: String!, total_order: Float!): CheckDiscountResponse!
   #product variant
   productVariants(
     pagination: PaginationInput
@@ -226,4 +226,8 @@ type Mutation {
     input: UpdateTransactionInput!
   ): UpdateTransactionResponse! @auth
   cancelTransaction(id: String!): UpdateTransactionResponse! @auth
+  createTransactionQris(
+    id: String!
+    expiry_minutes: Int = 60
+  ): QrisTransactionResponse! @auth
 }

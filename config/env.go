@@ -42,6 +42,9 @@ func LoadEnv() error {
 	setDefaultEnv("REDIS_USERNAME", os.Getenv("REDIS_USERNAME"))
 	setDefaultEnv("REDIS_PASSWORD", os.Getenv("REDIS_PASSWORD"))
 	setDefaultEnv("REDIS_DB", os.Getenv("REDIS_DB"))
+	setDefaultEnv("MERCHANT_ID", os.Getenv("MERCHANT_ID"))
+	setDefaultEnv("MERCHANT_CLIENT_KEY", os.Getenv("MERCHANT_CLIENT_KEY"))
+	setDefaultEnv("MERCHANT_SERVER_KEY", os.Getenv("MERCHANT_SERVER_KEY"))
 
 	return nil
 }

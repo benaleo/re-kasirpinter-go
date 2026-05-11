@@ -609,6 +609,7 @@ type TransactionDB struct {
 	Tax           float64   `gorm:"default:0" json:"tax"`
 	Subtotal      float64   `gorm:"not null" json:"subtotal"`
 	Discount      float64   `gorm:"default:0" json:"discount"`
+	DiscountCode  *string   `json:"discount_code,omitempty"`
 	CustomerID    *string   `gorm:"index" json:"customer_id,omitempty"`
 	IsCompleted   bool      `gorm:"default:false" json:"is_completed"`
 	IsCanceled    bool      `gorm:"default:false" json:"is_canceled"`

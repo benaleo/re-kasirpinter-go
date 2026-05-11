@@ -13,6 +13,8 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/redis/go-redis/v9 v9.19.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/vektah/gqlparser/v2 v2.5.33
 	golang.org/x/crypto v0.50.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
@@ -48,8 +50,6 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/redis/go-redis/v9 v9.19.0 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sosodev/duration v1.4.0 // indirect
 	github.com/urfave/cli/v3 v3.8.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect

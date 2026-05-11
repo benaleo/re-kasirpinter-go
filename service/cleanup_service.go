@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
+	"re-kasirpinter-go/graph/model"
 	"time"
 
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func NewCleanupService(db *gorm.DB) *CleanupService {
 
 // CleanupExpiredTokens removes expired active_tokens from the database
 func (s *CleanupService) CleanupExpiredTokens() error {
-	result := s.DB.Where("expires_at < ?", time.Now()).Delete(&struct{}{})
+	result := s.DB.Where("expires_at < ?", time.Now()).Delete(&model.ActiveTokenDB{})
 	if result.Error != nil {
 		return fmt.Errorf("failed to cleanup expired tokens: %w", result.Error)
 	}
